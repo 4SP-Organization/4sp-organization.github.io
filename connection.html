@@ -16,7 +16,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
-        // Silence noisy extension/COOP warnings
+        // Silence noisy extension and COOP warnings
         (function() {
             const oE = console.error; const oW = console.warn;
             console.error = (...a) => { if (a[0]?.includes?.('browser-polyfill') || a[0]?.includes?.('object Object')) return; oE.apply(console, a); };
@@ -24,15 +24,15 @@
         })();
 
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        'custom-darkest': '#040404',
-                        'custom-dark': '#111111',
-                        'custom-medium': '#252525',
-                        'custom-light': '#505050',
-                        'custom-lighter': '#808080',
+                        'custom-darkest-gray': '#040404',
+                        'custom-dark-gray': '#111111',
+                        'custom-medium-gray': '#252525',
+                        'custom-light-gray': '#505050',
+                        'custom-lighter-gray': '#808080',
+                        'custom-white-gray': '#c0c0c0',
                     }
                 }
             }
@@ -40,105 +40,172 @@
     </script>
 
     <style>
-        body { font-family: 'Geist', sans-serif; background-color: #000000; color: white; }
-        .glass-box { background-color: #111111; border: 1px solid #252525; border-radius: 1.5rem; }
-        .input-field { background-color: #0c0c0c; border: 1px solid #252525; color: white; border-radius: 0.75rem; width: 100%; padding: 0.75rem 1rem; transition: border-color 0.2s; }
-        .input-field:focus { border-color: #0070f3; outline: none; }
-        .btn-provider { background-color: #181818; border: 1px solid #252525; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 0.75rem; border-radius: 0.75rem; width: 100%; }
-        .btn-provider:hover { background-color: #252525; transform: translateY(-1px); }
-        .btn-primary { background-image: linear-gradient(90deg, #0070f3, #f81ce5); border-radius: 0.75rem; padding: 0.75rem; font-weight: 500; text-align: center; width: 100%; transition: opacity 0.2s; }
-        .btn-primary:hover { opacity: 0.9; }
-        .btn-dv-download { background: rgba(147, 51, 234, 0.1); border: 1px solid rgba(192, 132, 252, 0.3); color: #c084fc; border-radius: 0.75rem; padding: 1rem; text-align: center; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem; transition: all 0.2s; }
-        .btn-dv-download:hover { background: rgba(147, 51, 234, 0.2); border-color: rgba(192, 132, 252, 1); color: white; }
+        body { font-family: 'Geist', sans-serif; background-color: #040404; color: #c0c0c0; font-weight: 300; }
+        h1, h2, h3, .font-bold { font-weight: 400 !important; }
+        
+        /* Auth Layout Styles from authentication.html */
+        .auth-split-container { max-width: 1200px; margin: 0 auto; width: 100%; }
+        @media (max-width: 767px) { .right-col { display: none; } }
+
+        .input-field { 
+            background-color: #111111; border: 1px solid #252525; color: white; border-radius: 0.75rem; 
+            width: 100%; padding: 0.75rem 1rem; transition: border-color 0.2s; 
+        }
+        .input-field:focus { border-color: #505050; outline: none; }
+        
+        .btn-social { 
+            transition: all 0.3s ease; background-color: #111111; border: 1px solid #252525; 
+            display: flex; align-items: center; justify-content: center; width: 100%; padding: 0.75rem; border-radius: 0.75rem;
+        }
+        .btn-social:hover { background-color: rgba(37, 37, 37, 0.7); border-color: #383838; }
+
+        .btn-auth-action {
+            width: 100%; padding: 0.75rem; font-size: 1.125rem; border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2); background-color: rgba(255, 255, 255, 0.05);
+            color: white; transition: all 0.2s;
+        }
+        .btn-auth-action:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+        .btn-dv-download {
+            background: linear-gradient(90deg, #0070f3, #f81ce5); border-radius: 0.75rem;
+            padding: 1rem; color: white; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+        }
+
+        .message-area { min-height: 24px; font-size: 0.875rem; text-align: center; margin-top: 1rem; }
+        .error-message { color: #f87171; }
+        .success-message { color: #4ade80; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
     <div id="navbar-container"></div>
 
-    <main class="flex-grow flex items-center justify-center p-6 mt-12">
-        <div class="max-w-md w-full glass-box p-8 space-y-6">
+    <main class="flex-grow flex items-center justify-center p-0 md:p-6">
+        
+        <div id="auth-interface" class="auth-split-container flex flex-wrap w-full overflow-hidden">
             
-            <div class="text-center space-y-2">
-                <h1 class="text-3xl font-light tracking-tight">4SP - CONNECT</h1>
-                <p class="text-custom-lighter text-sm font-light">Link your local client to the 4SP Database.</p>
-            </div>
-
-            <div id="auth-panel" class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <button id="googleBtn" class="btn-provider"><i class="fab fa-google"></i></button>
-                    <button id="githubBtn" class="btn-provider"><i class="fab fa-github"></i></button>
-                    <button id="microsoftBtn" class="btn-provider"><i class="fab fa-microsoft"></i></button>
-                    <button id="twitterBtn" class="btn-provider"><i class="fab fa-x-twitter"></i></button>
-                </div>
-
-                <div class="relative py-2">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-custom-medium"></div></div>
-                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-custom-dark px-2 text-custom-light">OR EMAIL</span></div>
-                </div>
-
-                <div class="space-y-3">
-                    <input type="email" id="email" placeholder="Email Address" class="input-field">
-                    <input type="password" id="password" placeholder="Password" class="input-field">
-                    <button id="loginBtn" class="btn-primary">Connect Account</button>
-                </div>
+            <div class="flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray min-w-[300px]">
                 
-                <p class="text-center text-xs text-custom-light">
-                    No account? <button id="showRegister" class="text-purple-400 hover:underline">Create a 4SP ID</button>
-                </p>
-            </div>
-
-            <div id="register-panel" class="hidden space-y-4">
-                <h2 class="text-xl font-light text-center">New Organization ID</h2>
-                <input type="text" id="reg-username" placeholder="Choose a Username" class="input-field">
-                <input type="email" id="reg-email" placeholder="Email Address" class="input-field">
-                <input type="password" id="reg-password" placeholder="Create Password" class="input-field">
-                <button id="doRegister" class="btn-primary">Create and Connect</button>
-                <button id="backToLogin" class="w-full text-xs text-custom-light hover:text-white">Back to connection</button>
-            </div>
-
-            <div id="connected-panel" class="hidden space-y-6">
-                <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-custom-medium">
-                    <div id="u-avatar" class="w-14 h-14 rounded-full bg-custom-medium flex items-center justify-center overflow-hidden text-xl"></div>
-                    <div>
-                        <h2 id="u-name" class="font-medium">User</h2>
-                        <p id="u-email" class="text-xs text-custom-lighter"></p>
+                <div id="login-view" class="w-full max-w-md space-y-6">
+                    <h2 class="text-3xl text-center tracking-tighter">Connect to 4SP</h2>
+                    <div class="space-y-4">
+                        <input type="email" id="loginEmail" placeholder="Email" class="input-field">
+                        <input type="password" id="loginPassword" placeholder="Password" class="input-field">
+                        <button id="doLogin" class="btn-auth-action">LOGIN</button>
+                    </div>
+                    <div class="text-center space-y-2">
+                        <button id="gotoReset" class="text-sm text-white hover:underline">Forgot Password?</button>
+                        <p class="text-sm text-custom-light-gray">
+                            Need an account? <button id="gotoUsername" class="text-white hover:underline">Create 4SP ID</button>
+                        </p>
                     </div>
                 </div>
 
-                <div class="space-y-3">
-                    <label class="text-[10px] uppercase tracking-widest text-custom-light font-bold">Local Client</label>
-                    <a href="../4simpleproblems_dv.html" class="btn-dv-download">
-                        <i class="fas fa-cloud-arrow-down"></i> Download 4SP DV Client
-                    </a>
+                <div id="username-view" class="hidden w-full max-w-md space-y-6">
+                    <h2 class="text-3xl text-center tracking-tighter">Choose Username</h2>
+                    <div class="space-y-4">
+                        <input type="text" id="regUsername" placeholder="Username (6-24 chars)" class="input-field">
+                        <button id="doNext" class="btn-auth-action">NEXT</button>
+                    </div>
+                    <button id="backToLoginFromUser" class="w-full text-sm text-custom-light-gray hover:text-white">← Back to Login</button>
                 </div>
 
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <label class="text-[10px] uppercase tracking-widest text-custom-light font-bold">Access Code</label>
-                        <span class="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded uppercase font-bold">Connected</span>
+                <div id="signup-view" class="hidden w-full max-w-md space-y-6">
+                    <h2 class="text-3xl text-center tracking-tighter">Set Credentials</h2>
+                    <div class="space-y-4">
+                        <input type="email" id="regEmail" placeholder="Email Address" class="input-field">
+                        <input type="password" id="regPassword" placeholder="Create Password" class="input-field">
+                        <button id="doSignup" class="btn-auth-action">CREATE ACCOUNT</button>
                     </div>
-                    <div class="flex items-center justify-between bg-custom-darkest rounded-xl p-4 border border-custom-medium">
-                        <span id="current-code" class="font-mono text-purple-400">Loading...</span>
-                        <div class="flex gap-1 text-custom-light">
-                            <button id="copyCode" class="p-2 hover:text-white"><i class="fas fa-copy"></i></button>
-                            <button id="genCode" class="p-2 hover:text-white"><i class="fas fa-sync-alt"></i></button>
-                        </div>
-                    </div>
+                    <button id="backToUser" class="w-full text-sm text-custom-light-gray hover:text-white">← Back to Username</button>
                 </div>
 
-                <button id="logoutBtn" class="w-full border border-red-900/20 text-red-500/80 hover:bg-red-900/20 py-3 rounded-xl transition text-sm">Disconnect</button>
+                <div id="reset-view" class="hidden w-full max-w-md space-y-6">
+                    <h2 class="text-3xl text-center tracking-tighter">Reset Password</h2>
+                    <input type="email" id="resetEmail" placeholder="Enter registered email" class="input-field">
+                    <button id="doReset" class="btn-auth-action">SEND LINK</button>
+                    <button id="backToLoginFromReset" class="w-full text-sm text-custom-light-gray hover:text-white">← Back to Login</button>
+                </div>
+
+                <div id="auth-msg" class="message-area"></div>
             </div>
 
-            <div id="status-msg" class="text-center text-xs font-light"></div>
+            <div class="right-col flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray border-l border-custom-medium-gray">
+                <div class="w-full max-w-sm space-y-6">
+                    <div class="text-center">
+                        <h2 class="text-3xl tracking-tighter mb-2">Continue instantly</h2>
+                        <p class="text-custom-light-gray text-sm">Use a trusted provider to connect in one click.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button id="googleAuth" class="btn-social"><img src="images/google-icon.png" class="w-5 h-5 mr-3"> Google</button>
+                        <button id="microsoftAuth" class="btn-social"><img src="images/microsoft.png" class="w-5 h-5 mr-3"> Microsoft</button>
+                        <button id="githubAuth" class="btn-social"><img src="images/github-mark-white.png" class="w-5 h-5 mr-3"> GitHub</button>
+                        <button id="twitterAuth" class="btn-social"><img src="../images/x.png" class="w-5 h-5 mr-3"> X / Twitter</button>
+                    </div>
+
+                    <p class="text-[10px] italic text-custom-light-gray text-center leading-relaxed">
+                        By connecting, you agree to our 
+                        <a href="legal.html" class="text-white hover:underline">Terms of Service</a>.
+                    </p>
+                </div>
+            </div>
         </div>
+
+        <div id="connected-interface" class="hidden w-full max-w-lg p-8 bg-custom-dark-gray border border-custom-medium-gray rounded-3xl space-y-8">
+            <div class="text-center space-y-2">
+                <h1 class="text-3xl tracking-tighter">4SP - CONNECT</h1>
+                <p class="text-custom-lighter-gray text-sm">Your local client is ready to sync.</p>
+            </div>
+
+            <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-custom-medium-gray">
+                <div id="u-avatar" class="w-14 h-14 rounded-full bg-custom-medium-gray flex items-center justify-center overflow-hidden"></div>
+                <div>
+                    <h2 id="u-name" class="font-medium text-white">Member</h2>
+                    <p id="u-email" class="text-xs text-custom-lighter-gray"></p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <label class="text-[10px] uppercase tracking-widest text-custom-light-gray font-bold">Step 1: Get the Client</label>
+                <a href="../4simpleproblems-version-5.html" class="btn-dv-download">
+                    <i class="fas fa-download"></i> Download 4SP DV Client
+                </a>
+            </div>
+
+            <div class="space-y-3">
+                <label class="text-[10px] uppercase tracking-widest text-custom-light-gray font-bold">Step 2: Use Access Code</label>
+                <div class="flex items-center justify-between bg-custom-darkest-gray rounded-xl p-4 border border-custom-medium-gray">
+                    <span id="current-code" class="font-mono text-purple-400 text-lg">Loading...</span>
+                    <div class="flex gap-1">
+                        <button id="copyCode" class="p-2 hover:text-white"><i class="fas fa-copy"></i></button>
+                        <button id="genCode" class="p-2 hover:text-white"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                </div>
+                <p class="text-[10px] text-custom-light-gray text-center">Paste this code into your local DV client to link your account.</p>
+            </div>
+
+            <button id="logoutBtn" class="w-full text-xs text-red-500/60 hover:text-red-400 transition">Disconnect Account</button>
+        </div>
+
     </main>
+
+    <footer class="py-8 border-t border-custom-medium-gray/30">
+        <div class="text-center text-xs text-custom-light-gray">
+            &copy; 2025 4simpleproblems (4SP). Database Connectivity Hub.
+        </div>
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, TwitterAuthProvider, OAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { 
+            getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, 
+            TwitterAuthProvider, OAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+            sendEmailVerification, sendPasswordResetEmail, signOut 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAZBKAckVa4IMvJGjcyndZx6Y1XD52lgro",
             authDomain: "project-zirconium.firebaseapp.com",
@@ -152,112 +219,132 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const panels = {
-            auth: document.getElementById('auth-panel'),
-            reg: document.getElementById('register-panel'),
-            connected: document.getElementById('connected-panel')
-        };
+        let selectedUsername = "";
+        const views = ['login-view', 'username-view', 'signup-view', 'reset-view'];
 
-        function showStatus(txt, isError = false) {
-            const msg = document.getElementById('status-msg');
-            msg.textContent = txt;
-            msg.className = `text-center text-xs font-light ${isError ? 'text-red-400' : 'text-purple-400'}`;
+        function showView(target) {
+            views.forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(target).classList.remove('hidden');
+            document.getElementById('auth-msg').innerHTML = "";
         }
 
+        function showStatus(txt, type = 'error') {
+            const msg = document.getElementById('auth-msg');
+            msg.innerHTML = txt;
+            msg.className = `message-area ${type}-message`;
+        }
+
+        // --- AUTH OBSERVER ---
         onAuthStateChanged(auth, async (user) => {
+            const authDiv = document.getElementById('auth-interface');
+            const connectDiv = document.getElementById('connected-interface');
+
             if (user) {
-                // Ensure record exists in DB
+                // Verification Guard
+                const isSocial = user.providerData.some(p => p.providerId !== 'password');
+                if (!user.emailVerified && !isSocial) {
+                    showStatus(`Please verify your email to continue. <button id="resend" class="underline text-white">Resend Link</button>`, 'error');
+                    document.getElementById('resend').onclick = () => sendEmailVerification(user).then(() => showStatus("Verification link sent!", "success"));
+                    authDiv.classList.remove('hidden');
+                    connectDiv.classList.add('hidden');
+                    return;
+                }
+
+                // Check for Firestore Profile
                 const userRef = doc(db, "users", user.uid);
                 const snap = await getDoc(userRef);
 
                 if (!snap.exists()) {
-                    // New user from Social Login without a DB record - redirect to registration style username prompt
-                    panels.auth.classList.add('hidden');
-                    panels.reg.classList.remove('hidden');
-                    document.getElementById('reg-email').value = user.email;
-                    document.getElementById('reg-email').disabled = true;
-                    showStatus("Please complete your profile.");
+                    // Social user without profile - redirect to username step
+                    showView('username-view');
+                    authDiv.classList.remove('hidden');
+                    connectDiv.classList.add('hidden');
                     return;
                 }
 
-                // Show Dashboard
-                panels.auth.classList.add('hidden');
-                panels.reg.classList.add('hidden');
-                panels.connected.classList.remove('hidden');
+                // SUCCESS: User is logged in, verified, and has a profile
+                authDiv.classList.add('hidden');
+                connectDiv.classList.remove('hidden');
 
-                document.getElementById('u-name').textContent = snap.data().username || user.displayName || 'Member';
+                document.getElementById('u-name').textContent = snap.data().username || 'Member';
                 document.getElementById('u-email').textContent = user.email;
                 const avatar = document.getElementById('u-avatar');
-                avatar.innerHTML = user.photoURL ? `<img src="${user.photoURL}" class="w-full h-full object-cover">` : `<i class="fas fa-user text-custom-light"></i>`;
+                avatar.innerHTML = user.photoURL ? `<img src="${user.photoURL}" class="w-full h-full object-cover">` : `<i class="fas fa-user text-2xl text-custom-light-gray"></i>`;
 
                 onSnapshot(userRef, (d) => {
                     document.getElementById('current-code').textContent = d.data()?.code || 'None';
                 });
 
             } else {
-                panels.connected.classList.add('hidden');
-                panels.auth.classList.remove('hidden');
+                authDiv.classList.remove('hidden');
+                connectDiv.classList.add('hidden');
+                showView('login-view');
             }
         });
 
-        // Provider Auth
-        async function popAuth(provider) {
-            try { await signInWithPopup(auth, provider); } catch(e) { showStatus(e.message, true); }
-        }
-
-        document.getElementById('googleBtn').onclick = () => popAuth(new GoogleAuthProvider());
-        document.getElementById('githubBtn').onclick = () => popAuth(new GithubAuthProvider());
-        document.getElementById('twitterBtn').onclick = () => popAuth(new TwitterAuthProvider());
-        document.getElementById('microsoftBtn').onclick = () => popAuth(new OAuthProvider('microsoft.com'));
-
-        // Email Auth
-        document.getElementById('loginBtn').onclick = async () => {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
-            try { await signInWithEmailAndPassword(auth, e, p); } catch(e) { showStatus("Check credentials.", true); }
+        // --- HANDLERS ---
+        document.getElementById('doLogin').onclick = () => {
+            const e = document.getElementById('loginEmail').value;
+            const p = document.getElementById('loginPassword').value;
+            signInWithEmailAndPassword(auth, e, p).catch(err => showStatus("Invalid email or password."));
         };
 
-        // Registration
-        document.getElementById('doRegister').onclick = async () => {
-            const user = auth.currentUser;
-            const username = document.getElementById('reg-username').value;
-            
-            if (username.length < 3) return showStatus("Username too short", true);
+        document.getElementById('doNext').onclick = () => {
+            const u = document.getElementById('regUsername').value.trim();
+            if (u.length < 6) return showStatus("Username must be at least 6 characters.");
+            selectedUsername = u;
+            showView('signup-view');
+        };
 
+        document.getElementById('doSignup').onclick = async () => {
+            const e = document.getElementById('regEmail').value;
+            const p = document.getElementById('regPassword').value;
             try {
-                let uid = user?.uid;
-                if (!user) {
-                    const e = document.getElementById('reg-email').value;
-                    const p = document.getElementById('reg-password').value;
-                    const cred = await createUserWithEmailAndPassword(auth, e, p);
-                    uid = cred.user.uid;
-                    await sendEmailVerification(cred.user);
-                }
-                
-                await setDoc(doc(db, "users", uid), {
-                    username: username,
-                    email: user?.email || document.getElementById('reg-email').value,
+                const cred = await createUserWithEmailAndPassword(auth, e, p);
+                await sendEmailVerification(cred.user);
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    username: selectedUsername,
+                    email: e,
                     createdAt: serverTimestamp(),
                     code: '4SP-' + Math.random().toString(36).substring(2, 12).toUpperCase()
                 });
-                location.reload();
-            } catch(e) { showStatus(e.message, true); }
+                showStatus("Check your email for a verification link!", "success");
+            } catch (err) { showStatus(err.message); }
         };
+
+        document.getElementById('doReset').onclick = () => {
+            sendPasswordResetEmail(auth, document.getElementById('resetEmail').value)
+                .then(() => showStatus("Reset link sent!", "success"))
+                .catch(() => showStatus("User not found."));
+        };
+
+        // Social Logins
+        const pop = (p) => signInWithPopup(auth, p).catch(e => showStatus(e.message));
+        document.getElementById('googleAuth').onclick = () => pop(new GoogleAuthProvider());
+        document.getElementById('githubAuth').onclick = () => pop(new GithubAuthProvider());
+        document.getElementById('twitterAuth').onclick = () => pop(new TwitterAuthProvider());
+        document.getElementById('microsoftAuth').onclick = () => pop(new OAuthProvider('microsoft.com'));
 
         // Access Code Utilities
         document.getElementById('genCode').onclick = async () => {
             const code = '4SP-' + Math.random().toString(36).substring(2, 12).toUpperCase();
             await updateDoc(doc(db, "users", auth.currentUser.uid), { code });
         };
-
         document.getElementById('copyCode').onclick = () => {
             navigator.clipboard.writeText(document.getElementById('current-code').textContent);
-            showStatus("Code Copied!");
+            const btn = document.getElementById('copyCode');
+            btn.innerHTML = '<i class="fas fa-check text-green-400"></i>';
+            setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i>', 2000);
         };
 
         document.getElementById('logoutBtn').onclick = () => signOut(auth);
-        document.getElementById('showRegister').onclick = () => { panels.auth.classList.add('hidden'); panels.reg.classList.remove('hidden'); };
-        document.getElementById('backToLogin').onclick = () => { panels.reg.classList.add('hidden'); panels.auth.classList.remove('hidden'); };
+
+        // Navigation
+        document.getElementById('gotoUsername').onclick = () => showView('username-view');
+        document.getElementById('gotoReset').onclick = () => showView('reset-view');
+        document.getElementById('backToLoginFromUser').onclick = () => showView('login-view');
+        document.getElementById('backToLoginFromReset').onclick = () => showView('login-view');
+        document.getElementById('backToUser').onclick = () => showView('username-view');
 
     </script>
 </body>
