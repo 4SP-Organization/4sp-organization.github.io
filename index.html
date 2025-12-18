@@ -45,8 +45,8 @@
             padding: 0 1rem;
         }
         .nav-link-button {
-            display: flex; align-items: center; padding: 0.5rem 0.75rem; font-size: 0.875rem;
-            color: #d1d5db; border-radius: 0.5rem; transition: background-color 0.15s, color 0.15s;
+            display: flex; align-items: center; padding: 0.5rem 1rem; font-size: 0.875rem;
+            color: #d1d5db; border-radius: 9999px; transition: background-color 0.15s, color 0.15s;
             border: none; cursor: pointer; text-decoration: none; gap: 8px;
         }
         .nav-link-button:hover { background-color: #2a2a2a; color: #ffffff; }
@@ -54,12 +54,17 @@
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             background-color: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 1rem;
+            border-radius: 1.75rem; /* More rounded like legal.html */
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.15);
-            padding: 1.5rem;
+            padding: 2rem;
         }
         body::-webkit-scrollbar { display: none; }
         body { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .summary-section h3 { color: #ffffff; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.25rem; border-left: 2px solid #0070f3; padding-left: 10px; }
+        .summary-list { list-style-type: none; padding-left: 0; }
+        .summary-list li { margin-bottom: 0.5rem; color: #9ca3af; position: relative; padding-left: 1.5rem; }
+        .summary-list li::before { content: "•"; color: #f81ce5; position: absolute; left: 0; }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen">
@@ -76,15 +81,10 @@
                 <i class="fa-solid fa-clock-rotate-left w-5"></i>
                 History
             </button>
-            <button class="nav-link-button scroll-to-link" data-target="versions" title="View all major 4SP versions">
-                <i class="fa-solid fa-list-ol w-5"></i>
-                Versions
+            <button class="nav-link-button scroll-to-link" data-target="project-full-summary" title="Read the full project brief">
+                <i class="fa-solid fa-book-open w-5"></i>
+                Full Summary
             </button>
-            <button class="nav-link-button scroll-to-link" data-target="v5-features" title="What's new in Version 5">
-                <i class="fa-solid fa-star w-5"></i>
-                V5 Features
-            </button>
-
             <a id="redirect-button" href="../connection.html" target="_blank" class="nav-link-button bg-white/10 ring-1 ring-white/20 hover:bg-white/20 ml-2" title="Connect to 4SP Local">
                 <i class="fa-solid fa-rocket w-5"></i>
                 Connect to 4SP DV
@@ -105,7 +105,7 @@
                     This is the official organizational home for <strong class="text-white">4simpleproblems (4SP)</strong>. <strong class="text-purple-400">Version 5 DV (Downloadable Version)</strong> is now in development, offering literally unblockable access, full local security, and no Firebase authentication in the client file.
                 </p>
                 <div class="mb-4">
-                    <a id="hero-redirect-button" href="../connection.html" target="_blank" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-normal rounded-xl shadow-sm text-white bg-purple-600/20 ring-1 ring-purple-400 hover:bg-purple-400/20 transition">
+                    <a id="hero-redirect-button" href="../connection.html" target="_blank" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-normal rounded-full shadow-sm text-white bg-purple-600/20 ring-1 ring-purple-400 hover:bg-purple-400/20 transition">
                         Connect to 4SP DV <i class="fas fa-arrow-right ml-2"></i>
                     </a>
                 </div>
@@ -114,7 +114,7 @@
                         <i class="fab fa-discord"></i> Discord Server
                     </a>
                     <a href="https://linktr.ee/4simpleproblems" target="_blank" class="text-white hover:underline transition mx-3">
-                        <i class="fas fa-link"></i> Linktree
+                        <i class="fa-brands fa-linktree"></i> Linktree
                     </a>
                 </div>
             </div>
@@ -133,120 +133,82 @@
                 <div class="col-span-1 glass-box pr-4 mb-6 lg:mb-0">
                     <h3 class="text-3xl font-light mb-4 text-blue-400">The Turning Point (V4)</h3>
                     <p class="text-lg text-gray-400 font-light">
-                        Version 4, released in <strong class="text-white">August 2025</strong>, represented a major shift. It introduced the modern dashboard layout, widgets, and essential QOL features like <strong class="text-white">Tab Disguising</strong> and the <strong class="text-white">Panic Key</strong>, creating a more structured platform.
+                        Version 4, released in <strong class="text-white">August 2025</strong>, represented a major shift. It introduced the modern dashboard layout, widgets, and essential QOL features like <strong class="text-white">Tab Disguising</strong> and the <strong class="text-white">Panic Key</strong>.
                     </p>
                 </div>
                 <div class="col-span-1 glass-box">
                     <h3 class="text-3xl font-light mb-4 text-green-400">The Professional Rebuild (V5)</h3>
                     <p class="text-lg text-gray-400 font-light">
-                        After a temporary platform block in October 2025, Version 5 was created in just two months. It is a complete rebuild, focusing on <strong class="text-white">security, professional design,</strong> and comprehensive <strong class="text-white">student utility.</strong>
+                        After a platform block in October 2025, Version 5 was created. It is a complete rebuild, focusing on <strong class="text-white">security, professional design,</strong> and comprehensive <strong class="text-white">student utility.</strong>
                     </p>
                 </div>
             </div>
         </section>
 
-        <section id="versions" class="py-16 mx-auto max-w-4xl px-4 border-b border-gray-900">
-             <h2 class="text-4xl font-light text-center mb-12">Major Version Highlights</h2>
+        <section id="project-full-summary" class="py-16 mx-auto max-w-5xl px-4 border-b border-gray-900">
+            <div class="glass-box summary-section">
+                <h2 class="text-4xl font-light mb-6 text-center">Project Brief</h2>
+                <p class="text-gray-300 text-lg mb-8 text-center italic">"This is the biggest, most complete summary of the 4simpleproblems project."</p>
+                
+                <h3>Overview</h3>
+                <p class="text-gray-400 mb-4">4simpleproblems, usually called 4SP, is a student-made web project built for bored school days. It mixes utilities, games, soundboards, and small tools that feel fast, local, and fun instead of polished or corporate. The project evolved from a couple of joke pages into a full dashboard-style platform with accounts, cloud functions, and serious security decisions.</p>
 
-             <ol class="relative border-l border-gray-700">
-                <!-- Version 5 DV -->
-                <li class="mb-10 ml-6">
-                    <div class="glass-box border-2 border-purple-500">
-                        <span class="absolute flex items-center justify-center w-6 h-6 bg-pink-600 rounded-full -left-3 ring-8 ring-black ring-opacity-100 text-white">
-                            <i class="fas fa-download"></i>
-                        </span>
-                        <h3 class="mb-1 text-2xl font-semibold text-white">Version 5 DV (Dec 16, 2025)</h3>
-                        <time class="block mb-2 text-sm font-normal leading-none text-gray-500">Downloadable Version - In Development</time>
-                        <p class="text-base font-light text-gray-400">
-                            Version 5 DV is designed for literally unblockable access. All files run locally, giving full security and persistence, with no Firebase authentication included in the client. Features include secure code-based login, CDN-hosted files, device binding, and cloud functions for code generation, redemption, and revocation. Completion planned by end of Christmas Break 2025.
-                        </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3>Core Idea</h3>
+                        <ul class="summary-list">
+                            <li>Make something that feels personal and not "fake-professional."</li>
+                            <li>Avoid corporate aesthetics.</li>
+                            <li>Ensure it is fast to load and hard to block.</li>
+                            <li>Provide entertainment when school is boring.</li>
+                        </ul>
                     </div>
-                </li>
-
-                <!-- Version 5 original -->
-                <li class="mb-10 ml-6">
-                    <div class="glass-box">
-                        <span class="absolute flex items-center justify-center w-6 h-6 bg-purple-900 rounded-full -left-3 ring-8 ring-black ring-opacity-100 text-white"><i class="fas fa-star"></i></span>
-                        <h3 class="flex items-center mb-1 text-2xl font-semibold text-white">Version 5 (Dec 2, 2025)</h3>
-                        <time class="block mb-2 text-sm font-normal leading-none text-gray-500">The Professional Rebuild - <strong class="text-gray-300">Full Production</strong></time>
-                        <p class="mb-4 text-base font-light text-gray-400">Complete rewrite with a focus on security, professional design, and comprehensive student utility. Introduced the customizable navigation bar and the Games Collection (<strong class="text-white">1,600+ games</strong>). Rapidly developed in two months after Version 4 was blocked.</p>
+                    <div>
+                        <h3>Tech Stack</h3>
+                        <ul class="summary-list">
+                            <li>Standard HTML, CSS, and JavaScript.</li>
+                            <li>Firebase: Hosting, Firestore, Cloud Functions, and Auth.</li>
+                            <li>Heavy use of CDNs, specifically jsDelivr.</li>
+                            <li>Minimal backend exposure to protect the client-side focus.</li>
+                        </ul>
                     </div>
-                </li>
-
-                <!-- Versions 4,3,2,1 unchanged -->
-                <li class="mb-10 ml-6">
-                    <div class="glass-box">
-                        <span class="absolute flex items-center justify-center w-6 h-6 bg-purple-700 rounded-full -left-3 ring-8 ring-black ring-opacity-100 text-white"><i class="fas fa-star"></i></span>
-                        <h3 class="mb-1 text-2xl font-semibold text-white">Version 4 (Aug 22, 2025)</h3>
-                        <time class="block mb-2 text-sm font-normal leading-none text-gray-500">The Dashboard Launch</time>
-                        <p class="text-base font-light text-gray-400">Introduced the dark grey/purple scheme, a structured sidebar/dashboard, widgets, <strong class="text-white">Tab Disguising</strong>, and the <strong class="text-white">Panic Key</strong>. Proxies and other experimental pages were removed.</p>
-                    </div>
-                </li>
-                <li class="mb-10 ml-6">
-                    <div class="glass-box">
-                        <span class="absolute flex items-center justify-center w-6 h-6 bg-blue-700 rounded-full -left-3 ring-8 ring-black ring-opacity-100 text-white"><i class="fas fa-paint-brush"></i></span>
-                        <h3 class="mb-1 text-2xl font-semibold text-white">Version 3 (May 15, 2025)</h3>
-                        <time class="block mb-2 text-sm font-normal leading-none text-gray-500">The Visual Redesign</time>
-                        <p class="text-base font-light text-gray-400">Shifted from a black-and-white to a light white-and-grey palette using the Outfit font, with minimal functional updates.</p>
-                    </div>
-                </li>
-                <li class="mb-10 ml-6">
-                    <div class="glass-box">
-                        <span class="absolute flex items-center justify-center w-6 h-6 bg-yellow-700 rounded-full -left-3 ring-8 ring-black ring-opacity-100 text-white"><i class="fas fa-layer-group"></i></span>
-                        <h3 class="mb-1 text-2xl font-semibold text-white">Version 2 (Apr 11, 2025)</h3>
-                        <time class="block mb-2 text-sm font-normal leading-none text-gray-500">The Great Expansion</time>
-                        <p class="text-base font-light text-gray-400">Expanded significantly to <strong class="text-white">36 pages</strong>, introducing games, playlists, proxies, and multimedia. The repository became cluttered, and a pirated movie was later removed.</p>
-                    </div>
-                </li>
-                <li class="mb-10 ml-6">
-                    <div class="glass-box">
-                        <span class="absolute flex items-center justify-center w-6 h-6 bg-gray-700 rounded-full -left-3 ring-8 ring-black ring-opacity-100 text-white"><i class="fas fa-home"></i></span>
-                        <h3 class="mb-1 text-2xl font-semibold text-white">Version 1 (Mar 13, 2025)</h3>
-                        <time class="block mb-2 text-sm font-normal leading-none text-gray-500">The Genesis</time>
-                        <p class="text-base font-light text-gray-400">Launched as a simple two-page website featuring a soundboard (<strong class="text-white">22 normal, 4 explicit sounds</strong>) and a request page.</p>
-                    </div>
-                </li>
-             </ol>
-        </section>
-
-        <section id="v5-features" class="py-16 mx-auto max-w-7xl px-4">
-             <h2 class="text-4xl font-light text-center mb-12">Version 5: Feature Highlights</h2>
-
-            <div class="mx-auto max-w-4xl space-y-8">
-                <div class="glass-box">
-                    <span class="text-sm font-light text-purple-400 uppercase tracking-widest mb-2 block">Security & Access</span>
-                    <h3 class="text-4xl font-light mb-3 mt-2">Professional User Management</h3>
-                    <p class="text-xl text-gray-400 mb-5 font-light">
-                        Version 5 focuses on providing a secure and flexible authentication experience using modern cloud infrastructure (Firebase) for the main platform, but <strong class="text-purple-400">the downloadable DV client uses no Firebase authentication</strong>.
-                    </p>
-                    <ul class="space-y-2 text-lg text-gray-300 mt-6">
-                        <li class="flex items-center py-3 border-b border-white/5"><i class="fas fa-thumbtack fa-fw w-5 mr-3 text-purple-500"></i><span class="font-light mr-2">Customizable Navbar & Pin Button:</span>Reduced page clutter and offers quick access to favorite apps.</li>
-                        <li class="flex items-center py-3"><i class="fas fa-desktop fa-fw w-5 mr-3 text-purple-500"></i><span class="font-light mr-2">Adaptive UI:</span>Optimized for both desktop and mobile use.</li>
-                    </ul>
                 </div>
 
-                <div class="glass-box">
-                    <span class="text-sm font-light text-green-400 uppercase tracking-widest mb-2 block">Entertainment & Data</span>
-                    <h3 class="text-4xl font-light mb-3 mt-2">Comprehensive Games Collection</h3>
-                    <p class="text-xl text-gray-400 mb-5 font-light">
-                        Version 5 aggregates a massive library for student downtime, now featuring game data management for a persistent experience.
-                    </p>
-                    <ul class="space-y-2 text-lg text-gray-300 mt-6">
-                        <li class="flex items-center py-3 border-b border-white/5"><i class="fas fa-database fa-fw w-5 mr-3 text-green-500"></i><span class="font-light mr-2">Game Data Management:</span>Allows for saving progress across sessions.</li>
-                        <li class="flex items-center py-3 border-b border-white/5"><i class="fas fa-dice fa-fw w-5 mr-3 text-green-500"></i><span class="font-light mr-2">Games Library:</span><strong class="text-white">Over 1,600 games,  aggregated from sources like GN-Math and StrongdogXP.</strong></li>
-                        <li class="flex items-center py-3"><i class="fas fa-laptop-code fa-fw w-5 mr-3 text-green-500"></i><span class="font-light mr-2">Retro Games:</span>Includes HTML-based classics like Eaglercraft, Grand Theft Auto (original), Doom, and SimCity 1 & 2000.</li>
-                    </ul>
+                <h3>Version History</h3>
+                <div class="space-y-6">
+                    <div class="border-l border-gray-800 pl-6">
+                        <h4 class="text-white text-xl">Version 1: The Genesis</h4>
+                        <p class="text-gray-400 text-sm">Launched March 13, 2025. Featured a 20-sound soundboard, an autoclicker, and a request page. No accounts or real structure.</p>
+                    </div>
+                    <div class="border-l border-gray-800 pl-6">
+                        <h4 class="text-white text-xl">Version 2: Expansion</h4>
+                        <p class="text-gray-400 text-sm">Expanded to 36 pages including media, playlists, proxies, and accounts. Firebase usage increased significantly.</p>
+                    </div>
+                    <div class="border-l border-gray-800 pl-6">
+                        <h4 class="text-white text-xl">Version 3: Visual Reskin</h4>
+                        <p class="text-gray-400 text-sm">First big identity shift. Introduced a white layout with sharp corners and cleaner structures while keeping the chaotic fun.</p>
+                    </div>
+                    <div class="border-l border-gray-800 pl-6">
+                        <h4 class="text-white text-xl">Version 4: The Platform</h4>
+                        <p class="text-gray-400 text-sm">Major turning point. Introduced the dashboard layout, Koyeb-inspired widgets (Weather, Notes, Calculator), and stealth features like the Panic Key and Tab Disguise.</p>
+                    </div>
+                    <div class="border-l border-gray-800 pl-6">
+                        <h4 class="text-white text-xl">Version 5: Project Zirconium</h4>
+                        <p class="text-gray-400 text-sm">The most professional version. Vercel-inspired design, dynamic navigation, and the introduction of the unblockable Downloadable Version (DV) client.</p>
+                    </div>
                 </div>
+
+                <h3>Final Thoughts</h3>
+                <p class="text-gray-400 mt-8">4SP is a long-running experiment and personal sandbox. It is a response to restrictions and a place where small tools matter. Every time someone tries to stop it, the project grows. It has history, users, and scars from blocks—and it is still changing.</p>
             </div>
         </section>
 
-        <section class="py-12 mx-auto max-w-7xl px-4 text-center border-t border-gray-900">
+        <section class="py-12 mx-auto max-w-7xl px-4 text-center">
             <h2 class="text-xl font-light text-gray-400 mb-2">Developed and Maintained by the Organization</h2>
             <p class="text-gray-500 text-lg font-light">
-                This project is built using modern web standards and is committed to providing a secure, reliable, and continuously updated <strong class="text-gray-300">student toolkit</strong>.
+                Built using modern web standards for a secure, reliable, and continuously updated student toolkit.
             </p>
         </section>
-
     </main>
 
     <footer class="border-t border-gray-900 py-6">
@@ -261,25 +223,22 @@
     
     <script>
         (function() {
-            // set redirect buttons to direct URL
             const redirectButtons = document.querySelectorAll('#redirect-button, #hero-redirect-button');
             redirectButtons.forEach(button => {
                 button.href = "../connection.html";
             });
 
-            // smooth scroll for in-page nav
             document.querySelectorAll('.scroll-to-link').forEach(button => {
                 button.addEventListener('click', function(e) {
                     const targetId = this.getAttribute('data-target');
                     const targetElement = document.getElementById(targetId);
                     if (targetElement) {
                         e.preventDefault();
-                        window.scrollTo({ top: targetElement.offsetTop - 64, behavior: 'smooth' });
+                        window.scrollTo({ top: targetElement.offsetTop - 80, behavior: 'smooth' });
                     }
                 });
             });
 
-            // logo click scrolls to top
             document.getElementById('logo-link').addEventListener('click', function(e){
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
