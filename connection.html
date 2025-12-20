@@ -3,349 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4SP - CONNECT</title>
-    <meta name="description" content="Connect your local 4SP client to the organization database.">
-    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+    <title>4SP - AUTHENTICATION</title>
+    <meta name="description" content="Log into or create your 4SP account to access the student toolkit.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <script src="../navigation-mini.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../navigation-mini.js"></script>
 
     <script>
-        // Silence noisy extension and COOP warnings
-        (function() {
-            const oE = console.error; const oW = console.warn;
-            console.error = (...a) => { if (a[0]?.includes?.('browser-polyfill') || a[0]?.includes?.('object Object')) return; oE.apply(console, a); };
-            console.warn = (...a) => { if (a[0]?.includes?.('cdn.tailwindcss.com') || a[0]?.includes?.('Cross-Origin-Opener-Policy')) return; oW.apply(console, a); };
-        })();
-
+        // Unified Tailwind CSS configuration for a consistent dark theme
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'custom-darkest-gray': '#040404',
-                        'custom-dark-gray': '#111111',
-                        'custom-medium-gray': '#252525',
-                        'custom-light-gray': '#505050',
-                        'custom-lighter-gray': '#808080',
-                        'custom-white-gray': '#c0c0c0',
+                        'custom-darkest-gray': '#040404', // Body background
+                        'custom-dark-gray': '#111111',    // Form container background
+                        'custom-medium-gray': '#252525', // Borders, inputs, buttons
+                        'custom-light-gray': '#505050',  // Labels and secondary text
+                        'custom-lighter-gray': '#808080', // Hover states and subtle text
+                        'custom-white-gray': '#c0c0c0',  // Main text and headings
                     }
                 }
             }
         }
     </script>
-
+    
     <style>
-        body { font-family: 'Geist', sans-serif; background-color: #040404; color: #c0c0c0; font-weight: 300; }
-        h1, h2, h3, .font-bold { font-weight: 400 !important; }
+        :root {
+            --geist-foreground: 192, 192, 192; /* custom-white-gray */
+            --geist-background: 7, 7, 7;       /* custom-darkest-gray */
+        }
+
+        body {
+            font-family: 'Geist', sans-serif;
+            background-color: rgb(var(--geist-background));
+            color: rgb(var(--geist-foreground));
+            transition: all 0.3s ease;
+            font-weight: 300; /* CUSTOM: Lighter base font weight */
+        }
+
+        /* CUSTOM: Lighter bold/headings to match notes.html */
+        h1, h2, h3, .font-bold, .font-semibold, strong, .tracking-tighter {
+            font-weight: 400 !important;
+        }
+
+        .btn-social {
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-social:hover {
+            /* Keep existing hover effect for social buttons */
+            background-color: rgba(37, 37, 37, 0.7); /* custom-medium-gray with transparency */
+            border-color: #383838;
+        }
         
-        /* Auth Layout Styles from authentication.html */
-        .auth-split-container { max-width: 1200px; margin: 0 auto; width: 100%; }
-        @media (max-width: 767px) { .right-col { display: none; } }
-
-        .input-field { 
-            background-color: #111111; border: 1px solid #252525; color: white; border-radius: 0.75rem; 
-            width: 100%; padding: 0.75rem 1rem; transition: border-color 0.2s; 
-        }
-        .input-field:focus { border-color: #505050; outline: none; }
+        .message-area { min-height: 20px; }
+        .error-message { color: #f87171; font-weight: 400; /* Match new heading weight */ }
+        .success-message { color: #4ade80; font-weight: 400; }
+        .warning-message { color: #fbbf24; font-weight: 400; }
         
-        .btn-social { 
-            transition: all 0.3s ease; background-color: #111111; border: 1px solid #252525; 
-            display: flex; align-items: center; justify-content: center; width: 100%; padding: 0.75rem; border-radius: 0.75rem;
-        }
-        .btn-social:hover { background-color: rgba(37, 37, 37, 0.7); border-color: #383838; }
-
-        .btn-auth-action {
-            width: 100%; padding: 0.75rem; font-size: 1.125rem; border-radius: 0.75rem;
-            border: 1px solid rgba(255, 255, 255, 0.2); background-color: rgba(255, 255, 255, 0.05);
-            color: white; transition: all 0.2s;
-        }
-        .btn-auth-action:hover { background-color: rgba(255, 255, 255, 0.1); }
-
-        .btn-dv-download {
-            background: linear-gradient(90deg, #0070f3, #f81ce5); border-radius: 0.75rem;
-            padding: 1rem; color: white; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+        .auth-split-container { max-width: 1200px; margin: 0 auto; }
+        @media (min-width: 768px) { .auth-col { } }
+        @media (max-width: 767px) {
+            .right-col { display: none; }
+            .left-col { border-right: none; }
         }
 
-        .message-area { min-height: 24px; font-size: 0.875rem; text-align: center; margin-top: 1rem; }
-        .error-message { color: #f87171; }
-        .success-message { color: #4ade80; }
+        .code-display {
+            font-family: monospace;
+            letter-spacing: 0.2em;
+            font-size: 1.5rem;
+            background: #000;
+            border: 1px solid #333;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="bg-custom-darkest-gray text-custom-white-gray min-h-screen flex flex-col">
 
-    <div id="navbar-container"></div>
+    <main class="flex-grow flex items-stretch justify-center p-0">
+        <div class="auth-split-container bg-custom-darkest-gray flex flex-wrap w-full border-0 overflow-hidden p-0">
+            <div class="auth-col left-col flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray min-w-[300px]">
 
-    <main class="flex-grow flex items-center justify-center p-0 md:p-6">
-        
-        <div id="auth-interface" class="auth-split-container flex flex-wrap w-full overflow-hidden">
-            
-            <div class="flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray min-w-[300px]">
-                
-                <div id="login-view" class="w-full max-w-md space-y-6">
-                    <h2 class="text-3xl text-center tracking-tighter">Connect to 4SP</h2>
-                    <div class="space-y-4">
-                        <input type="email" id="loginEmail" placeholder="Email" class="input-field">
-                        <input type="password" id="loginPassword" placeholder="Password" class="input-field">
-                        <button id="doLogin" class="btn-auth-action">LOGIN</button>
+                <div id="loginContainer" class="w-full flex flex-col items-center">
+                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Access Code Generator</h2>
+                    <div id="unauthenticatedView" class="w-full max-w-md">
+                        <p class="text-custom-light-gray text-center mb-8">Sign in to generate a unique access code for your 4SP Client.</p>
+                        <div class="message-area w-full mt-4 text-center text-sm text-gray-500">Please use the provider login on the right.</div>
                     </div>
-                    <div class="text-center space-y-2">
-                        <button id="gotoReset" class="text-sm text-white hover:underline">Forgot Password?</button>
-                        <p class="text-sm text-custom-light-gray">
-                            Need an account? <button id="gotoUsername" class="text-white hover:underline">Create 4SP ID</button>
-                        </p>
+
+                    <div id="authenticatedView" class="w-full max-w-md hidden">
+                        <p class="text-custom-light-gray text-center mb-6">You are signed in as <span id="userEmail" class="text-white font-medium">...</span></p>
+                        
+                        <div id="generatorBox" class="flex flex-col items-center">
+                            <button id="generateBtn" class="w-full p-4 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-indigo-600 hover:bg-indigo-700 transition mb-6">
+                                GENERATE CODE
+                            </button>
+
+                            <div id="resultContainer" class="w-full hidden flex-col items-center">
+                                <div class="code-display" id="codeOutput">XXXX-XXXX-XXXX</div>
+                                <button id="copyBtn" class="w-full p-3 text-base rounded-xl font-normal border border-custom-medium-gray text-custom-white-gray hover:bg-custom-medium-gray transition flex items-center justify-center gap-2">
+                                    <i class="fa-regular fa-copy"></i> Copy to Clipboard
+                                </button>
+                            </div>
+                        </div>
+                        <div id="messageArea" class="message-area mt-4 text-center text-sm"></div>
+                        <button id="logoutBtn" class="mt-8 text-custom-light-gray hover:text-white text-sm transition underline underline-offset-4">Sign Out</button>
                     </div>
                 </div>
 
-                <div id="username-view" class="hidden w-full max-w-md space-y-6">
-                    <h2 class="text-3xl text-center tracking-tighter">Choose Username</h2>
-                    <div class="space-y-4">
-                        <input type="text" id="regUsername" placeholder="Username (6-24 chars)" class="input-field">
-                        <button id="doNext" class="btn-auth-action">NEXT</button>
-                    </div>
-                    <button id="backToLoginFromUser" class="w-full text-sm text-custom-light-gray hover:text-white">← Back to Login</button>
-                </div>
-
-                <div id="signup-view" class="hidden w-full max-w-md space-y-6">
-                    <h2 class="text-3xl text-center tracking-tighter">Set Credentials</h2>
-                    <div class="space-y-4">
-                        <input type="email" id="regEmail" placeholder="Email Address" class="input-field">
-                        <input type="password" id="regPassword" placeholder="Create Password" class="input-field">
-                        <button id="doSignup" class="btn-auth-action">CREATE ACCOUNT</button>
-                    </div>
-                    <button id="backToUser" class="w-full text-sm text-custom-light-gray hover:text-white">← Back to Username</button>
-                </div>
-
-                <div id="reset-view" class="hidden w-full max-w-md space-y-6">
-                    <h2 class="text-3xl text-center tracking-tighter">Reset Password</h2>
-                    <input type="email" id="resetEmail" placeholder="Enter registered email" class="input-field">
-                    <button id="doReset" class="btn-auth-action">SEND LINK</button>
-                    <button id="backToLoginFromReset" class="w-full text-sm text-custom-light-gray hover:text-white">← Back to Login</button>
-                </div>
-
-                <div id="auth-msg" class="message-area"></div>
             </div>
 
-            <div class="right-col flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray border-l border-custom-medium-gray">
-                <div class="w-full max-w-sm space-y-6">
-                    <div class="text-center">
-                        <h2 class="text-3xl tracking-tighter mb-2">Continue instantly</h2>
-                        <p class="text-custom-light-gray text-sm">Use a trusted provider to connect in one click.</p>
-                    </div>
+            <div class="auth-col right-col flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray">
+                <div class="w-full flex flex-col items-center justify-center">
+                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Continue instantly</h2>
+                    <p class="text-lg text-custom-light-gray mb-8 text-center max-w-md font-normal">
+                        Use a trusted provider to sign in or create an account in one click.
+                    </p>
+                    
+                    <button id="googleAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
+                        <img src="https://cdn.jsdelivr.net/gh/4simpleproblems-v5/v5-4simpleproblems-dv@main/images/google-icon.png" alt="Google Logo" class="w-6 h-6 mr-3">
+                        Continue with Google
+                    </button>
+                    <button id="microsoftAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
+                        <img src="https://cdn.jsdelivr.net/gh/4simpleproblems-v5/v5-4simpleproblems-dv@main/images/microsoft.png" alt="Microsoft Logo" class="w-6 h-6 mr-3">
+                        Continue with Microsoft
+                    </button>
+                    <button id="githubAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
+                        <img src="https://cdn.jsdelivr.net/gh/4simpleproblems-v5/v5-4simpleproblems-dv@main/images/github-mark-white.png" alt="GitHub Logo" class="w-6 h-6 mr-3">
+                        Continue with GitHub
+                    </button>
+                    
+                    <button id="twitterAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
+                        <img src="https://cdn.jsdelivr.net/gh/4simpleproblems-v5/v5-4simpleproblems-dv@main/images/x.png" alt="X Logo" class="w-6 h-6 mr-3">
+                        Continue with X
+                    </button>
 
-                    <div class="space-y-3">
-                        <button id="googleAuth" class="btn-social"><img src="images/google-icon.png" class="w-5 h-5 mr-3"> Google</button>
-                        <button id="microsoftAuth" class="btn-social"><img src="images/microsoft.png" class="w-5 h-5 mr-3"> Microsoft</button>
-                        <button id="githubAuth" class="btn-social"><img src="images/github-mark-white.png" class="w-5 h-5 mr-3"> GitHub</button>
-                        <button id="twitterAuth" class="btn-social"><img src="../images/x.png" class="w-5 h-5 mr-3"> X / Twitter</button>
-                    </div>
-
-                    <p class="text-[10px] italic text-custom-light-gray text-center leading-relaxed">
-                        By connecting, you agree to our 
-                        <a href="legal.html" class="text-white hover:underline">Terms of Service</a>.
+                    <p class="text-xs italic text-custom-light-gray text-center max-w-md mt-4 leading-relaxed font-light">
+                        By continuing, you agree to our 
+                        <a href="../legal.html#terms-of-service" target="_blank" class="text-white hover:text-gray-300 font-normal">Terms of Service</a> and 
+                        <a href="../legal.html#privacy-policy" target="_blank" class="text-white hover:text-gray-300 font-normal">Privacy Policy</a>.
                     </p>
                 </div>
             </div>
         </div>
-
-        <div id="connected-interface" class="hidden w-full max-w-lg p-8 bg-custom-dark-gray border border-custom-medium-gray rounded-3xl space-y-8">
-            <div class="text-center space-y-2">
-                <h1 class="text-3xl tracking-tighter">4SP - CONNECT</h1>
-                <p class="text-custom-lighter-gray text-sm">Your local client is ready to sync.</p>
-            </div>
-
-            <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-custom-medium-gray">
-                <div id="u-avatar" class="w-14 h-14 rounded-full bg-custom-medium-gray flex items-center justify-center overflow-hidden"></div>
-                <div>
-                    <h2 id="u-name" class="font-medium text-white">Member</h2>
-                    <p id="u-email" class="text-xs text-custom-lighter-gray"></p>
-                </div>
-            </div>
-
-            <div class="space-y-4">
-                <label class="text-[10px] uppercase tracking-widest text-custom-light-gray font-bold">Step 1: Get the Client</label>
-                <a href="../4simpleproblems-version-5.html" class="btn-dv-download">
-                    <i class="fas fa-download"></i> Download 4SP DV Client
-                </a>
-            </div>
-
-            <div class="space-y-3">
-                <label class="text-[10px] uppercase tracking-widest text-custom-light-gray font-bold">Step 2: Use Access Code</label>
-                <div class="flex items-center justify-between bg-custom-darkest-gray rounded-xl p-4 border border-custom-medium-gray">
-                    <span id="current-code" class="font-mono text-purple-400 text-lg">Loading...</span>
-                    <div class="flex gap-1">
-                        <button id="copyCode" class="p-2 hover:text-white"><i class="fas fa-copy"></i></button>
-                        <button id="genCode" class="p-2 hover:text-white"><i class="fas fa-sync-alt"></i></button>
-                    </div>
-                </div>
-                <p class="text-[10px] text-custom-light-gray text-center">Paste this code into your local DV client to link your account.</p>
-            </div>
-
-            <button id="logoutBtn" class="w-full text-xs text-red-500/60 hover:text-red-400 transition">Disconnect Account</button>
-        </div>
-
     </main>
 
-    <footer class="py-8 border-t border-custom-medium-gray/30">
-        <div class="text-center text-xs text-custom-light-gray">
-            &copy; 2025 4simpleproblems (4SP). Database Connectivity Hub.
+    <footer class="border-t border-gray-900 py-6">
+        <div class="mx-auto max-w-7xl px-4 text-center text-gray-500 text-sm">
+            &copy; 2025 4simpleproblems (4SP). Built for students.
         </div>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { 
-            getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, 
-            TwitterAuthProvider, OAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
-            sendEmailVerification, sendPasswordResetEmail, signOut 
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut,
+            GoogleAuthProvider,
+            GithubAuthProvider,
+            TwitterAuthProvider,
+            OAuthProvider,
+            signInWithPopup
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // Firebase Config
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyAZBKAckVa4IMvJGjcyndZx6Y1XD52lgro",
             authDomain: "project-zirconium.firebaseapp.com",
             projectId: "project-zirconium",
             storageBucket: "project-zirconium.firebasestorage.app",
             messagingSenderId: "1096564243475",
-            appId: "1:1096564243475:web:6d0956a70125eeea1ad3e6"
+            appId: "1:1096564243475:web:6d0956a70125eeea1ad3e6",
+            measurementId: "G-1D4F692C1Q"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let selectedUsername = "";
-        const views = ['login-view', 'username-view', 'signup-view', 'reset-view'];
+        const unauthView = document.getElementById('unauthenticatedView');
+        const authView = document.getElementById('authenticatedView');
+        const userEmailSpan = document.getElementById('userEmail');
+        const generateBtn = document.getElementById('generateBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const codeOutput = document.getElementById('codeOutput');
+        const copyBtn = document.getElementById('copyBtn');
+        const messageArea = document.getElementById('messageArea');
+        const logoutBtn = document.getElementById('logoutBtn');
 
-        function showView(target) {
-            views.forEach(v => document.getElementById(v).classList.add('hidden'));
-            document.getElementById(target).classList.remove('hidden');
-            document.getElementById('auth-msg').innerHTML = "";
-        }
-
-        function showStatus(txt, type = 'error') {
-            const msg = document.getElementById('auth-msg');
-            msg.innerHTML = txt;
-            msg.className = `message-area ${type}-message`;
-        }
-
-        // --- AUTH OBSERVER ---
-        onAuthStateChanged(auth, async (user) => {
-            const authDiv = document.getElementById('auth-interface');
-            const connectDiv = document.getElementById('connected-interface');
-
+        onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Verification Guard
-                const isSocial = user.providerData.some(p => p.providerId !== 'password');
-                if (!user.emailVerified && !isSocial) {
-                    showStatus(`Please verify your email to continue. <button id="resend" class="underline text-white">Resend Link</button>`, 'error');
-                    document.getElementById('resend').onclick = () => sendEmailVerification(user).then(() => showStatus("Verification link sent!", "success"));
-                    authDiv.classList.remove('hidden');
-                    connectDiv.classList.add('hidden');
-                    return;
-                }
-
-                // Check for Firestore Profile
-                const userRef = doc(db, "users", user.uid);
-                const snap = await getDoc(userRef);
-
-                if (!snap.exists()) {
-                    // Social user without profile - redirect to username step
-                    showView('username-view');
-                    authDiv.classList.remove('hidden');
-                    connectDiv.classList.add('hidden');
-                    return;
-                }
-
-                // SUCCESS: User is logged in, verified, and has a profile
-                authDiv.classList.add('hidden');
-                connectDiv.classList.remove('hidden');
-
-                document.getElementById('u-name').textContent = snap.data().username || 'Member';
-                document.getElementById('u-email').textContent = user.email;
-                const avatar = document.getElementById('u-avatar');
-                avatar.innerHTML = user.photoURL ? `<img src="${user.photoURL}" class="w-full h-full object-cover">` : `<i class="fas fa-user text-2xl text-custom-light-gray"></i>`;
-
-                onSnapshot(userRef, (d) => {
-                    document.getElementById('current-code').textContent = d.data()?.code || 'None';
-                });
-
+                unauthView.classList.add('hidden');
+                authView.classList.remove('hidden');
+                userEmailSpan.textContent = user.email;
             } else {
-                authDiv.classList.remove('hidden');
-                connectDiv.classList.add('hidden');
-                showView('login-view');
+                unauthView.classList.remove('hidden');
+                authView.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                generateBtn.classList.remove('hidden');
             }
         });
 
-        // --- HANDLERS ---
-        document.getElementById('doLogin').onclick = () => {
-            const e = document.getElementById('loginEmail').value;
-            const p = document.getElementById('loginPassword').value;
-            signInWithEmailAndPassword(auth, e, p).catch(err => showStatus("Invalid email or password."));
-        };
-
-        document.getElementById('doNext').onclick = () => {
-            const u = document.getElementById('regUsername').value.trim();
-            if (u.length < 6) return showStatus("Username must be at least 6 characters.");
-            selectedUsername = u;
-            showView('signup-view');
-        };
-
-        document.getElementById('doSignup').onclick = async () => {
-            const e = document.getElementById('regEmail').value;
-            const p = document.getElementById('regPassword').value;
+        async function handleSocialAuth(provider) {
             try {
-                const cred = await createUserWithEmailAndPassword(auth, e, p);
-                await sendEmailVerification(cred.user);
-                await setDoc(doc(db, "users", cred.user.uid), {
-                    username: selectedUsername,
-                    email: e,
-                    createdAt: serverTimestamp(),
-                    code: '4SP-' + Math.random().toString(36).substring(2, 12).toUpperCase()
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Auth error:", error);
+                alert("Authentication failed.");
+            }
+        }
+
+        document.getElementById('googleAuthBtn').addEventListener('click', () => handleSocialAuth(new GoogleAuthProvider()));
+        document.getElementById('githubAuthBtn').addEventListener('click', () => handleSocialAuth(new GithubAuthProvider()));
+        document.getElementById('twitterAuthBtn').addEventListener('click', () => handleSocialAuth(new TwitterAuthProvider()));
+        document.getElementById('microsoftAuthBtn').addEventListener('click', () => handleSocialAuth(new OAuthProvider('microsoft.com')));
+        logoutBtn.addEventListener('click', () => signOut(auth));
+
+        function generateRandomCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 12; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        generateBtn.addEventListener('click', async () => {
+            generateBtn.disabled = true;
+            generateBtn.innerText = "Generating...";
+            
+            const rawCode = generateRandomCode();
+            const formattedCode = rawCode.match(/.{1,4}/g).join('-');
+
+            try {
+                await setDoc(doc(db, "access_codes", rawCode), {
+                    active: true,
+                    claimed: false,
+                    ownerEmail: auth.currentUser.email,
+                    ownerUid: auth.currentUser.uid,
+                    createdAt: serverTimestamp()
                 });
-                showStatus("Check your email for a verification link!", "success");
-            } catch (err) { showStatus(err.message); }
-        };
 
-        document.getElementById('doReset').onclick = () => {
-            sendPasswordResetEmail(auth, document.getElementById('resetEmail').value)
-                .then(() => showStatus("Reset link sent!", "success"))
-                .catch(() => showStatus("User not found."));
-        };
+                codeOutput.innerText = formattedCode;
+                generateBtn.classList.add('hidden');
+                resultContainer.classList.remove('hidden');
+                resultContainer.style.display = 'flex';
+                
+            } catch (e) {
+                console.error("Error creating code:", e);
+                alert("Failed to generate code.");
+                generateBtn.disabled = false;
+                generateBtn.innerText = "GENERATE CODE";
+            }
+        });
 
-        // Social Logins
-        const pop = (p) => signInWithPopup(auth, p).catch(e => showStatus(e.message));
-        document.getElementById('googleAuth').onclick = () => pop(new GoogleAuthProvider());
-        document.getElementById('githubAuth').onclick = () => pop(new GithubAuthProvider());
-        document.getElementById('twitterAuth').onclick = () => pop(new TwitterAuthProvider());
-        document.getElementById('microsoftAuth').onclick = () => pop(new OAuthProvider('microsoft.com'));
-
-        // Access Code Utilities
-        document.getElementById('genCode').onclick = async () => {
-            const code = '4SP-' + Math.random().toString(36).substring(2, 12).toUpperCase();
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { code });
-        };
-        document.getElementById('copyCode').onclick = () => {
-            navigator.clipboard.writeText(document.getElementById('current-code').textContent);
-            const btn = document.getElementById('copyCode');
-            btn.innerHTML = '<i class="fas fa-check text-green-400"></i>';
-            setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i>', 2000);
-        };
-
-        document.getElementById('logoutBtn').onclick = () => signOut(auth);
-
-        // Navigation
-        document.getElementById('gotoUsername').onclick = () => showView('username-view');
-        document.getElementById('gotoReset').onclick = () => showView('reset-view');
-        document.getElementById('backToLoginFromUser').onclick = () => showView('login-view');
-        document.getElementById('backToLoginFromReset').onclick = () => showView('login-view');
-        document.getElementById('backToUser').onclick = () => showView('username-view');
-
+        copyBtn.addEventListener('click', () => {
+            const code = codeOutput.innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                messageArea.innerText = "Copied to clipboard!";
+                messageArea.className = "message-area mt-4 text-center text-sm success-message";
+                setTimeout(() => messageArea.innerText = "", 3000);
+            });
+        });
     </script>
 </body>
 </html>
