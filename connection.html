@@ -179,14 +179,15 @@
             getFirestore, 
             doc, 
             setDoc,
-            deleteDoc, // Added import
+            deleteDoc, 
             serverTimestamp,
             query,
             where,
             getDocs,
             limit,
             collection,
-            writeBatch
+            writeBatch,
+            onSnapshot // Added onSnapshot for real-time updates
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
         const firebaseConfig = {
@@ -217,66 +218,98 @@
         const INDIGO_CLASSES = "text-indigo-500 bg-indigo-500/10 border-indigo-500 hover:bg-indigo-500/20";
         const CYAN_CLASSES = "text-cyan-500 bg-cyan-500/10 border-cyan-500 hover:bg-cyan-500/20";
 
+        // Variable to hold the unsubscribe function for the listener
+        let unsubscribeCodeListener = null;
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 unauthView.classList.add('hidden');
                 authView.classList.remove('hidden');
                 userEmailSpan.textContent = user.email;
 
-                // CHECK FOR EXISTING CODE
-                // Removed "orderBy" and "active=true" to fix index issues and find *any* code owned by user
+                // Set up Real-time Listener for the user's access code
+                if (unsubscribeCodeListener) {
+                    unsubscribeCodeListener(); // Prevent duplicate listeners
+                }
+
                 try {
                     const q = query(
                         collection(db, "access_codes"), 
                         where("ownerUid", "==", user.uid),
                         limit(1)
                     );
-                    const querySnapshot = await getDocs(q);
 
-                    if (!querySnapshot.empty) {
-                        const docSnapshot = querySnapshot.docs[0];
-                        const docData = docSnapshot.data();
-                        const docId = docSnapshot.id;
-                        const formatted = docId.match(/.{1,4}/g).join('-');
-                        
-                        codeOutput.innerText = formatted;
-                        resultContainer.classList.remove('hidden');
-                        resultContainer.style.display = 'flex';
-                        
-                        // Check 'claimed' status
-                        if (docData.claimed === true) {
-                            codeStatus.innerHTML = '<span class="text-green-500"><i class="fa-solid fa-link"></i> Linked & Active</span>';
-                            messageArea.innerText = "This code is currently in use on your local client.";
-                            messageArea.className = "message-area mt-4 text-center text-sm text-gray-500";
+                    unsubscribeCodeListener = onSnapshot(q, (snapshot) => {
+                        if (!snapshot.empty) {
+                            // Code Exists - Render it
+                            const docSnapshot = snapshot.docs[0];
+                            renderCodeState(docSnapshot);
                         } else {
-                            codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
-                            messageArea.innerText = "This code is ready. Enter it in your 4SP Local Client.";
-                            messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
+                            // No Code Found - Reset UI
+                            renderNoCodeState();
                         }
-                        
-                        // Set Regenerate Style
-                        generateBtn.innerText = "Regenerate Code";
-                        generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl transition mb-6 ${CYAN_CLASSES}`;
-                        generateBtn.classList.remove('hidden');
-                    } else {
-                        // Default Style (No code found)
-                        generateBtn.innerText = "Generate Code";
-                        generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl transition mb-6 ${INDIGO_CLASSES}`;
-                        resultContainer.classList.add('hidden');
-                        generateBtn.classList.remove('hidden');
-                        messageArea.innerText = "";
-                    }
+                    }, (error) => {
+                        console.error("Snapshot error:", error);
+                    });
+
                 } catch (e) {
-                    console.error("Error fetching code:", e);
+                    console.error("Error setting up listener:", e);
                 }
 
             } else {
+                // User logged out
                 unauthView.classList.remove('hidden');
                 authView.classList.add('hidden');
                 resultContainer.classList.add('hidden');
                 generateBtn.classList.remove('hidden');
+                
+                // Detach listener
+                if (unsubscribeCodeListener) {
+                    unsubscribeCodeListener();
+                    unsubscribeCodeListener = null;
+                }
             }
         });
+
+        // Helper: Render UI when a code exists
+        function renderCodeState(docSnapshot) {
+            const docData = docSnapshot.data();
+            const docId = docSnapshot.id;
+            const formatted = docId.match(/.{1,4}/g).join('-');
+            
+            codeOutput.innerText = formatted;
+            resultContainer.classList.remove('hidden');
+            resultContainer.style.display = 'flex';
+            
+            // Check 'claimed' status
+            if (docData.claimed === true) {
+                codeStatus.innerHTML = '<span class="text-green-500"><i class="fa-solid fa-link"></i> Linked & Active</span>';
+                messageArea.innerHTML = "This code is currently in use on your local client.";
+                messageArea.className = "message-area mt-4 text-center text-sm text-gray-500";
+            } else {
+                codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
+                
+                // Added Download Link here
+                messageArea.innerHTML = `Code generated. Enter it in your 4SP Local Client. <a href="../4simpleproblems_v5.html" download="4simpleproblems_v5.html" class="text-cyan-500 hover:underline cursor-pointer ml-1" title="Download 4SP Client">Download Here</a>`;
+                messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
+            }
+            
+            // Set Regenerate Style
+            generateBtn.innerText = "Regenerate Code";
+            generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl transition mb-6 ${CYAN_CLASSES}`;
+            generateBtn.disabled = false;
+            generateBtn.classList.remove('hidden');
+        }
+
+        // Helper: Render UI when no code exists
+        function renderNoCodeState() {
+            generateBtn.innerText = "Generate Code";
+            generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl transition mb-6 ${INDIGO_CLASSES}`;
+            resultContainer.classList.add('hidden');
+            generateBtn.classList.remove('hidden');
+            generateBtn.disabled = false;
+            messageArea.innerText = "";
+        }
 
         async function handleSocialAuth(provider) {
             try {
@@ -304,22 +337,20 @@
 
         generateBtn.addEventListener('click', async () => {
             generateBtn.disabled = true;
-            const originalText = generateBtn.innerText;
             generateBtn.innerText = "Generating...";
             
             const rawCode = generateRandomCode();
-            const formattedCode = rawCode.match(/.{1,4}/g).join('-');
 
             try {
                 // 1. DELETE ANY OLD CODES
-                // We find ANY code owned by this user and delete it to keep it clean (1 user = 1 code)
+                // We find ANY code owned by this user and delete it.
+                // The onSnapshot listener will detect this deletion.
                 const q = query(
                     collection(db, "access_codes"), 
                     where("ownerUid", "==", auth.currentUser.uid)
                 );
                 const querySnapshot = await getDocs(q);
                 
-                // Use a batch to delete all found (usually just 1)
                 const batch = writeBatch(db);
                 querySnapshot.forEach((doc) => {
                     batch.delete(doc.ref);
@@ -327,6 +358,7 @@
                 await batch.commit();
 
                 // 2. CREATE NEW CODE
+                // The onSnapshot listener will detect this creation and update the UI automatically.
                 await setDoc(doc(db, "access_codes", rawCode), {
                     active: true,
                     claimed: false,
@@ -334,42 +366,29 @@
                     ownerUid: auth.currentUser.uid,
                     createdAt: serverTimestamp()
                 });
-
-                codeOutput.innerText = formattedCode;
                 
-                // Show result
-                resultContainer.classList.remove('hidden');
-                resultContainer.style.display = 'flex';
-                
-                // Set Status to Awaiting for new code
-                codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
-                messageArea.innerText = "Code generated. Enter it in your 4SP Local Client.";
-                messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
-                
-                // Switch to Regenerate Style
-                generateBtn.innerText = "Regenerate Code";
-                generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl transition mb-6 ${CYAN_CLASSES}`;
-                generateBtn.disabled = false;
+                // No manual UI update needed here anymore; the listener handles it.
                 
             } catch (e) {
                 console.error("Error creating code:", e);
                 alert("Failed to generate code.");
                 generateBtn.disabled = false;
-                generateBtn.innerText = originalText;
+                generateBtn.innerText = "Regenerate Code"; // Fallback text
             }
         });
 
         copyBtn.addEventListener('click', () => {
             const code = codeOutput.innerText;
             navigator.clipboard.writeText(code).then(() => {
-                const prevText = messageArea.innerText;
+                // Save current HTML (which might include the link) to restore later
+                const prevHTML = messageArea.innerHTML;
                 const prevClass = messageArea.className;
                 
                 messageArea.innerText = "Copied to clipboard!";
                 messageArea.className = "message-area mt-4 text-center text-sm success-message";
                 
                 setTimeout(() => {
-                    messageArea.innerText = prevText;
+                    messageArea.innerHTML = prevHTML;
                     messageArea.className = prevClass;
                 }, 2000);
             });
