@@ -42,10 +42,9 @@
             background-color: rgb(var(--geist-background));
             color: rgb(var(--geist-foreground));
             transition: all 0.3s ease;
-            font-weight: 300; /* CUSTOM: Lighter base font weight */
+            font-weight: 300;
         }
 
-        /* CUSTOM: Lighter bold/headings to match notes.html */
         h1, h2, h3, .font-bold, .font-semibold, strong, .tracking-tighter {
             font-weight: 400 !important;
         }
@@ -54,13 +53,12 @@
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         .btn-social:hover {
-            /* Keep existing hover effect for social buttons */
-            background-color: rgba(37, 37, 37, 0.7); /* custom-medium-gray with transparency */
+            background-color: rgba(37, 37, 37, 0.7);
             border-color: #383838;
         }
         
         .message-area { min-height: 20px; }
-        .error-message { color: #f87171; font-weight: 400; /* Match new heading weight */ }
+        .error-message { color: #f87171; font-weight: 400; }
         .success-message { color: #4ade80; font-weight: 400; }
         .warning-message { color: #fbbf24; font-weight: 400; }
         
@@ -81,7 +79,7 @@
             border-radius: 0.5rem;
             width: 100%;
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem; /* Reduced margin to fit status text */
             color: #fff;
         }
     </style>
@@ -109,6 +107,9 @@
 
                             <div id="resultContainer" class="w-full hidden flex-col items-center">
                                 <div class="code-display" id="codeOutput">XXXX-XXXX-XXXX</div>
+                                
+                                <div id="codeStatus" class="text-sm mb-4 font-normal text-center w-full"></div>
+
                                 <button id="copyBtn" class="w-full p-3 text-base rounded-xl font-normal border border-custom-medium-gray text-custom-white-gray hover:bg-custom-medium-gray transition flex items-center justify-center gap-2">
                                     <i class="fa-regular fa-copy"></i> Copy to Clipboard
                                 </button>
@@ -208,6 +209,7 @@
         const generateBtn = document.getElementById('generateBtn');
         const resultContainer = document.getElementById('resultContainer');
         const codeOutput = document.getElementById('codeOutput');
+        const codeStatus = document.getElementById('codeStatus');
         const copyBtn = document.getElementById('copyBtn');
         const messageArea = document.getElementById('messageArea');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -233,24 +235,37 @@
                     const querySnapshot = await getDocs(q);
 
                     if (!querySnapshot.empty) {
-                        const docData = querySnapshot.docs[0].data();
-                        const docId = querySnapshot.docs[0].id;
+                        const docSnapshot = querySnapshot.docs[0];
+                        const docData = docSnapshot.data();
+                        const docId = docSnapshot.id;
                         const formatted = docId.match(/.{1,4}/g).join('-');
                         
                         codeOutput.innerText = formatted;
                         resultContainer.classList.remove('hidden');
                         resultContainer.style.display = 'flex';
                         
+                        // Check 'claimed' status
+                        if (docData.claimed === true) {
+                            codeStatus.innerHTML = '<span class="text-green-500"><i class="fa-solid fa-link"></i> Linked & Active</span>';
+                            messageArea.innerText = "This code is currently in use on your local client.";
+                            messageArea.className = "message-area mt-4 text-center text-sm text-gray-500";
+                        } else {
+                            codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
+                            messageArea.innerText = "This code is ready. Enter it in your 4SP Local Client.";
+                            messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
+                        }
+                        
                         // Set Regenerate Style
                         generateBtn.innerText = "Regenerate Code";
                         generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl transition mb-6 ${CYAN_CLASSES}`;
                         generateBtn.classList.remove('hidden');
                     } else {
-                        // Default Style
+                        // Default Style (No code found)
                         generateBtn.innerText = "Generate Code";
                         generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl transition mb-6 ${INDIGO_CLASSES}`;
                         resultContainer.classList.add('hidden');
                         generateBtn.classList.remove('hidden');
+                        messageArea.innerText = "";
                     }
                 } catch (e) {
                     console.error("Error fetching code:", e);
@@ -297,7 +312,7 @@
             const formattedCode = rawCode.match(/.{1,4}/g).join('-');
 
             try {
-                // Deactivate old codes first (optional but cleaner)
+                // Deactivate old codes first
                 const q = query(
                     collection(db, "access_codes"), 
                     where("ownerUid", "==", auth.currentUser.uid),
@@ -310,6 +325,7 @@
                 });
                 await batch.commit();
 
+                // Create new code
                 await setDoc(doc(db, "access_codes", rawCode), {
                     active: true,
                     claimed: false,
@@ -323,6 +339,11 @@
                 // Show result
                 resultContainer.classList.remove('hidden');
                 resultContainer.style.display = 'flex';
+                
+                // Set Status to Awaiting for new code
+                codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
+                messageArea.innerText = "Code generated. Enter it in your 4SP Local Client.";
+                messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
                 
                 // Switch to Regenerate Style
                 generateBtn.innerText = "Regenerate Code";
@@ -340,9 +361,17 @@
         copyBtn.addEventListener('click', () => {
             const code = codeOutput.innerText;
             navigator.clipboard.writeText(code).then(() => {
+                // Temporary success message in the main message area
+                const prevText = messageArea.innerText;
+                const prevClass = messageArea.className;
+                
                 messageArea.innerText = "Copied to clipboard!";
                 messageArea.className = "message-area mt-4 text-center text-sm success-message";
-                setTimeout(() => messageArea.innerText = "", 3000);
+                
+                setTimeout(() => {
+                    messageArea.innerText = prevText;
+                    messageArea.className = prevClass;
+                }, 2000);
             });
         });
     </script>
