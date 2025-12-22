@@ -62,7 +62,7 @@
         .success-message { color: #4ade80; font-weight: 400; }
         .warning-message { color: #fbbf24; font-weight: 400; }
         
-        .auth-split-container { max-width: 1200px; margin: 0 auto; }
+        .auth-split-container { max-width: 1200px; margin: 0 auto; min-height: 600px; }
         @media (min-width: 768px) { .auth-col { } }
         @media (max-width: 767px) {
             .right-col { display: none; }
@@ -88,42 +88,58 @@
 
     <main class="flex-grow flex items-stretch justify-center p-0">
         <div class="auth-split-container bg-custom-darkest-gray flex flex-wrap w-full border-0 overflow-hidden p-0">
-            <div class="auth-col left-col flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray min-w-[300px]">
+            
+            <div class="auth-col left-col flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray min-w-[300px] border-r border-custom-medium-gray/30">
 
-                <div id="loginContainer" class="w-full flex flex-col items-center">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Access Code Generator</h2>
-                    <div id="unauthenticatedView" class="w-full max-w-md">
-                        <p class="text-custom-light-gray text-center mb-8">Sign in to generate a unique access code for your 4SP Client.</p>
-                        <div class="message-area w-full mt-4 text-center text-sm text-gray-500">Please use the provider login on the right.</div>
-                    </div>
+                <div id="unauth-login-container" class="w-full flex flex-col items-center">
+                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Login to Generate Code</h2>
+                    <form id="loginForm" class="w-full max-w-md"> 
+                        <div class="mb-5">
+                            <label for="loginEmail" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Email</label>
+                            <input type="email" id="loginEmail" placeholder="Enter your email" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
+                        </div>
+                        <div class="mb-5">
+                            <label for="loginPassword" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Password</label>
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
+                        </div>
+                        <button type="submit" class="w-full p-3 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-white/5 hover:bg-white/10 transition">LOGIN</button>
+                    </form>
+                    <div id="loginMessage" class="message-area w-full mt-4 text-center text-sm text-red-400"></div>
+                    
+                    <p class="text-sm text-custom-light-gray mt-6 text-center w-full max-w-md">
+                        Don't have an account? 
+                        <a href="authentication.html" class="text-white hover:text-gray-300 font-normal transition">Sign up here</a>
+                    </p>
+                </div>
 
-                    <div id="authenticatedView" class="w-full max-w-md hidden">
-                        <p class="text-custom-light-gray text-center mb-6">You are signed in as <span id="userEmail" class="text-white font-medium">...</span></p>
+                <div id="auth-code-container" class="w-full flex-col items-center hidden">
+                    <h2 class="text-3xl font-normal text-custom-white-gray mb-2 text-center w-full tracking-tighter">Your Access Code</h2>
+                    <p class="text-custom-light-gray text-center mb-8">User: <span id="userEmail" class="text-white font-medium">...</span></p>
+                    
+                    <div id="generatorBox" class="flex flex-col items-center w-full max-w-md">
                         
-                        <div id="generatorBox" class="flex flex-col items-center">
-                            <button id="generateBtn" class="w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl text-indigo-500 bg-indigo-500/10 border border-indigo-500 hover:bg-indigo-500/20 transition mb-6">
-                                Generate Code
+                        <button id="generateBtn" class="w-full py-2 px-4 text-sm font-medium rounded-xl text-indigo-500 bg-indigo-500/10 border border-indigo-500 hover:bg-indigo-500/20 transition mb-6">
+                            Generate Code
+                        </button>
+
+                        <div id="resultContainer" class="w-full hidden flex-col items-center">
+                            <div class="code-display" id="codeOutput">XXXX-XXXX-XXXX</div>
+                            
+                            <div id="codeStatus" class="text-sm mb-4 font-normal text-center w-full"></div>
+
+                            <button id="copyBtn" class="w-full p-3 text-base rounded-xl font-normal border border-custom-medium-gray text-custom-white-gray hover:bg-custom-medium-gray transition flex items-center justify-center gap-2">
+                                <i class="fa-regular fa-copy"></i> Copy to Clipboard
                             </button>
-
-                            <div id="resultContainer" class="w-full hidden flex-col items-center">
-                                <div class="code-display" id="codeOutput">XXXX-XXXX-XXXX</div>
-                                
-                                <div id="codeStatus" class="text-sm mb-4 font-normal text-center w-full"></div>
-
-                                <button id="copyBtn" class="w-full p-3 text-base rounded-xl font-normal border border-custom-medium-gray text-custom-white-gray hover:bg-custom-medium-gray transition flex items-center justify-center gap-2">
-                                    <i class="fa-regular fa-copy"></i> Copy to Clipboard
-                                </button>
-                            </div>
                         </div>
                         <div id="messageArea" class="message-area mt-4 text-center text-sm"></div>
-                        <button id="logoutBtn" class="mt-8 text-custom-light-gray hover:text-white text-sm transition underline underline-offset-4">Sign Out</button>
                     </div>
                 </div>
 
             </div>
 
-            <div class="auth-col right-col flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray">
-                <div class="w-full flex flex-col items-center justify-center">
+            <div class="auth-col right-col flex-1 p-8 flex flex-col items-center bg-custom-darkest-gray">
+                
+                <div id="unauth-social-container" class="w-full h-full flex flex-col items-center justify-center">
                     <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Continue instantly</h2>
                     <p class="text-lg text-custom-light-gray mb-8 text-center max-w-md font-normal">
                         Use a trusted provider to sign in or create an account in one click.
@@ -153,6 +169,30 @@
                         <a href="../legal.html#privacy-policy" target="_blank" class="text-white hover:text-gray-300 font-normal">Privacy Policy</a>.
                     </p>
                 </div>
+
+                <div id="auth-info-container" class="w-full h-full flex flex-col justify-between hidden">
+                    <div class="flex flex-col items-center justify-center flex-grow">
+                        <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">How to Connect</h2>
+                        <div class="max-w-md text-custom-light-gray text-lg font-light leading-relaxed space-y-4">
+                            <p>
+                                <strong class="text-white">1. Generate Code:</strong> Click the button on the left to create a unique pairing key.
+                            </p>
+                            <p>
+                                <strong class="text-white">2. Open Client:</strong> Launch the 4SP desktop application on your computer.
+                            </p>
+                            <p>
+                                <strong class="text-white">3. Link:</strong> Enter the code into the client to sync your account and unlock the toolkit.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full flex justify-end mt-8">
+                        <button id="logoutBtn" class="py-2 px-6 text-sm font-medium rounded-xl text-indigo-500 bg-indigo-500/10 border border-indigo-500 hover:bg-indigo-500/20 transition">
+                            Sign Out <i class="fa-solid fa-arrow-right-from-bracket ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
@@ -169,6 +209,7 @@
             getAuth,
             onAuthStateChanged,
             signOut,
+            signInWithEmailAndPassword,
             GoogleAuthProvider,
             GithubAuthProvider,
             TwitterAuthProvider,
@@ -179,14 +220,15 @@
             getFirestore, 
             doc, 
             setDoc,
-            deleteDoc, // Added import
+            deleteDoc, 
             serverTimestamp,
             query,
             where,
             getDocs,
             limit,
             collection,
-            writeBatch
+            writeBatch,
+            onSnapshot 
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
         const firebaseConfig = {
@@ -203,8 +245,12 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const unauthView = document.getElementById('unauthenticatedView');
-        const authView = document.getElementById('authenticatedView');
+        // UI References
+        const unauthLoginContainer = document.getElementById('unauth-login-container');
+        const unauthSocialContainer = document.getElementById('unauth-social-container');
+        const authCodeContainer = document.getElementById('auth-code-container');
+        const authInfoContainer = document.getElementById('auth-info-container');
+
         const userEmailSpan = document.getElementById('userEmail');
         const generateBtn = document.getElementById('generateBtn');
         const resultContainer = document.getElementById('resultContainer');
@@ -213,70 +259,132 @@
         const copyBtn = document.getElementById('copyBtn');
         const messageArea = document.getElementById('messageArea');
         const logoutBtn = document.getElementById('logoutBtn');
+        const loginMessage = document.getElementById('loginMessage');
 
         const INDIGO_CLASSES = "text-indigo-500 bg-indigo-500/10 border-indigo-500 hover:bg-indigo-500/20";
         const CYAN_CLASSES = "text-cyan-500 bg-cyan-500/10 border-cyan-500 hover:bg-cyan-500/20";
 
+        // Variable to hold the unsubscribe function for the listener
+        let unsubscribeCodeListener = null;
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                unauthView.classList.add('hidden');
-                authView.classList.remove('hidden');
+                // LOGGED IN
+                unauthLoginContainer.classList.add('hidden');
+                unauthSocialContainer.classList.add('hidden');
+                
+                authCodeContainer.classList.remove('hidden');
+                authCodeContainer.style.display = 'flex'; // Ensure flex layout
+                authInfoContainer.classList.remove('hidden');
+                
                 userEmailSpan.textContent = user.email;
 
-                // CHECK FOR EXISTING CODE
-                // Removed "orderBy" and "active=true" to fix index issues and find *any* code owned by user
+                // Set up Real-time Listener for the user's access code
+                if (unsubscribeCodeListener) {
+                    unsubscribeCodeListener(); // Prevent duplicate listeners
+                }
+
                 try {
                     const q = query(
                         collection(db, "access_codes"), 
                         where("ownerUid", "==", user.uid),
                         limit(1)
                     );
-                    const querySnapshot = await getDocs(q);
 
-                    if (!querySnapshot.empty) {
-                        const docSnapshot = querySnapshot.docs[0];
-                        const docData = docSnapshot.data();
-                        const docId = docSnapshot.id;
-                        const formatted = docId.match(/.{1,4}/g).join('-');
-                        
-                        codeOutput.innerText = formatted;
-                        resultContainer.classList.remove('hidden');
-                        resultContainer.style.display = 'flex';
-                        
-                        // Check 'claimed' status
-                        if (docData.claimed === true) {
-                            codeStatus.innerHTML = '<span class="text-green-500"><i class="fa-solid fa-link"></i> Linked & Active</span>';
-                            messageArea.innerText = "This code is currently in use on your local client.";
-                            messageArea.className = "message-area mt-4 text-center text-sm text-gray-500";
+                    unsubscribeCodeListener = onSnapshot(q, (snapshot) => {
+                        if (!snapshot.empty) {
+                            // Code Exists - Render it
+                            const docSnapshot = snapshot.docs[0];
+                            renderCodeState(docSnapshot);
                         } else {
-                            codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
-                            messageArea.innerText = "This code is ready. Enter it in your 4SP Local Client.";
-                            messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
+                            // No Code Found - Reset UI
+                            renderNoCodeState();
                         }
-                        
-                        // Set Regenerate Style
-                        generateBtn.innerText = "Regenerate Code";
-                        generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl transition mb-6 ${CYAN_CLASSES}`;
-                        generateBtn.classList.remove('hidden');
-                    } else {
-                        // Default Style (No code found)
-                        generateBtn.innerText = "Generate Code";
-                        generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl transition mb-6 ${INDIGO_CLASSES}`;
-                        resultContainer.classList.add('hidden');
-                        generateBtn.classList.remove('hidden');
-                        messageArea.innerText = "";
-                    }
+                    }, (error) => {
+                        console.error("Snapshot error:", error);
+                    });
+
                 } catch (e) {
-                    console.error("Error fetching code:", e);
+                    console.error("Error setting up listener:", e);
                 }
 
             } else {
-                unauthView.classList.remove('hidden');
-                authView.classList.add('hidden');
+                // LOGGED OUT
+                unauthLoginContainer.classList.remove('hidden');
+                unauthSocialContainer.classList.remove('hidden');
+                
+                authCodeContainer.classList.add('hidden');
+                authInfoContainer.classList.add('hidden');
+                
                 resultContainer.classList.add('hidden');
                 generateBtn.classList.remove('hidden');
+                
+                // Detach listener
+                if (unsubscribeCodeListener) {
+                    unsubscribeCodeListener();
+                    unsubscribeCodeListener = null;
+                }
             }
         });
+
+        // --- Email/Password Login Handler ---
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            loginMessage.innerText = ""; // Clear previous errors
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // State change handled by onAuthStateChanged
+            } catch (error) {
+                let msg = 'Invalid email or password.';
+                if (error.code === 'auth/too-many-requests') msg = 'Access temporarily disabled due to too many failed login attempts.';
+                else if (error.code === 'auth/user-disabled') msg = 'Your account has been disabled.';
+                loginMessage.innerText = msg;
+            }
+        });
+
+        // Helper: Render UI when a code exists
+        function renderCodeState(docSnapshot) {
+            const docData = docSnapshot.data();
+            const docId = docSnapshot.id;
+            const formatted = docId.match(/.{1,4}/g).join('-');
+            
+            codeOutput.innerText = formatted;
+            resultContainer.classList.remove('hidden');
+            resultContainer.style.display = 'flex';
+            
+            // Check 'claimed' status
+            if (docData.claimed === true) {
+                codeStatus.innerHTML = '<span class="text-green-500"><i class="fa-solid fa-link"></i> Linked & Active</span>';
+                messageArea.innerHTML = "This code is currently in use on your local client.";
+                messageArea.className = "message-area mt-4 text-center text-sm text-gray-500";
+            } else {
+                codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
+                
+                // Added Download Link here
+                messageArea.innerHTML = `Code generated. Enter it in your 4SP Local Client. <a href="../4simpleproblems_v5.html" download="4simpleproblems_v5.html" class="text-cyan-500 hover:underline cursor-pointer ml-1" title="Download 4SP Client">Download Here</a>`;
+                messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
+            }
+            
+            // Set Regenerate Style (Outline added via classes)
+            generateBtn.innerText = "Regenerate Code";
+            generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl border border-cyan-500 transition mb-6 ${CYAN_CLASSES}`;
+            generateBtn.disabled = false;
+            generateBtn.classList.remove('hidden');
+        }
+
+        // Helper: Render UI when no code exists
+        function renderNoCodeState() {
+            generateBtn.innerText = "Generate Code";
+            generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl border border-indigo-500 transition mb-6 ${INDIGO_CLASSES}`;
+            resultContainer.classList.add('hidden');
+            generateBtn.classList.remove('hidden');
+            generateBtn.disabled = false;
+            messageArea.innerText = "";
+        }
 
         async function handleSocialAuth(provider) {
             try {
@@ -291,6 +399,7 @@
         document.getElementById('githubAuthBtn').addEventListener('click', () => handleSocialAuth(new GithubAuthProvider()));
         document.getElementById('twitterAuthBtn').addEventListener('click', () => handleSocialAuth(new TwitterAuthProvider()));
         document.getElementById('microsoftAuthBtn').addEventListener('click', () => handleSocialAuth(new OAuthProvider('microsoft.com')));
+        
         logoutBtn.addEventListener('click', () => signOut(auth));
 
         function generateRandomCode() {
@@ -304,22 +413,18 @@
 
         generateBtn.addEventListener('click', async () => {
             generateBtn.disabled = true;
-            const originalText = generateBtn.innerText;
             generateBtn.innerText = "Generating...";
             
             const rawCode = generateRandomCode();
-            const formattedCode = rawCode.match(/.{1,4}/g).join('-');
 
             try {
                 // 1. DELETE ANY OLD CODES
-                // We find ANY code owned by this user and delete it to keep it clean (1 user = 1 code)
                 const q = query(
                     collection(db, "access_codes"), 
                     where("ownerUid", "==", auth.currentUser.uid)
                 );
                 const querySnapshot = await getDocs(q);
                 
-                // Use a batch to delete all found (usually just 1)
                 const batch = writeBatch(db);
                 querySnapshot.forEach((doc) => {
                     batch.delete(doc.ref);
@@ -334,42 +439,26 @@
                     ownerUid: auth.currentUser.uid,
                     createdAt: serverTimestamp()
                 });
-
-                codeOutput.innerText = formattedCode;
-                
-                // Show result
-                resultContainer.classList.remove('hidden');
-                resultContainer.style.display = 'flex';
-                
-                // Set Status to Awaiting for new code
-                codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
-                messageArea.innerText = "Code generated. Enter it in your 4SP Local Client.";
-                messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
-                
-                // Switch to Regenerate Style
-                generateBtn.innerText = "Regenerate Code";
-                generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl transition mb-6 ${CYAN_CLASSES}`;
-                generateBtn.disabled = false;
                 
             } catch (e) {
                 console.error("Error creating code:", e);
                 alert("Failed to generate code.");
                 generateBtn.disabled = false;
-                generateBtn.innerText = originalText;
+                generateBtn.innerText = "Regenerate Code"; // Fallback text
             }
         });
 
         copyBtn.addEventListener('click', () => {
             const code = codeOutput.innerText;
             navigator.clipboard.writeText(code).then(() => {
-                const prevText = messageArea.innerText;
+                const prevHTML = messageArea.innerHTML;
                 const prevClass = messageArea.className;
                 
                 messageArea.innerText = "Copied to clipboard!";
                 messageArea.className = "message-area mt-4 text-center text-sm success-message";
                 
                 setTimeout(() => {
-                    messageArea.innerText = prevText;
+                    messageArea.innerHTML = prevHTML;
                     messageArea.className = prevClass;
                 }, 2000);
             });
