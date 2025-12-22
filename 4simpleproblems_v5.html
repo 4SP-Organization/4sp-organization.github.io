@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4SP - LOCAL CLIENT</title>
+    <base href="https://cdn.jsdelivr.net/npm/4sp-dv@latest/logged-in/">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body { 
+            background-color: #040404; 
+            color: #c0c0c0; 
+            font-family: 'Geist', sans-serif; 
+            height: 100vh; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            font-weight: 300;
+        }
+        
+        h1, h2, h3, .font-bold, .font-semibold, strong, b, .tracking-widest {
+            font-weight: 400 !important;
+        }
+
+        #app-frame { width: 100%; height: 100%; border: none; display: none; flex-grow: 1; }
+        .hidden { display: none !important; }
+
+        /* --- Navbar Styles --- */
+        #navbar-container {
+            background: var(--navbar-bg, #000000);
+            border-bottom: 1px solid var(--navbar-border, #1f2937);
+            height: 64px;
+            width: 100%;
+            display: none; /* Hidden until unlocked */
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            z-index: 60; /* Ensure navbar is above settings */
+            position: relative;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .navbar-logo { height: 40px; width: auto; transition: filter 0.3s ease; }
+        .tab-wrapper { flex-grow: 1; display: flex; align-items: center; position: relative; min-width: 0; margin: 0 1rem; justify-content: center; overflow: hidden; }
+        .tab-scroll-container { 
+            display: flex; align-items: center; gap: 0.5rem; overflow-x: auto; 
+            scrollbar-width: none; white-space: nowrap; max-width: 100%;
+        }
+        .tab-scroll-container::-webkit-scrollbar { display: none; }
+        
+        .nav-tab { 
+            padding: 0.5rem 1rem; 
+            color: var(--tab-text, #9ca3af); 
+            font-size: 0.875rem; font-weight: 400; 
+            border-radius: 12px; text-decoration: none; display: flex; align-items: center; gap: 0.5rem;
+            border: 1px solid transparent; transition: all 0.2s; cursor: pointer;
+        }
+        .nav-tab:hover { 
+            color: var(--tab-hover-text, #ffffff); 
+            background-color: var(--tab-hover-bg, rgba(79, 70, 229, 0.05));
+            border-color: var(--tab-hover-border, transparent);
+        }
+        .nav-tab.active { 
+            color: var(--tab-active-text, #4f46e5); 
+            border-color: var(--tab-active-border, #4f46e5); 
+            background-color: var(--tab-active-bg, rgba(79, 70, 229, 0.1)); 
+        }
+        .nav-tab.active:hover {
+            color: var(--tab-active-hover-text, #6366f1);
+            border-color: var(--tab-active-hover-border, #6366f1);
+            background-color: var(--tab-active-hover-bg, rgba(79, 70, 229, 0.15));
+        }
+        
+        .auth-controls-wrapper { display: flex; align-items: center; gap: 1rem; position: relative; }
+        
+        .icon-btn {
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid #4b5563; 
+            display: flex; align-items: center; justify-content: center; color: #d1d5db; 
+            cursor: pointer; background: transparent; transition: background 0.2s; position: relative;
+        }
+        .icon-btn:hover { background-color: #374151; color: white; }
+
+        .auth-menu, .pin-context-menu {
+            position: absolute; right: 0; top: 50px; width: 14rem;
+            background: var(--menu-bg, #000); 
+            border: 1px solid var(--menu-border, #374151); 
+            border-radius: 0.75rem;
+            padding: 0.5rem; display: none; flex-direction: column; gap: 0.25rem; z-index: 50;
+        }
+        .pin-context-menu { right: auto; left: 0; width: 12rem; }
+        .auth-menu.open, .pin-context-menu.open { display: flex; }
+        
+        .auth-menu-item {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem;
+            color: var(--menu-text, #d1d5db); 
+            border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem;
+            transition: background 0.15s; cursor: pointer;
+        }
+        .auth-menu-item:hover { 
+            background-color: var(--menu-item-hover-bg, #374151); 
+            color: var(--menu-item-hover-text, white); 
+        }
+        .auth-header { 
+            padding: 0.5rem; 
+            border-bottom: 1px solid var(--menu-divider, #374151); 
+            margin-bottom: 0.25rem; 
+        }
+        .auth-username { color: var(--menu-username-text, white); font-weight: 400; font-size: 0.9rem; }
+        .auth-email { color: var(--menu-email-text, #9ca3af); font-size: 0.75rem; }
+
+        /* --- Settings Page Styles --- */
+        #settings-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            top: 64px; /* Below navbar */
+            background: #040404;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #settings-container {
+            display: flex;
+            flex-grow: 1;
+            padding: 20px;
+            overflow: hidden; /* Contain scroll */
+        }
+
+        #settings-sidebar {
+            width: 250px;
+            padding-right: 20px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+        }
+
+        #settings-main-view {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 0.75rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .btn-toolbar-style {
+            background: #000000;
+            border: 1px solid #333;
+            border-radius: 0.75rem;
+            color: #d1d5db;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-toolbar-style:hover {
+            background-color: #000000;
+            border-color: #fff;
+            color: #ffffff;
+        }
+        
+        .btn-toolbar-style.btn-primary-override {
+            justify-content: center;
+            background-color: rgba(79, 70, 229, 0.1);
+            border: 1px solid #4f46e5;
+            color: #4f46e5;
+        }
+        .btn-toolbar-style.btn-primary-override:hover {
+            background-color: rgba(79, 70, 229, 0.15);
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        .settings-tab {
+            width: 100%;
+            justify-content: flex-start;
+        }
+        .settings-tab.active {
+            background-color: rgba(79, 70, 229, 0.1);
+            border: 1px solid #4f46e5;
+            color: #4f46e5;
+        }
+        .settings-tab.active:hover {
+            background-color: rgba(79, 70, 229, 0.15);
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        .settings-box { 
+            border: 1px solid #333; 
+            border-radius: 1rem; 
+            background-color: #000000; 
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-text-style, .input-select-style {
+            width: 100%; padding: 0.75rem; border: 1px solid #252525; 
+            background-color: #111111; border-radius: 0.5rem; color: #c0c0c0; transition: all 0.2s;
+        }
+        .input-text-style:focus, .input-select-style:focus { 
+            border-color: #505050; outline: none; box-shadow: 0 0 0 2px rgba(80, 80, 80, 0.5);
+        }
+
+        /* --- Input Key Style (Panic Key) --- */
+        .input-key-style {
+            width: 4rem; /* Fixed width for a single key */
+            padding: 0.75rem;
+            border: 1px solid #252525; 
+            background-color: #111111; 
+            border-radius: 0.5rem; 
+            color: #c0c0c0; 
+            transition: all 0.2s;
+            font-size: 1.1rem;
+            text-align: center;
+            font-weight: 500;
+            text-transform: uppercase;
+            caret-color: transparent;
+        }
+        .input-key-style:focus {
+            border-color: #505050; 
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(80, 80, 80, 0.5);
+        }
+        .input-key-style::placeholder {
+            font-size: 1rem;
+            text-transform: none;
+        }
+        .general-message-area { min-height: 20px; margin-top: 1rem; font-weight: 400; }
+        .success-message { color: #4ade80; }
+        .error-message { color: #f87171; }
+        .warning-message { color: #fbbf24; }
+        
+        /* --- Theme Picker Styles --- */
+        #theme-picker-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+            width: 100%;
+        }
+        .theme-button {
+            border: 2px solid var(--tab-active-border, #4f46e5); 
+            background-color: #111; 
+            border-radius: 0.75rem; 
+            padding: 0.75rem; 
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease-out;
+            opacity: 0.7;
+            position: relative;
+        }
+        .theme-button:hover {
+            opacity: 1;
+            border-color: var(--tab-active-hover-border, #6366f1);
+            transform: translateY(-2px);
+        }
+        .theme-button.active {
+            opacity: 1;
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
+        }
+        .theme-button-name {
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+
+        /* Cropper Styles */
+        #cropperModal {
+            display: none; position: fixed; z-index: 2050; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); justify-content: center; align-items: center; flex-direction: column;
+        }
+        #cropperContent {
+            background-color: #000000; padding: 0; border-radius: 1rem; border: 1px solid #333;
+            display: flex; flex-direction: column; width: 90%; max-width: 600px; overflow: hidden;
+        }
+        #cropperCanvasContainer {
+            position: relative; margin-bottom: 20px; overflow: hidden; max-height: 60vh;
+        }
+        #cropperCanvas { display: block; max-width: 100%; max-height: 60vh; border: 1px dashed rgba(255, 255, 255, 0.3); }
+
+    </style>
+</head>
+<body>
+    <div id="lock-screen" class="w-full h-full flex flex-col items-center justify-center p-4">
+        <div class="max-w-5xl w-full bg-[#040404] flex flex-col md:flex-row border border-[#252525] rounded-3xl overflow-hidden shadow-2xl">
+            <div class="flex-1 p-8 flex flex-col justify-center items-center border-b md:border-b-0 md:border-r border-[#252525]">
+                <h2 class="text-3xl text-[#c0c0c0] mb-6 text-center w-full font-light tracking-tighter">4SP v5 Client</h2>
+                <p class="text-[#505050] text-center mb-8 text-sm">Enter your 12-character access code.</p>
+                
+                <input type="text" id="codeInput" class="w-full max-w-xs bg-[#111] border border-[#252525] text-white rounded-xl p-3 text-center tracking-[0.2em] mb-4 outline-none focus:border-indigo-500 transition" placeholder="XXXX-XXXX-XXXX">
+                
+                <button id="unlockBtn" class="w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl text-indigo-500 bg-indigo-500/10 border border-indigo-500 hover:bg-indigo-500/20 transition mb-4">
+                    Login
+                </button>
+                
+                <p id="lockMessage" class="text-red-400 text-xs mt-2 min-h-[20px] text-center"></p>
+                <p id="loading-text" class="text-gray-500 text-xs mt-2 hidden text-center">Verifying...</p>
+            </div>
+
+            <div class="flex-1 p-8 flex flex-col justify-center items-center bg-[#040404]">
+                <h2 class="text-3xl text-[#c0c0c0] mb-6 text-center w-full font-light tracking-tighter">How it works</h2>
+                <p class="text-lg text-[#505050] mb-8 text-center max-w-md font-light leading-relaxed">
+                    This client provides secure, local access to the 4SP suite. Generate a unique code from your web dashboard to log in properly.
+                </p>
+                
+                <a href="https://4sp-organization.github.io/connection.html" target="_blank" class="w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl text-cyan-500 bg-cyan-500/10 border border-cyan-500 hover:bg-cyan-500/20 transition text-center flex items-center justify-center">
+                    Get Your Code
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="navbar-container">
+        <img src="https://cdn.jsdelivr.net/npm/4sp-asset-library@latest/logo.png" id="navbar-logo" class="navbar-logo" alt="Logo">
+        
+        <div class="tab-wrapper">
+            <div class="tab-scroll-container" id="tabs-container">
+                </div>
+        </div>
+
+        <div class="auth-controls-wrapper">
+            <div class="relative" id="pin-wrapper">
+                <button id="pin-btn" class="icon-btn" title="Pin this page">
+                    <i class="fa-solid fa-thumbtack"></i>
+                </button>
+                <div id="pin-menu" class="pin-context-menu">
+                    <div class="auth-menu-item" id="repin-btn">
+                        <i class="fa-solid fa-thumbtack w-4"></i> Repin
+                    </div>
+                    <div class="auth-menu-item text-red-400 hover:text-red-300" id="remove-pin-btn">
+                        <i class="fa-solid fa-xmark w-4"></i> Remove Pin
+                    </div>
+                    <div class="auth-menu-item text-red-400 hover:text-red-300" id="hide-pin-btn">
+                        <i class="fa-solid fa-eye-slash w-4"></i> Hide Button
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative">
+                <button id="auth-btn" class="icon-btn">
+                    <i class="fa-solid fa-user"></i>
+                </button>
+                <div id="auth-menu" class="auth-menu">
+                    <div class="auth-header">
+                        <div class="auth-username" id="display-username">Client User</div>
+                        <div class="auth-email" id="display-email">local@client</div>
+                    </div>
+                    <a href="#" class="auth-menu-item" onclick="loadPage('settings.html'); return false;">
+                        <i class="fa-solid fa-gear w-4"></i> Settings
+                    </a>
+                    <div class="auth-menu-item hidden" id="show-pin-menu-item">
+                        <i class="fa-solid fa-eye w-4"></i> Show Pin Button
+                    </div>
+                    <div class="auth-menu-item text-red-400 hover:text-red-300" id="logout-btn">
+                        <i class="fa-solid fa-right-from-bracket w-4"></i> Disconnect
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-overlay" class="hidden">
+        <header class="flex justify-between items-center p-4 border-b border-[#1a1a1a]">
+            <h1 class="text-2xl font-bold text-white">4SP Settings</h1>
+        </header>
+
+        <div id="settings-container">
+            <nav id="settings-sidebar">
+                <button class="btn-toolbar-style settings-tab active" data-tab="general">
+                    <i class="fa-solid fa-gear w-5"></i> <span>General</span>
+                </button>
+                <button class="btn-toolbar-style settings-tab" data-tab="personalization">
+                    <i class="fa-solid fa-palette w-5"></i> <span>Personalization</span>
+                </button>
+                <button class="btn-toolbar-style settings-tab" data-tab="privacy">
+                    <i class="fa-solid fa-shield-halved w-5"></i> <span>Privacy & Security</span>
+                </button>
+                <button class="btn-toolbar-style settings-tab" data-tab="about">
+                    <i class="fa-solid fa-circle-info w-5"></i> <span>About 4SP</span>
+                </button>
+            </nav>
+
+            <div id="settings-main-view">
+                <div id="tab-general" class="settings-section">
+                    <h3 class="text-3xl font-bold text-white mb-6">General Settings</h3>
+                    <div class="settings-box">
+                        <h3 class="text-xl font-bold text-white mb-2">Account Username</h3>
+                        <label class="block text-gray-400 text-sm mb-2 font-light">New Username</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="settings-username-input" class="input-text-style" placeholder="Enter username">
+                            <button id="save-username-btn" class="btn-toolbar-style btn-primary-override">Save</button>
+                        </div>
+                        <p id="username-msg" class="general-message-area text-sm mt-2"></p>
+                    </div>
+                </div>
+
+                <div id="tab-personalization" class="settings-section hidden">
+                    <h3 class="text-3xl font-bold text-white mb-6">Personalization</h3>
+                    
+                    <h3 class="text-xl font-bold text-white mb-2">Profile Picture</h3>
+                    <div class="settings-box mb-8 p-4">
+                        <div class="flex items-start gap-6">
+                            <div class="flex flex-col items-center gap-2">
+                                <div id="pfp-preview" class="w-24 h-24 rounded-full bg-gray-700 overflow-hidden border-2 border-[#333] flex items-center justify-center text-3xl font-bold text-white relative">
+                                </div>
+                                <p class="text-xs text-gray-500">Preview</p>
+                            </div>
+                            
+                            <div class="flex-grow">
+                                <div class="flex gap-4 mb-4 border-b border-[#333] pb-4">
+                                    <button class="pfp-mode-btn active btn-toolbar-style" data-mode="letter">Letter Avatar</button>
+                                    <button class="pfp-mode-btn btn-toolbar-style" data-mode="upload">Upload Image</button>
+                                </div>
+
+                                <div id="pfp-letter-options" class="block">
+                                    <div class="grid grid-cols-6 gap-2 mb-4 max-w-xs">
+                                        </div>
+                                    <button id="save-letter-pfp-btn" class="btn-toolbar-style btn-primary-override">Set Letter Avatar</button>
+                                </div>
+
+                                <div id="pfp-upload-options" class="hidden">
+                                    <input type="file" id="pfp-upload-input" accept="image/*" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#222] file:text-white hover:file:bg-[#333] mb-4"/>
+                                    <p class="text-xs text-gray-500 mb-4">Max size 2MB. Square images work best.</p>
+                                    <button id="save-upload-pfp-btn" class="btn-toolbar-style btn-primary-override">Upload & Set</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-white mb-2">Navigation Bar Theme</h3>
+                    <div class="settings-box p-4">
+                        <div id="theme-picker-container">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-privacy" class="settings-section hidden">
+                    <h3 class="text-3xl font-bold text-white mb-6">Privacy & Security</h3>
+                    
+                    <h3 class="text-xl font-bold text-white mb-2">Panic Key Settings</h3>
+                    <div class="settings-box p-4">
+                        <p class="text-sm font-light text-gray-400 mb-4">
+                            Configure up to 3 panic keys. Pressing the specified key (without Shift, Ctrl, or Alt) on any page will redirect you to the URL you set.
+                            <br>
+                            <span class="text-yellow-400">Valid keys:</span> a-z, 0-9, and &#96; - = [ ] \ ; ' , . /
+                        </p>
+                        
+                        <div class="flex items-center gap-4 px-2 mb-2">
+                            <label class="block text-gray-400 text-sm font-light" style="width: 4rem; text-align: center;">Key</label>
+                            <label class="block text-gray-400 text-sm font-light flex-grow">Redirect URL</label>
+                        </div>
+
+                        <div class="flex items-center gap-4 mb-3">
+                            <input type="text" id="panicKey1" data-key-id="1" class="input-key-style panic-key-input" placeholder="-" maxlength="1">
+                            <input type="url" id="panicUrl1" class="input-text-style" placeholder="e.g., https://google.com">
+                        </div>
+                        
+                        <div class="flex items-center gap-4 mb-3">
+                            <input type="text" id="panicKey2" data-key-id="2" class="input-key-style panic-key-input" placeholder="-" maxlength="1">
+                            <input type="url" id="panicUrl2" class="input-text-style" placeholder="e.g., https://youtube.com/feed/subscriptions">
+                        </div>
+                        
+                        <div class="flex items-center gap-4 mb-3">
+                            <input type="text" id="panicKey3" data-key-id="3" class="input-key-style panic-key-input" placeholder="-" maxlength="1">
+                            <input type="url" id="panicUrl3" class="input-text-style" placeholder="e.g., https://wikipedia.org">
+                        </div>
+                        
+                        <div class="flex justify-between items-center pt-4 border-t border-[#252525]">
+                            <p id="panicKeyMessage" class="general-message-area text-sm"></p>
+                            <button id="applyPanicKeyBtn" class="btn-toolbar-style btn-primary-override w-36" style="padding: 0.5rem 0.75rem;">
+                                <i class="fa-solid fa-check mr-1"></i> Apply Keys
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-about" class="settings-section hidden">
+                    <h3 class="text-3xl font-bold text-white mb-6">About 4SP</h3>
+                    <div class="settings-box p-6 flex flex-col items-center text-center">
+                        <img src="https://cdn.jsdelivr.net/npm/4sp-asset-library@latest/logo.png" class="h-24 mb-4" alt="Logo">
+                        <h1 class="text-3xl font-bold text-white mb-2">4SimpleProblems</h1>
+                        <p class="text-gray-400 mb-6 max-w-lg font-light">A comprehensive student toolkit and entertainment platform.</p>
+                        
+                        <div class="inline-block bg-[#0a0a0a] border border-[#333] px-4 py-2 rounded-full mb-8">
+                            <span class="text-gray-500 text-sm">Version</span>
+                            <span class="text-indigo-400 font-mono font-bold ml-2">5.0.0 DV</span>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <a href="#" class="text-gray-400 hover:text-white transition"><i class="fa-brands fa-github fa-xl"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-white transition"><i class="fa-brands fa-youtube fa-xl"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-white transition"><i class="fa-brands fa-discord fa-xl"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="cropperModal">
+        <div id="cropperContent">
+            <div class="flex justify-between items-center p-6 border-b border-[#333] bg-black">
+                <h3 class="text-2xl font-bold text-white">Adjust Profile Picture</h3>
+                <button id="cancelCropBtn" class="btn-toolbar-style w-10 h-10 flex items-center justify-center p-0 rounded-xl">
+                     <i class="fa-solid fa-xmark fa-xl"></i>
+                </button>
+            </div>
+            <div class="flex flex-col items-center p-6 bg-[#0a0a0a]">
+                <p class="text-sm text-gray-400 mb-4">Drag to move. Scroll to resize.</p>
+                <div id="cropperCanvasContainer" class="relative mb-6 border border-[#333] rounded-lg overflow-hidden w-full flex justify-center bg-black">
+                    <canvas id="cropperCanvas"></canvas>
+                </div>
+                <div class="flex justify-end w-full">
+                    <button id="submitCropBtn" class="btn-toolbar-style btn-primary-override px-6 py-2 rounded-xl">
+                        <i class="fa-solid fa-check mr-2"></i> Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <template id="games-page-template">
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <title>4SP - GAMES</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico" id="faviconLink" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://dv-service-lfs.4simpleproblems.workers.dev/url-changer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/analytics.js"></script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1D4F692C1Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-1D4F692C1Q');
+    </script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'deep-black': '#040404',
+                        'card-dark': '#111111',
+                        'accent-indigo': '#4f46e5',
+                        'brand-border': '#252525',
+                        'strongdog-orange': '#FFA500',
+                        'gn-math': '#FB2651',
+                        'gameboy': '#9A2257', 
+                        'other-grey': '#AAAAAA', 
+                    },
+                    fontFamily: {
+                        sans: ['Geist', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'md': '0.375rem',
+                        'lg': '0.5rem',
+                        'xl': '0.75rem',
+                        '2xl': '1.25rem',
+                        '3xl': '1.5rem', 
+                    },
+                    aspectRatio: {
+                        '3/2': '3 / 2',
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Base styles */
+        :root {
+            --menu-bg: #000000;
+            --menu-border: #333;
+            --menu-text: #d1d5db;
+            --tab-hover-text: #ffffff;
+            --tab-active-bg: rgba(79, 70, 229, 0.1);
+            --tab-active-text: #4f46e5;
+            --tab-active-border: #4f46e5;
+        }
+
+        body {
+            font-family: 'Geist', 'sans-serif';
+            font-weight: 300;
+            background-color: #040404;
+            padding-bottom: 100px;
+        }
+        
+        h1, h2, h3, .font-bold, .font-semibold, strong {
+            font-weight: 400 !important;
+        }
+
+        /* --- Toolbar Button Style (Global) --- */
+        .btn-toolbar-style {
+            background: var(--menu-bg);
+            border: 1px solid var(--menu-border);
+            border-radius: 0.75rem; 
+            color: var(--menu-text);
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+        .btn-toolbar-style:hover {
+            background-color: var(--menu-bg);
+            border-color: #fff;
+            color: var(--tab-hover-text);
+        }
+
+        /* --- Card Action Buttons --- */
+        .btn-card-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 0.5rem;
+            background-color: transparent;
+            border: 1px solid transparent;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .btn-card-action:hover {
+            background-color: var(--tab-active-bg);
+            color: var(--tab-active-text);
+            border-color: var(--tab-active-border);
+        }
+        
+        /* Favorite Button Logic */
+        .btn-card-action.fav-action .fa-solid-star { display: none; }
+        .btn-card-action.fav-action .fa-regular-star { display: inline-block; }
+        
+        .btn-card-action.fav-action.favorited .fa-solid-star { display: inline-block; color: #facc15; }
+        .btn-card-action.fav-action.favorited .fa-regular-star { display: none; }
+        
+        .btn-card-action.fav-action:not(.favorited):hover .fa-regular-star { color: var(--tab-active-text); }
+        
+        /* Card Hover Effects */
+        .zone-item {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            will-change: transform;
+        }
+        .zone-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.2);
+        }
+        
+        .other-zone-item {
+            min-height: 250px;
+            transition: box-shadow 0.2s ease-in-out;
+            position: relative; 
+            z-index: 1; 
+        }
+        .other-zone-item:hover {
+            box-shadow: 0 8px 25px rgba(170, 170, 170, 0.2);
+            z-index: 10; 
+        }
+        .other-zone-item .image-overlay {
+            background: linear-gradient(90deg, rgba(7,7,7,0.85) 0%, rgba(7,7,7,0) 40%, rgba(7,7,7,0) 60%, rgba(7,7,7,0.85) 100%);
+            border-radius: 1.25rem; 
+        }
+        .other-zone-item:hover .image-overlay {
+            background: linear-gradient(90deg, rgba(7,7,7,0.7) 0%, rgba(7,7,7,0) 50%, rgba(7,7,7,0) 50%, rgba(7,7,7,0.7) 100%);
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
+        }
+        .fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+            pointer-events: none;
+        }
+
+        /* Search Bar & Results */
+        .search-results-container {
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #333 transparent;
+        }
+        .search-item {
+            display: flex;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #e5e7eb;
+            text-decoration: none;
+            padding: 10px 15px;
+        }
+        .search-item:hover { background-color: rgba(255, 255, 255, 0.05); }
+
+        @media (max-width: 768px) {
+            #bottom-fixed-bar {
+                left: 10px !important; right: 10px !important;
+                bottom: 10px !important; width: auto !important;
+            }
+        }
+
+        /* Polyfill for aspect-ratio */
+        .aspect-w-3 { position: relative; padding-bottom: 66.666667%; }
+        .aspect-h-2 { }
+        .aspect-w-3 > * { position: absolute; height: 100%; width: 100%; top: 0; right: 0; bottom: 0; left: 0; }
+        
+        /* --- Game Viewer Modal --- */
+        #zoneViewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); z-index: 5000; flex-direction: column; }
+        #zoneViewer .zone-header {
+            background-color: #111111;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #252525;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        #zoneViewer .zone-header .zone-title h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ffffff;
+            font-family: 'Geist', sans-serif;
+        }
+        #zoneViewer .zone-header .zone-controls { display: flex; align-items: center; }
+        #zoneViewer .zone-header .zone-controls button,
+        #zoneViewer .zone-header .zone-controls a {
+            margin-left: 8px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease-in-out;
+            text-decoration: none;
+        }
+        #zoneViewer .zone-header .zone-controls button:hover,
+        #zoneViewer .zone-header .zone-controls a:hover { background-color: rgba(255, 255, 255, 0.2); }
+        #zoneViewer iframe { flex-grow: 1; border: none; background-color: #000; }
+        .hidden { display: none !important; }
+
+        /* --- Dropdown (Modified to popup ABOVE) --- */
+        .eagler-dropdown {
+            display: none;
+            position: absolute;
+            bottom: 120%; /* Pops up above the button */
+            right: 0;
+            margin-bottom: 5px;
+            background-color: rgba(20, 20, 20, 0.98);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            z-index: 1000;
+            min-width: 200px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            transform-origin: bottom right;
+        }
+        .eagler-dropdown.show { display: block; animation: fadeInUp 0.15s ease-out; }
+        
+        @keyframes fadeInUp { 
+            from { opacity: 0; transform: translateY(10px) scale(0.95); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+
+        .eagler-dropdown-link {
+            display: block;
+            padding: 0.6rem 0.8rem;
+            color: #d1d5db;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            font-weight: 400;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+        .eagler-dropdown-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+
+        #creditsModal { display: none; }
+        
+        /* Modal Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+
+<body class="bg-deep-black text-white min-h-screen">
+
+    <main class="mx-auto my-5 w-full max-w-screen-2xl px-4 relative">
+        <button id="creditsBtn" class="absolute top-0 right-4 z-20 btn-toolbar-style">
+            <i class="fa-solid fa-users mr-2"></i>Credits
+        </button>
+        
+        <div class="mx-auto my-8 p-4 sm:p-6 w-full max-w-3xl relative">
+            <p class="bg-card-dark text-white p-5 rounded-xl shadow-lg border border-brand-border text-sm sm:text-base text-center">
+                <strong>Welcome to 4SP Games!</strong><br>
+                This is a collection of games curated for the 4SP community. Use the search bar below to find your favorite.
+            </p>
+        </div>
+        
+        <div id="favoritesSection">
+            <h2 id="favoritesHeader" class="text-center text-3xl font-bold mt-12 mb-6 text-white" style="display: none;">
+                <strong>Favorites</strong>
+            </h2>
+            <div class="games-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4" id="favoritesGameList" style="display: none;"></div>
+        </div>
+
+        <div id="category-viewer" class="w-full mt-12">
+            <div id="category-slider-container" class="relative flex items-center justify-center max-w-sm mx-auto h-12">
+                <button id="prev-category" class="absolute left-0 top-1/2 -translate-y-1/2 text-2xl text-gray-500 hover:text-white transition-all p-2 z-10 disabled:opacity-30 disabled:text-gray-700 disabled:hover:text-gray-700">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="overflow-hidden w-64 text-center">
+                    <div id="category-slider" class="flex transition-transform duration-500 ease-in-out">
+                        </div>
+                </div>
+                <button id="next-category" class="absolute right-0 top-1/2 -translate-y-1/2 text-2xl text-gray-500 hover:text-white transition-all p-2 z-10 disabled:opacity-30 disabled:text-gray-700 disabled:hover:text-gray-700">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div id="games-grid-container" class="games-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4 mt-6 transition-opacity duration-300 ease-in-out">
+                </div>
+        </div>
+    </main>
+
+    <div id="bottom-fixed-bar" class="fixed bottom-4 right-4 bg-black/80 backdrop-blur-xl rounded-3xl border border-brand-border shadow-2xl shadow-black/50 w-full max-w-md z-50 transition-all duration-300 flex flex-col">
+        <div id="searchResults" class="search-results-container w-full" style="display: none;">
+            </div>
+        
+        <div id="searchDivider" class="w-full h-[1px] bg-white/10" style="display: none;"></div>
+
+        <div class="flex items-center w-full p-1">
+            <div class="pl-4 pr-2 text-gray-400">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search for games…" autocomplete="off" class="w-full py-3 pr-4 bg-transparent text-white placeholder-gray-500 focus:outline-none focus:ring-0 text-base" />
+        </div>
+    </div>
+    
+    <div id="zoneViewer" aria-modal="true" role="dialog">
+        <div class="zone-header">
+             <div class="zone-title">
+                <h2 id="zoneNameEl">Game Title</h2>
+             </div>
+             <div class="zone-controls">
+                <button id="fullscreenBtnZone" title="Fullscreen"><i class="fas fa-expand"></i></button>
+                <a id="downloadBtnZone" title="Download" class="hidden" href="#"><i class="fas fa-download"></i></a>
+                <button id="closeBtnZone" title="Close"><i class="fas fa-times"></i></button>
+             </div>
+        </div>
+        <iframe id="zoneFrame" title="Game Content" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"></iframe>
+    </div>
+
+    <div id="creditsModal" class="fixed top-0 left-0 w-full h-full bg-black/70 backdrop-blur-lg z-[6000] items-center justify-center p-4" style="display: none;">
+        <div class="bg-card-dark rounded-xl border border-brand-border shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
+            <div class="flex justify-between items-center p-4 border-b border-brand-border sticky top-0 bg-card-dark z-10">
+                <h3 class="text-xl font-bold">Project Credits</h3>
+                <button id="closeCreditsBtn" class="text-white hover:text-gray-400 p-2"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="creditsContent" class="p-6 space-y-6">
+                </div>
+        </div>
+    </div>
+
+    <div id="instruction-overlay" class="fixed inset-0 bg-black/80 z-[8000] transition-opacity duration-300 opacity-0 flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-card-dark text-white rounded-3xl border border-gray-700 shadow-2xl backdrop-blur-md w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
+                <h3 class="text-2xl font-bold mb-4 text-center">Welcome to 4SP Games</h3>
+                <p class="text-sm text-gray-400 mb-6 text-center">Please read the following information before playing.</p>
+                
+                <ul class="space-y-4 text-gray-300 text-sm sm:text-base leading-relaxed">
+                    <li class="flex items-start">
+                        <i class="fas fa-compass mt-1 mr-3 text-accent-indigo"></i>
+                        <span><strong>Navigation:</strong> Use the arrows next to the category title (currently "<strong>StrongdogXP</strong>") to switch between different game collections like <strong>GN-Math</strong> and <strong>Others</strong>.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-file-signature mt-1 mr-3 text-accent-indigo"></i>
+                        <span><strong>Rebranding:</strong> "4SP Game Hub" is now shortened to "<strong>4SP Games</strong>".</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-bug mt-1 mr-3 text-strongdog-orange"></i>
+                        <span><strong>Stability Disclaimer:</strong> Some games may be unstable, glitchy, or fail to load. This is often due to browser restrictions or the age of the game files.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-user-gear mt-1 mr-3 text-gn-math"></i>
+                        <span><strong>Management:</strong> I do not personally manage or host the files for these game collections. I cannot directly fix broken game files or save data issues.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-server mt-1 mr-3 text-gn-math"></i>
+                        <span><strong>GN-Math & CDN:</strong> The <strong>GN-Math</strong> category is particularly hard to modify because it uses a <em>CDN (Content Delivery Network)</em>. This means the game files are hosted on remote servers around the world to load faster, rather than being stored here. I cannot edit those files.</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="p-6 border-t border-gray-800 bg-black/20 rounded-b-3xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span class="text-xs text-gray-500">Type "I understand" to continue.</span>
+                <input type="text" id="instruction-input" placeholder="Type 'I understand'" class="w-full sm:w-auto px-6 py-3 border border-transparent text-base font-normal rounded-xl text-white bg-purple-500/10 ring-1 ring-purple-500/50 focus:ring-purple-500/80 focus:bg-purple-500/20 focus:outline-none placeholder-gray-400 transition-all duration-200">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration & Globals ---
+        
+        const GN_ZONES_URL = "https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json";
+        const GN_COVER_URL_BASE = "https://cdn.jsdelivr.net/gh/gn-math/covers@main";
+        
+        // FIXED: Use raw.githack.com for HTML to prevent "showing code" issue
+        const GN_HTML_URL_BASE = "https://raw.githack.com/gn-math/html/main";
+        
+        const WORKER_ROOT = "https://dv-service-lfs.4simpleproblems.workers.dev/";
+        const GAMES_BASE_URL = "https://dv-service-lfs.4simpleproblems.workers.dev/GAMES/";
+        const CARDS_DATA_URL = "https://dv-service-lfs.4simpleproblems.workers.dev/GAMES/cards-data.js";
+
+        const FAVORITES_KEY = 'gameHubFavorites_v3';
+
+        let allGames = [];
+        let searchableGames = [];
+        let categories = [];
+        let currentCategoryIndex = 0;
+        const categoryColors = {
+            'StrongdogXP': 'text-strongdog-orange',
+            'GN-Math': 'text-gn-math',
+            'Gameboy Games': 'text-gameboy',
+            'Others': 'text-other-grey', 
+        };
+        
+        const CREDITS_DATA = {
+            'StrongdogXP': { credit: "Core game collection provided by Josh P.", githubUrl: "https://github.com/jman1593/" },
+            'GN-Math': { credit: "Primary game source and infrastructure provided by the GN-Math Community.", githubUrl: "https://github.com/gn-math/" },
+            'Gameboy Games': { credit: "Emulator and ROM files from various public sources." },
+            'Others': { credit: "Various community developers and open-source projects (e.g., DOOM, Eaglercraft, Carnage3D, JS-DOS)." }
+        };
+
+        const favoritesHeader = document.getElementById("favoritesHeader");
+        const favoritesGameList = document.getElementById("favoritesGameList");
+        const searchInput = document.getElementById("searchInput");
+        const searchResults = document.getElementById("searchResults");
+        const searchDivider = document.getElementById("searchDivider");
+        const categorySlider = document.getElementById('category-slider');
+        const prevCategoryBtn = document.getElementById('prev-category');
+        const nextCategoryBtn = document.getElementById('next-category');
+        const gamesGridContainer = document.getElementById('games-grid-container');
+        
+        const creditsModal = document.getElementById('creditsModal');
+        const creditsContent = document.getElementById('creditsContent');
+        const creditsBtn = document.getElementById('creditsBtn');
+        const closeCreditsBtn = document.getElementById('closeCreditsBtn');
+
+        const INSTRUCTION_KEY = '4sp-games-instruction-extended-seen';
+        const instructionOverlay = document.getElementById('instruction-overlay');
+        const instructionInput = document.getElementById('instruction-input');
+
+        // --- Intersection Observer for Image Virtualization ---
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                const img = entry.target;
+                if (entry.isIntersecting) {
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                    }
+                } else {
+                    if(img.src && !img.src.includes('placehold.co') && !img.dataset.src) {
+                         img.dataset.src = img.src;
+                    }
+                    if(img.dataset.src) {
+                        img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+                    }
+                }
+            });
+        }, {
+            rootMargin: "300px 0px", 
+            threshold: 0.01
+        });
+
+        function observeImages(container) {
+            const images = container.querySelectorAll('img[data-src]');
+            images.forEach(img => imageObserver.observe(img));
+        }
+
+        // --- URL Management ---
+        function updateURL(category, gameId = null) {
+            let hash = `#${encodeURIComponent(category.replace(/\s+/g, '-'))}`;
+            if (gameId) hash += `?id=${gameId}`;
+            try {
+                history.replaceState(null, null, hash);
+            } catch(e) {
+                console.warn('History API not supported in this environment');
+            }
+        }
+
+        function parseURL() {
+            const hash = window.location.hash.substring(1);
+            if (!hash) return { category: null, gameId: null };
+            const parts = hash.split('?');
+            let rawCategory = parts[0];
+            let category = decodeURIComponent(rawCategory).replace(/-/g, ' '); 
+            let gameId = null;
+            if (parts[1]) {
+                const params = new URLSearchParams(parts[1]);
+                gameId = params.get('id');
+            }
+            return { category: rawCategory, gameId };
+        }
+
+        function setupInstructionOverlay() {
+            if (localStorage.getItem(INSTRUCTION_KEY) !== 'seen') {
+                instructionOverlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; 
+                setTimeout(() => {
+                    instructionOverlay.classList.remove('opacity-0');
+                    instructionOverlay.classList.add('opacity-100');
+                }, 10);
+                instructionInput.addEventListener('input', (e) => {
+                    if (e.target.value.trim().toLowerCase() === 'i understand') {
+                        instructionOverlay.classList.remove('opacity-100');
+                        instructionOverlay.classList.add('opacity-0');
+                        setTimeout(() => {
+                            instructionOverlay.style.display = 'none';
+                            document.body.style.overflow = '';
+                            localStorage.setItem(INSTRUCTION_KEY, 'seen');
+                        }, 300);
+                    }
+                });
+            }
+        }
+
+        // --- Favorites Management (Live Updates) ---
+        const getFavorites = () => JSON.parse(localStorage.getItem(FAVORITES_KEY)) || [];
+        const saveFavorites = (favs) => localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+        
+        function toggleFavorite(gameId) {
+            const strGameId = String(gameId);
+            let favorites = getFavorites().map(String);
+            const isFavorited = favorites.includes(strGameId);
+
+            if (isFavorited) {
+                favorites = favorites.filter(id => id !== strGameId);
+                saveFavorites(favorites);
+                updateAllFavoriteButtons();
+                const favCard = favoritesGameList.querySelector(`.zone-item[data-game-id='${strGameId}'], .other-zone-item[data-game-id='${strGameId}']`);
+                if (favCard) {
+                    favCard.classList.add('fade-out');
+                    setTimeout(() => {
+                        favCard.remove();
+                        if (favoritesGameList.children.length === 0) {
+                            favoritesHeader.style.display = 'none';
+                            favoritesGameList.style.display = 'none';
+                        }
+                    }, 300); 
+                }
+            } else {
+                favorites.push(strGameId);
+                saveFavorites(favorites);
+                updateAllFavoriteButtons();
+                let gameData = allGames.find(g => String(g.id) === strGameId);
+                if (!gameData) {
+                    allGames.some(g => {
+                        if (g.versions) {
+                            const ver = g.versions.find(v => String(v.favoriteId) === strGameId);
+                            if (ver) {
+                                gameData = { ...g, id: ver.favoriteId, name: `${g.name} - ${ver.name}`, url: ver.url, versions: undefined };
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+                }
+                if (gameData) {
+                    favoritesHeader.style.display = "block";
+                    favoritesGameList.style.display = "grid";
+                    favoritesGameList.classList.add('grid', 'grid-cols-2', 'sm:grid-cols-3', 'md:grid-cols-5', 'lg:grid-cols-7', 'gap-4');
+                    const newCard = createGameCard(gameData, true);
+                    favoritesGameList.appendChild(newCard);
+                }
+            }
+        }
+
+        function updateAllFavoriteButtons() {
+            const favorites = getFavorites().map(String);
+            document.querySelectorAll('.btn-card-action.fav-action').forEach(btn => {
+                const card = btn.closest('.zone-item, .other-zone-item, .search-item');
+                if (!card) return;
+                const cardGameId = String(card.dataset.gameId);
+                if (btn.classList.contains('version-favorite-btn')) {
+                    const isAnyVersionFavorited = favorites.some(favId => favId.startsWith(cardGameId + '_'));
+                    btn.classList.toggle('favorited', isAnyVersionFavorited);
+                } else {
+                    const isFavorited = favorites.includes(cardGameId);
+                    btn.classList.toggle('favorited', isFavorited);
+                    btn.title = isFavorited ? 'Remove from Favorites' : 'Add to Favorites';
+                }
+            });
+        }
+
+        // --- URL Helpers (Strongdog) ---
+        // Modified to support injected URLs using WORKER_ROOT + directory logic
+        function getAdjustedUrls(imgSrc, page) {
+            if (page && page > 1) {
+                // ../strongdog2/img/... -> exists outside GAMES dir
+                return { adjustedImgSrc: `${WORKER_ROOT}strongdog${page}/img/${imgSrc}` };
+            }
+            // ./img -> assumed inside GAMES dir or wherever relative
+            return { adjustedImgSrc: `${GAMES_BASE_URL}img/${imgSrc}` }; 
+        }
+        
+        function sd_getBaseURLForPage(page) {
+            // Updated to point to WORKER_ROOT for numbered pages, GAMES_BASE_URL for default
+            if (page > 1) return `${WORKER_ROOT}strongdog${page}/`;
+            return `${WORKER_ROOT}STRONGDOG/`; // Assumes default strongdog is at root/STRONGDOG? Or inside GAMES?
+            // Re-reading logic: "stuff like ../DOOM/ will stay in GAMES directory but strongdog# directories exit"
+            // Let's assume default STRONGDOG is adjacent to strongdog2 etc. at root level based on prior naming conventions
+        }
+        
+        async function sd_getEmbedPath(adjustedHref, originalHref, page) {
+            let cleanHref = adjustedHref.replace(/index\.html$/, "").replace(/base\.html$/, "").replace(/\.html$/, "");
+            if (!cleanHref.endsWith("/")) cleanHref += "/";
+            const pathsToTry = [cleanHref + "game/index.html", cleanHref + "game/base.html", cleanHref + "gamereal/index.html", cleanHref + "gamereal/base.html", cleanHref + "index.html", cleanHref + "base.html", ];
+            try {
+                const response = await fetch(adjustedHref);
+                if (response.ok) {
+                    const text = await response.text();
+                    const match = text.match(/embedGame\((['"])(.*?)\1,\s*(['"])(.*?)\3\)/);
+                    if (match) {
+                        const resolvedPath = new URL(match[2], adjustedHref).href;
+                        if (await sd_fileExists(resolvedPath)) return resolvedPath;
+                    }
+                }
+            } catch (error) {}
+            for (const path of pathsToTry) {
+                if (await sd_fileExists(path)) return path;
+            }
+            return adjustedHref;
+        }
+        async function sd_fileExists(url) {
+            try { const response = await fetch(url, { method: "HEAD" }); return response.ok; } catch { return false; }
+        }
+
+        // --- URL Resolution Helper for "Others" ---
+        function resolveGameUrl(relativePath) {
+            // Logic: 
+            // If path starts with ../ -> Go to WORKER_ROOT + path (stripping ../)
+            // If path starts with ../GAMES/ -> It will effectively be WORKER_ROOT/GAMES/ (which matches GAMES_BASE_URL)
+            // This allows us to access root folders like ../GTA-JSDOS/ while keeping ../GAMES/sm64 intact.
+            
+            if (relativePath.startsWith('../')) {
+                const pathPart = relativePath.substring(3); // Remove '../'
+                return `${WORKER_ROOT}${pathPart}`;
+            }
+            
+            // If it doesn't start with ../, assume it's relative to GAMES base
+            return `${GAMES_BASE_URL}${relativePath.replace(/^\.\//, '')}`;
+        }
+
+        // --- Game Data (Others) ---
+        // We keep the original relative paths here so the resolver logic above can handle them dynamically
+        const othersGames = [
+            { id: "other-eaglercraft", name: "Eaglercraft", imgSrc: "./images/eaglercraft.png", description: "The classic survival and building game with authentic block-based physics and multiplayer support, accessible directly in the browser.", category: "Others", versions: [ { name: "Release 1.12.2", url: "../EAGLERCRAFT/eaglercraft-1.12.2.html", favoriteId: "other-eaglercraft_1.12.2" }, { name: "Release 1.12.2 WASM", url: "../EAGLERCRAFT/eaglercraft-1.12.2-wasm.html", favoriteId: "other-eaglercraft_wasm", wasm: true } ] },
+            { id: "other-gta", name: "Grand Theft Auto", imgSrc: "./images/gta.png", description: "The original top-down classic. Cause chaos, complete missions, or just go for a drive in three iconic cities.", category: "Others", versions: [ { name: "Carnage3D", url: "../CARNAGE3D/web/carnage3D.html", favoriteId: "other-gta_carnage3d" }, { name: "Grand Theft Auto (JS-DOS)", url: "../GTA-JSDOS/index.html", favoriteId: "other-gta_jsdos" } ] },
+            { id: "other-simcity", name: "Sim City", imgSrc: "./images/simcity2000.png", description: "The original city-building classics. Design, build, and manage the city of your dreams in either the original Sim City or the detailed Sim City 2000.", category: "Others", versions: [ { name: "Sim City", url: "../SIM-CITY/index.html", favoriteId: "other-simcity_1" }, { name: "Sim City 2000", url: "../SIM-CITY-2/index.html", favoriteId: "other-simcity_2000" } ] },
+            { id: "other-doom", name: "DOOM", imgSrc: "./images/doom.png", description: "The legendary first-person shooter that pioneered the genre, focusing on blasting through hordes of demons in a timeless, adrenaline-fueled classic.", category: "Others", url: "../DOOM/index.html" },
+            { id: "other-sm64", name: "Super Mario 64", imgSrc: "./images/sm64.png", description: "The iconic 3D platformer that revolutionized gaming. Run, jump, and triple-jump your way through vast worlds to collect stars and save the princess.", category: "Others", url: "../GAMES/sm64/index.html" }
+        ];
+
+        // --- Card Creation ---
+
+        function createOthersGameCard(game) {
+            const favorites = getFavorites().map(String);
+            const isAnyFavorite = game.versions ? favorites.some(favId => game.versions.some(v => String(v.favoriteId) === favId)) : favorites.includes(String(game.id));
+            const card = document.createElement("div");
+            card.className = 'other-zone-item bg-card-dark rounded-2xl border border-brand-border col-span-full shadow-lg'; 
+            card.dataset.gameId = game.id;
+
+            // Resolve Image URL
+            const resolvedImgSrc = resolveGameUrl(game.imgSrc);
+
+            let gameButtonsHtml = '';
+            let favoriteButtonHtml = '';
+            
+            if (game.versions && game.versions.length > 0) {
+                const availableVersions = game.versions; 
+                if (availableVersions.length === 1) {
+                    const vUrl = resolveGameUrl(availableVersions[0].url);
+                    gameButtonsHtml = `<button class="btn-card-action play-action" data-url="${vUrl}" data-version-name="${availableVersions[0].name}" title="Play Game"><i class="fa-solid fa-play transition-colors"></i></button>`;
+                } else {
+                    const dropdownLinks = availableVersions.map(v => {
+                        const vUrl = resolveGameUrl(v.url);
+                        return `<a href="#" class="eagler-dropdown-link" data-url="${vUrl}" data-version-name="${v.name}">${v.name}</a>`
+                    }).join('');
+                    gameButtonsHtml = `<div class="relative"><button class="btn-card-action version-btn" title="Select Version"><i class="fa-solid fa-chevron-up transition-colors"></i></button><div class="eagler-dropdown">${dropdownLinks}</div></div>`;
+                }
+                favoriteButtonHtml = `<div class="relative"><button class="btn-card-action fav-action version-favorite-btn ${isAnyFavorite ? 'favorited' : ''}" title="Favorite a version"><i class="fa-solid fa-star fa-solid-star transition-colors"></i><i class="fa-regular fa-star fa-regular-star transition-colors"></i></button><div class="eagler-dropdown">${game.versions.map(v => `<a href="#" class="eagler-dropdown-link favorite-link" data-favorite-id="${v.favoriteId}">${v.name}</a>`).join('')}</div></div>`;
+            } else {
+                const gUrl = resolveGameUrl(game.url);
+                gameButtonsHtml = `<button class="btn-card-action play-action" data-url="${gUrl}" title="Play Game"><i class="fa-solid fa-play transition-colors"></i></button>`;
+                favoriteButtonHtml = `<button class="btn-card-action fav-action ${isAnyFavorite ? 'favorited' : ''}" title="${isAnyFavorite ? 'Remove from Favorites' : 'Add to Favorites'}"><i class="fa-solid fa-star fa-solid-star transition-colors"></i><i class="fa-regular fa-star fa-regular-star transition-colors"></i></button>`;
+            }
+
+            card.innerHTML = `
+                <div class="relative w-full h-full cursor-pointer group" style="min-height: 250px;">
+                    <img data-src="${resolvedImgSrc}" alt="${game.name}" loading="lazy" decoding="async" class="w-full h-full object-cover absolute inset-0 rounded-2xl">
+                    <div class="image-overlay absolute inset-0 transition-colors duration-200"></div>
+                    <div class="absolute inset-0 p-4 sm:p-6 flex flex-col justify-between rounded-2xl">
+                        <div class="flex items-start justify-between w-full">
+                            <h3 class="text-4xl font-bold text-white truncate drop-shadow-lg" style="max-width: 80%;" title="${game.name}">${game.name}</h3>
+                            <div class="flex items-center space-x-3 bg-black/80 backdrop-blur-md rounded-xl px-2 py-1">
+                                ${gameButtonsHtml}
+                                ${favoriteButtonHtml}
+                            </div>
+                        </div>
+                        <p class="text-lg text-white font-medium drop-shadow-lg" style="max-width: 50%;">${game.description}</p>
+                    </div>
+                </div>
+            `;
+            
+            if (!game.versions) { 
+                card.querySelector('.group').addEventListener('click', () => {
+                     const gUrl = resolveGameUrl(game.url);
+                     openZone({...game, url: gUrl}); 
+                }); 
+            }
+            card.querySelectorAll('.play-action').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); openZone({ ...game, name: btn.dataset.versionName ? `${game.name} - ${btn.dataset.versionName}` : game.name, url: btn.dataset.url }); }));
+            
+            const versionBtn = card.querySelector('.version-btn');
+            if (versionBtn) { versionBtn.addEventListener('click', (e) => { e.stopPropagation(); document.querySelectorAll('.eagler-dropdown.show').forEach(d => d.classList.remove('show')); versionBtn.nextElementSibling.classList.toggle('show'); }); }
+            
+            card.querySelectorAll('.eagler-dropdown-link:not(.favorite-link)').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openZone({ ...game, name: link.dataset.versionName ? `${game.name} - ${link.dataset.versionName}` : game.name, url: link.dataset.url }); link.closest('.eagler-dropdown').classList.remove('show'); }));
+
+            const favBtn = card.querySelector('.btn-card-action.fav-action');
+            if (favBtn.classList.contains('version-favorite-btn')) {
+                favBtn.addEventListener('click', (e) => { e.stopPropagation(); document.querySelectorAll('.eagler-dropdown.show').forEach(d => d.classList.remove('show')); favBtn.nextElementSibling.classList.toggle('show'); });
+                card.querySelectorAll('.favorite-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(link.dataset.favoriteId); link.closest('.eagler-dropdown').classList.remove('show'); }));
+            } else {
+                favBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFavorite(game.id); });
+            }
+            imageObserver.observe(card.querySelector('img'));
+            return card;
+        }
+
+        function createGameCard(game, forceSmallCard = false) {
+            if (game.category === 'Others' && !forceSmallCard) return createOthersGameCard(game);
+            const isStrongdog = game.category === 'StrongdogXP';
+            
+            // Resolve Image Src
+            let imgSrc = game.imgSrc;
+            if (isStrongdog) {
+                 imgSrc = getAdjustedUrls(game.imgSrc, game.page).adjustedImgSrc;
+            } else if (game.category === 'Others' || game.category === 'Gameboy Games') {
+                 imgSrc = resolveGameUrl(game.imgSrc);
+            }
+
+            const isFavorite = getFavorites().map(String).includes(String(game.id));
+
+            const card = document.createElement("div");
+            card.className = 'zone-item bg-card-dark rounded-2xl border border-brand-border overflow-hidden';
+            card.dataset.gameId = game.id;
+            card.innerHTML = `
+                <div class="relative w-full cursor-pointer group">
+                    <div class="aspect-w-3 aspect-h-2"><img data-src="${imgSrc}" alt="${game.name}" class="w-full h-full object-cover"></div>
+                    <h3 class="absolute top-2 right-2 z-10 max-w-[80%] bg-black/60 backdrop-blur-md rounded-xl px-3 py-1.5 text-white truncate text-sm font-semibold shadow-lg" title="${game.name}">${game.name}</h3>
+                    <div class="absolute bottom-2 right-2 bg-black/80 backdrop-blur-md rounded-xl px-2 py-1 flex items-center space-x-2 shadow-lg">
+                        <button class="btn-card-action play-action" title="Play Game"><i class="fa-solid fa-play transition-colors"></i></button>
+                        <button class="btn-card-action fav-action ${isFavorite ? 'favorited' : ''}" title="${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}"><i class="fa-solid fa-star fa-solid-star transition-colors"></i><i class="fa-regular fa-star fa-regular-star transition-colors"></i></button>
+                    </div>
+                </div>
+            `;
+            
+            const handlePlay = async (e) => {
+                e.stopPropagation();
+                if (isStrongdog) {
+                    const baseURL = sd_getBaseURLForPage(game.page);
+                    let adjustedHref = baseURL.endsWith("/") ? baseURL + game.href.replace(/^\.\//, "") : baseURL + "/" + game.href.replace(/^\.\//, "");
+                    const embedPath = await sd_getEmbedPath(adjustedHref, game.href, game.page);
+                    openZone({ name: game.name, url: embedPath, category: game.category, id: game.id });
+                } else {
+                    // For GN-Math, url is absolute (handled in init). For Others/Gameboy, we might need to resolve
+                    let gUrl = game.url;
+                    if (game.category === 'Others' || game.category === 'Gameboy Games') {
+                        gUrl = resolveGameUrl(game.url);
+                    }
+                    openZone({ ...game, url: gUrl });
+                }
+            };
+
+            card.querySelector('.group').addEventListener('click', handlePlay);
+            card.querySelector('.play-action').addEventListener('click', handlePlay);
+            card.querySelector('.fav-action').addEventListener('click', (e) => { e.stopPropagation(); toggleFavorite(game.id); });
+            imageObserver.observe(card.querySelector('img'));
+            return card;
+        }
+
+        // --- Game Viewer Logic ---
+        function openZone(game) {
+            if (!game || !game.url) return;
+            updateURL(categories[currentCategoryIndex], game.id || null);
+            
+            const zoneViewer = document.getElementById('zoneViewer');
+            const zoneFrame = document.getElementById('zoneFrame');
+            const zoneNameEl = document.getElementById('zoneNameEl');
+            const downloadBtn = document.getElementById('downloadBtnZone');
+            
+            // Setup Download Button (Specific to Eaglercraft)
+            if (game.baseGameId === 'other-eaglercraft' || game.id === 'other-eaglercraft') {
+                downloadBtn.href = game.url;
+                downloadBtn.download = game.name.replace(/ /g, '_') + '.html';
+                downloadBtn.removeAttribute('target');
+                downloadBtn.classList.remove('hidden');
+            } else {
+                downloadBtn.classList.add('hidden');
+                downloadBtn.href = '#';
+                downloadBtn.removeAttribute('download');
+            }
+
+            zoneNameEl.textContent = game.name;
+            
+            // RESET FRAME BEFORE LOAD
+            zoneFrame.src = 'about:blank';
+            
+            // SECURITY: Set sandbox permissions
+            const sandboxRules = 'allow-scripts allow-same-origin allow-forms allow-pointer-lock';
+            zoneFrame.setAttribute('sandbox', sandboxRules);
+            zoneFrame.setAttribute('allow', 'fullscreen; pointer-lock; autoplay; clipboard-write');
+
+            // --- REVISED LOGIC FOR LOADING GAMES ---
+            // With raw.githack.com, we can treat GN-Math games as standard URL games again
+            // because Githack serves correct Content-Type: text/html headers.
+            const isStandardURLGame = game.category === 'StrongdogXP' || game.category === 'Others' || game.category === 'GN-Math';
+            
+            if (isStandardURLGame) {
+                // Load URL directly for standard games
+                zoneFrame.src = game.url;
+                zoneViewer.style.display = "flex";
+            } else {
+                // Fallback for other potential categories (same logic as before: fetch & write)
+                fetch(`${game.url}?t=${Date.now()}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                        return response.text();
+                    })
+                    .then(html => {
+                        const doc = zoneFrame.contentWindow.document;
+                        doc.open();
+                        doc.write(html);
+                        doc.close();
+                        zoneViewer.style.display = "flex";
+                    })
+                    .catch(error => {
+                        console.error(`Failed to load game "${game.name}": ${error.message}`);
+                        zoneFrame.src = game.url;
+                        zoneViewer.style.display = "flex";
+                    });
+            }
+        }
+
+        function closeZoneViewer() {
+            updateURL(categories[currentCategoryIndex]);
+            const downloadBtn = document.getElementById('downloadBtnZone');
+            downloadBtn.classList.add('hidden');
+            downloadBtn.href = '#';
+            downloadBtn.removeAttribute('download');
+            downloadBtn.removeAttribute('target');
+            const zoneViewer = document.getElementById('zoneViewer');
+            const zoneFrame = document.getElementById('zoneFrame');
+            zoneViewer.style.display = "none";
+            if (zoneFrame) {
+                zoneFrame.src = 'about:blank';
+            }
+        }
+
+        // --- Render Lists ---
+        function renderGames(gamesToRender, targetElement, forceSmallCard = false) {
+            targetElement.innerHTML = '';
+            targetElement.className = (categories[currentCategoryIndex] === 'Others' && !forceSmallCard) ? 'grid grid-cols-1 gap-6 mt-6' : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4 mt-6';
+            gamesToRender.forEach(game => targetElement.appendChild(createGameCard(game, forceSmallCard)));
+            observeImages(targetElement);
+        }
+
+        function renderFavorites() {
+            const favoriteIds = getFavorites().map(String);
+            if (favoriteIds.length > 0) {
+                favoritesHeader.style.display = "block";
+                favoritesGameList.style.display = "grid"; 
+                const favoriteGames = [];
+                allGames.forEach(game => {
+                    if (favoriteIds.includes(String(game.id)) && !game.versions) { favoriteGames.push(game); }
+                    else if (game.versions) { 
+                        game.versions.forEach(v => { 
+                            if (favoriteIds.includes(String(v.favoriteId))) {
+                                // Need to resolve URL here for favorites too!
+                                let vUrl = v.url;
+                                if (game.category === 'Others' || game.category === 'Gameboy Games') {
+                                    vUrl = resolveGameUrl(v.url);
+                                } else if (game.category === 'StrongdogXP') {
+                                    // Strongdog favorites usually just rely on the ID to regenerate logic, but for safety in this object:
+                                    // Logic remains handled inside createGameCard via ID lookup generally, but let's leave as is 
+                                    // because strongdog logic inside createGameCard regenerates paths based on ID/Page props anyway.
+                                }
+
+                                favoriteGames.push({ ...game, id: v.favoriteId, name: `${game.name} - ${v.name}`, url: vUrl, versions: undefined }); 
+                            }
+                        }); 
+                    }
+                });
+                renderGames(favoriteGames.sort((a, b) => a.name.localeCompare(b.name)), favoritesGameList, true);
+            } else {
+                favoritesHeader.style.display = "none";
+                favoritesGameList.style.display = "none";
+            }
+        }
+
+        // --- Category Nav ---
+        function updateArrowVisibility() {
+            prevCategoryBtn.disabled = currentCategoryIndex === 0;
+            nextCategoryBtn.disabled = currentCategoryIndex === categories.length - 1;
+        }
+
+        function switchCategory(newIndex) {
+            currentCategoryIndex = newIndex;
+            categorySlider.style.transform = `translateX(-${currentCategoryIndex * (100 / categories.length)}%)`;
+            renderGamesForCurrentCategory();
+            updateArrowVisibility();
+            updateURL(categories[currentCategoryIndex]);
+        }
+        
+        async function renderGamesForCurrentCategory() {
+            const categoryName = categories[currentCategoryIndex];
+            gamesGridContainer.classList.add('opacity-0');
+            await new Promise(r => setTimeout(r, 150));
+            renderGames(allGames.filter(g => g.category === categoryName), gamesGridContainer, false);
+            gamesGridContainer.classList.remove('opacity-0');
+        }
+
+        // --- Search ---
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        const handleSearch = debounce(() => {
+            const text = searchInput.value.toLowerCase().trim();
+            const filteredDropdown = text ? searchableGames.filter(g => g.name.toLowerCase().includes(text)).slice(0, 5) : [];
+            
+            searchResults.innerHTML = "";
+            
+            if (filteredDropdown.length === 0 || !text) {
+                searchResults.style.display = "none";
+                searchDivider.style.display = "none";
+                return;
+            }
+            
+            const favorites = getFavorites().map(String);
+            filteredDropdown.forEach(game => {
+                const isStrongdog = game.category === 'StrongdogXP';
+                let imgSrc;
+                let finalGameData = { ...game }; // clone
+
+                if (isStrongdog) {
+                    const { adjustedImgSrc } = getAdjustedUrls(game.imgSrc, game.page);
+                    imgSrc = adjustedImgSrc;
+                } else if (game.category === 'Others' || game.category === 'Gameboy Games') {
+                    imgSrc = resolveGameUrl(game.imgSrc);
+                    finalGameData.url = resolveGameUrl(game.url);
+                } else {
+                    imgSrc = game.imgSrc;
+                }
+                
+                const linkEl = document.createElement("a");
+                linkEl.href = '#';
+                linkEl.className = 'search-item flex justify-between items-center';
+                linkEl.dataset.gameId = game.id;
+                let isFavorite = favorites.includes(String(game.id));
+
+                linkEl.innerHTML = `
+                    <div class="flex items-center truncate min-w-0">
+                        <img src="${imgSrc}" alt="${game.name}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0">
+                        <span class="ml-3 font-medium truncate text-gray-200" title="${game.name}">${game.name}</span>
+                    </div>
+                    <div class="flex items-center flex-shrink-0">
+                        <div class="bg-black/80 backdrop-blur-md rounded-xl px-2 py-1 flex items-center space-x-2">
+                            <button class="btn-card-action play-action" title="Play Game">
+                                <i class="fa-solid fa-play transition-colors"></i>
+                            </button>
+                            <button class="btn-card-action fav-action ${isFavorite ? 'favorited' : ''}" title="${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}">
+                                <i class="fa-solid fa-star fa-solid-star transition-colors"></i>
+                                <i class="fa-regular fa-star fa-regular-star transition-colors"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                const favBtn = linkEl.querySelector('.fav-action');
+                favBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation(); 
+                    toggleFavorite(game.id);
+                });
+
+                linkEl.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    if (isStrongdog) {
+                        const baseURL = sd_getBaseURLForPage(game.page);
+                        let adjustedHref = baseURL.endsWith("/") ? baseURL + game.href.replace(/^\.\//, "") : baseURL + "/" + game.href.replace(/^\.\//, "");
+                        const embedPath = await sd_getEmbedPath(adjustedHref, game.href, game.page);
+                        const strongdogGameData = { name: game.name, url: embedPath, category: game.category, id: game.id };
+                        openZone(strongdogGameData);
+                    } else {
+                        openZone(finalGameData);
+                    }
+                    searchResults.style.display = "none";
+                    searchDivider.style.display = "none";
+                });
+                searchResults.appendChild(linkEl);
+            });
+            searchResults.style.display = "block";
+            searchDivider.style.display = "block";
+        }, 250);
+
+        // --- FETCHING DATA MANUALLY (NO MODULES) ---
+        // This function fetches the JS file as text, transforms it to set a global variable, and evals it.
+        // This bypasses module loading restrictions on file:// protocols.
+        async function fetchGameData() {
+            try {
+                // Fetch the file
+                const response = await fetch(CARDS_DATA_URL);
+                if (!response.ok) throw new Error('Failed to fetch game data');
+                let scriptText = await response.text();
+                
+                // Transform 'export default' to 'window.loadedGameData ='
+                // This assumes the file structure is simple "export default [...]"
+                if (scriptText.includes('export default')) {
+                    scriptText = scriptText.replace('export default', 'window.loadedGameData =');
+                }
+                
+                // Execute the script
+                // We use new Function instead of eval for slight isolation, though still unsafe for untrusted code
+                // (But we trust this source).
+                // However, new Function creates a local scope. We need global assignment.
+                // Standard eval or appending a script tag is better.
+                const scriptEl = document.createElement('script');
+                scriptEl.textContent = scriptText;
+                document.body.appendChild(scriptEl);
+                
+                // Wait a tick for execution
+                await new Promise(resolve => setTimeout(resolve, 0));
+                
+                if (window.loadedGameData) {
+                    return window.loadedGameData;
+                } else {
+                    console.warn("Script loaded but window.loadedGameData is undefined");
+                    return [];
+                }
+            } catch (e) {
+                console.error("Error manual loading games:", e);
+                return [];
+            }
+        }
+
+        // --- Init ---
+        async function initializeApp() {
+            // Load Game Data Manually
+            let gamesData = [];
+            try {
+                gamesData = await fetchGameData();
+            } catch (e) {
+                console.error("Could not load external games data", e);
+            }
+            
+            const strongdogGames = gamesData.map(g => ({ ...g, category: 'StrongdogXP' }));
+            
+            try {
+                const res = await fetch(GN_ZONES_URL);
+                const gnMathRaw = await res.json();
+                const gnMathGames = gnMathRaw.map(g => ({ id: `gn-${g.id}`, name: g.name, imgSrc: g.cover.replace("{COVER_URL}", GN_COVER_URL_BASE), category: 'GN-Math', url: g.url.replace("{HTML_URL}", GN_HTML_URL_BASE) }));
+                allGames = [...strongdogGames, ...gnMathGames, ...othersGames];
+            } catch (error) { 
+                console.warn("Failed to load GN-Math, falling back to others.", error);
+                allGames = [...strongdogGames, ...othersGames]; 
+            }
+
+            allGames = allGames.filter(g => !['bitlife', 'soundboard'].some(term => g.name.toLowerCase().includes(term)));
+            
+            searchableGames = [];
+            allGames.forEach(game => {
+                if (game.versions && game.versions.length > 0) {
+                    game.versions.forEach(version => {
+                        searchableGames.push({
+                            ...game,
+                            id: version.favoriteId,
+                            name: `${game.name} - ${version.name}`,
+                            url: version.url,
+                            wasm: version.wasm,
+                            versions: undefined,
+                            baseGameId: game.id
+                        });
+                    });
+                } else {
+                    searchableGames.push(game);
+                }
+            });
+
+            categories = ['StrongdogXP', 'GN-Math', 'Gameboy Games', 'Others'].filter(cat => allGames.some(g => g.category === cat));
+
+            const { category: urlCat } = parseURL();
+            if (urlCat) currentCategoryIndex = Math.max(0, categories.findIndex(c => c.replace(/\s+/g, '-').toLowerCase() === urlCat.toLowerCase()));
+
+            categorySlider.style.width = `${categories.length * 100}%`;
+            categorySlider.innerHTML = categories.map(cat => `<div class="w-64 flex-shrink-0"><h2 class="text-3xl font-bold ${categoryColors[cat] || 'text-white'}"><strong>${cat}</strong></h2></div>`).join('');
+
+            switchCategory(currentCategoryIndex);
+            renderFavorites();
+            setupInstructionOverlay();
+            
+            searchInput.placeholder = `Search all games...`;
+            searchInput.addEventListener("input", handleSearch);
+            searchInput.addEventListener("focus", handleSearch);
+
+            document.addEventListener("click", ev => {
+                if (!document.getElementById('bottom-fixed-bar').contains(ev.target)) {
+                    searchResults.style.display = "none";
+                    searchDivider.style.display = "none";
+                }
+                if (!ev.target.closest('.version-btn') && !ev.target.closest('.version-favorite-btn') && !ev.target.closest('.eagler-dropdown')) {
+                    document.querySelectorAll('.eagler-dropdown.show').forEach(d => {
+                        d.classList.remove('show');
+                    });
+                }
+            });
+
+            prevCategoryBtn.addEventListener('click', () => switchCategory(currentCategoryIndex - 1));
+            nextCategoryBtn.addEventListener('click', () => switchCategory(currentCategoryIndex + 1));
+            document.getElementById('closeBtnZone').addEventListener('click', closeZoneViewer);
+
+            // --- FULLSCREEN BUTTON LISTENER ---
+            document.getElementById('fullscreenBtnZone').addEventListener('click', () => {
+                const zoneFrame = document.getElementById('zoneFrame');
+                if (zoneFrame && zoneFrame.requestFullscreen) {
+                    zoneFrame.requestFullscreen();
+                } else if (zoneFrame && zoneFrame.webkitRequestFullscreen) {
+                    zoneFrame.webkitRequestFullscreen();
+                } else if (zoneFrame && zoneFrame.msRequestFullscreen) {
+                    zoneFrame.msRequestFullscreen();
+                }
+            });
+
+            creditsBtn.addEventListener('click', () => { creditsModal.style.display = 'flex'; creditsContent.innerHTML = categories.map(cat => CREDITS_DATA[cat] ? `<div class="p-4 border border-brand-border rounded-lg"><h4 class="font-bold mb-1">${cat}</h4><p class="text-sm text-gray-400">${CREDITS_DATA[cat].credit}</p></div>` : '').join(''); });
+            closeCreditsBtn.addEventListener('click', () => creditsModal.style.display = 'none');
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
+    </template>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAZBKAckVa4IMvJGjcyndZx6Y1XD52lgro",
+            authDomain: "project-zirconium.firebaseapp.com",
+            projectId: "project-zirconium",
+            storageBucket: "project-zirconium.firebasestorage.app",
+            messagingSenderId: "1096564243475",
+            appId: "1:1096564243475:web:6d0956a70125eeea1ad3e6",
+            measurementId: "G-1D4F692C1Q"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const lockScreen = document.getElementById('lock-screen');
+        const navbar = document.getElementById('navbar-container');
+        let appFrame = document.getElementById('app-frame');
+        const codeInput = document.getElementById('codeInput');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const lockMessage = document.getElementById('lockMessage');
+        const loadingText = document.getElementById('loading-text');
+        
+        // Navbar elements
+        const tabsContainer = document.getElementById('tabs-container');
+        
+        // Pin Elements
+        const pinWrapper = document.getElementById('pin-wrapper');
+        const pinBtn = document.getElementById('pin-btn');
+        const pinMenu = document.getElementById('pin-menu');
+        const repinBtn = document.getElementById('repin-btn');
+        const removePinBtn = document.getElementById('remove-pin-btn');
+        const hidePinBtn = document.getElementById('hide-pin-btn');
+        const showPinMenuItem = document.getElementById('show-pin-menu-item');
+
+        // Auth Elements
+        const authBtn = document.getElementById('auth-btn');
+        const authMenu = document.getElementById('auth-menu');
+        const logoutBtn = document.getElementById('logout-btn');
+        const displayUsername = document.getElementById('display-username');
+        const displayEmail = document.getElementById('display-email');
+
+        const BASE_URL = 'https://cdn.jsdelivr.net/npm/4sp-dv@1.0.14/logged-in/';
+        const STORAGE_KEY = 'local_access_code';
+        const PINNED_PAGE_KEY = 'local_pinned_page';
+        const PIN_HIDDEN_KEY = 'local_pin_hidden';
+        const USER_DATA_KEY = 'local_user_data';
+        const LAST_PAGE_KEY = 'local_last_page';
+
+        const PAGE_DATA = {
+            "dashboard": { "name": "Dashboard", "icon": "fa-solid fa-house-user", "url": "dashboard.html" },
+            "soundboard": { "name": "Soundboard", "icon": "fa-solid fa-volume-up", "url": "soundboard.html" },
+            "notes": { "name": "Notes", "icon": "fa-solid fa-sticky-note", "url": "notes.html" },
+            "dailyphoto": { "name": "Dailyphoto", "icon": "fa-solid fa-image", "url": "dailyphoto.html" },
+            "countdowns": { "name": "Countdowns", "icon": "fa-solid fa-clock", "url": "countdowns.html" },
+            "weather": { "name": "Weather", "icon": "fa-solid fa-cloud-sun", "url": "weather.html" },
+            "dictionary": { "name": "Dictionary", "icon": "fa-solid fa-book", "url": "dictionary.html" },
+            "messenger-v2": { "name": "Messenger", "icon": "fa-solid fa-comments", "url": "messenger-v2.html" },
+            "games": { "name": "GAMES", "icon": "fa-solid fa-gamepad", "url": "games.html" },
+            "settings": { "name": "Settings", "icon": "fa-solid fa-gear", "url": "settings.html" }
+        };
+
+        let currentUser = null;
+
+        // --- Navbar Logic ---
+        function renderNavbar(activePageUrl) {
+            const tabsContainerEl = document.getElementById('tabs-container');
+            const pinBtnEl = document.getElementById('pin-btn');
+            const pinWrapperEl = document.getElementById('pin-wrapper');
+            const showPinMenuItemEl = document.getElementById('show-pin-menu-item');
+
+            if (!tabsContainerEl) return;
+            tabsContainerEl.innerHTML = '';
+            
+            let currentPath = activePageUrl.replace(BASE_URL, '');
+            
+            Object.values(PAGE_DATA).forEach(page => {
+                const isAuth = page.url === currentPath;
+                const tab = document.createElement('a');
+                tab.className = `nav-tab ${isAuth ? 'active' : ''}`;
+                tab.innerHTML = `<i class="${page.icon}"></i> ${page.name}`;
+                tab.onclick = () => loadPage(page.url);
+                tabsContainerEl.appendChild(tab);
+            });
+
+            // Update Pin Button State
+            const pinned = localStorage.getItem(PINNED_PAGE_KEY);
+            if (pinBtnEl) {
+                if (pinned && pinned === currentPath) {
+                    pinBtnEl.style.color = '#4f46e5';
+                } else {
+                    pinBtnEl.style.color = '#d1d5db';
+                }
+            }
+
+            // Update Pin Visibility
+            const isHidden = localStorage.getItem(PIN_HIDDEN_KEY) === 'true';
+            if (isHidden) {
+                if (pinWrapperEl) pinWrapperEl.classList.add('hidden');
+                if (showPinMenuItemEl) {
+                    showPinMenuItemEl.classList.remove('hidden');
+                    showPinMenuItemEl.onclick = () => {
+                        localStorage.setItem(PIN_HIDDEN_KEY, 'false');
+                        renderNavbar(activePageUrl);
+                    };
+                }
+            } else {
+                if (pinWrapperEl) pinWrapperEl.classList.remove('hidden');
+                if (showPinMenuItemEl) showPinMenuItemEl.classList.add('hidden');
+            }
+        }
+
+        // --- Pin Logic ---
+        function getCurrentPage() {
+            const currentFrameSrc = appFrame.contentWindow.location.href;
+            let pageName = currentFrameSrc.replace(BASE_URL, '');
+            if (!pageName || pageName === 'about:blank') pageName = window.lastLoadedPage || 'dashboard.html';
+            return pageName;
+        }
+
+        // Pin Button
+        if (pinBtn) {
+            pinBtn.addEventListener('click', () => {
+                const pageName = getCurrentPage();
+                const currentPinned = localStorage.getItem(PINNED_PAGE_KEY);
+                
+                if (currentPinned === pageName) {
+                    localStorage.removeItem(PINNED_PAGE_KEY);
+                } else {
+                    localStorage.setItem(PINNED_PAGE_KEY, pageName);
+                }
+                renderNavbar(pageName);
+            });
+
+            // Context Menu
+            pinBtn.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                if (pinMenu) pinMenu.classList.toggle('open');
+                if (authMenu) authMenu.classList.remove('open');
+            });
+        }
+
+        if (repinBtn) {
+            repinBtn.addEventListener('click', () => {
+                localStorage.setItem(PINNED_PAGE_KEY, getCurrentPage());
+                renderNavbar(getCurrentPage());
+                if (pinMenu) pinMenu.classList.remove('open');
+            });
+        }
+
+        if (removePinBtn) {
+            removePinBtn.addEventListener('click', () => {
+                localStorage.removeItem(PINNED_PAGE_KEY);
+                renderNavbar(getCurrentPage());
+                if (pinMenu) pinMenu.classList.remove('open');
+            });
+        }
+
+        if (hidePinBtn) {
+            hidePinBtn.addEventListener('click', () => {
+                localStorage.setItem(PIN_HIDDEN_KEY, 'true');
+                renderNavbar(getCurrentPage());
+                if (pinMenu) pinMenu.classList.remove('open');
+            });
+        }
+
+        // Auth Menu
+        if (authBtn) {
+            authBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (authMenu) authMenu.classList.toggle('open');
+                if (pinMenu) pinMenu.classList.remove('open');
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (authMenu && authBtn && !authMenu.contains(e.target) && !authBtn.contains(e.target)) {
+                authMenu.classList.remove('open');
+            }
+            if (pinMenu && pinBtn && !pinMenu.contains(e.target) && !pinBtn.contains(e.target)) {
+                pinMenu.classList.remove('open');
+            }
+        });
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(USER_DATA_KEY);
+                location.reload();
+            });
+        }
+
+        async function fetchUserData(ownerUid) {
+            try {
+                const userDoc = await getDoc(doc(db, "users", ownerUid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    const userData = {
+                        uid: ownerUid,
+                        username: data.username || "User",
+                        email: data.email || "No email"
+                    };
+                    localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
+                    updateUIWithUser(userData);
+                    currentUser = userData; // Set global
+                }
+            } catch (e) {
+                console.error("Error fetching user data:", e);
+            }
+        }
+
+        function updateUIWithUser(userData) {
+            if (!userData) return;
+            displayUsername.textContent = userData.username;
+            displayEmail.textContent = userData.email;
+            
+            // Profile Picture Logic
+            const pfpType = userData.pfpType || 'letter';
+            let pfpHtml = '';
+            
+            if (pfpType === 'custom' && userData.customPfp) {
+                pfpHtml = `<img src="${userData.customPfp}" class="w-full h-full object-cover rounded-full" alt="Profile">`;
+            } else {
+                // Letter Avatar
+                const letter = (userData.username || 'U').charAt(0).toUpperCase();
+                const bgColor = userData.pfpLetterBg || '#3B82F6'; // Default blue
+                pfpHtml = `<div class="w-full h-full rounded-full flex items-center justify-center text-white font-bold text-lg" style="background-color: ${bgColor};">${letter}</div>`;
+            }
+            
+            authBtn.innerHTML = pfpHtml;
+            authBtn.style.padding = '0'; // Remove padding to let avatar fill
+            authBtn.style.overflow = 'hidden'; // Ensure roundness
+            authBtn.style.border = '1px solid #4b5563'; // Maintain border
+        }
+
+        // --- Auto-Login Logic ---
+        async function checkAutoLogin() {
+            const savedCode = localStorage.getItem(STORAGE_KEY);
+            if (savedCode) {
+                loadingText.classList.remove('hidden');
+                unlockBtn.classList.add('hidden');
+                codeInput.classList.add('hidden');
+                
+                try {
+                    const docRef = doc(db, "access_codes", savedCode);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists() && docSnap.data().active) {
+                        const codeData = docSnap.data();
+                        
+                        // Check for cached user data first
+                        let userData = null;
+                        try {
+                            userData = JSON.parse(localStorage.getItem(USER_DATA_KEY));
+                        } catch(e){}
+
+                        if (userData && userData.uid === codeData.ownerUid) {
+                             updateUIWithUser(userData);
+                             currentUser = userData;
+                        } else if (codeData.ownerUid) {
+                            await fetchUserData(codeData.ownerUid);
+                        }
+
+                        launchApp();
+                        return;
+                    } else {
+                        localStorage.removeItem(STORAGE_KEY);
+                        resetLockScreen("Session expired. Please enter code again.");
+                    }
+                } catch(e) {
+                    console.error("Auto-login error:", e);
+                    resetLockScreen("Connection failed. Retrying...");
+                }
+            }
+        }
+
+        function resetLockScreen(msg) {
+            loadingText.classList.add('hidden');
+            unlockBtn.classList.remove('hidden');
+            codeInput.classList.remove('hidden');
+            lockMessage.innerText = msg || "";
+        }
+
+        // --- Unlock Logic ---
+        unlockBtn.addEventListener('click', async () => {
+            let code = codeInput.value.trim().toUpperCase();
+            code = code.replace(/-/g, '');
+
+            if (code.length !== 12) {
+                lockMessage.innerText = "Invalid code format (12 characters).";
+                return;
+            }
+
+            lockMessage.innerText = "";
+            unlockBtn.disabled = true;
+            unlockBtn.innerText = "Checking...";
+
+            try {
+                const docRef = doc(db, "access_codes", code);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    throw new Error("Code not found.");
+                }
+
+                const data = docSnap.data();
+
+                if (data.claimed) {
+                    if (localStorage.getItem(STORAGE_KEY) === code) {
+                        launchApp();
+                        return;
+                    }
+                    throw new Error("This code is already in use.");
+                }
+
+                if (!data.active) {
+                    throw new Error("Code is inactive.");
+                }
+
+                // Claim it!
+                await updateDoc(docRef, { claimed: true });
+                localStorage.setItem(STORAGE_KEY, code);
+                
+                // Fetch User Data immediately
+                if (data.ownerUid) {
+                    await fetchUserData(data.ownerUid);
+                }
+
+                launchApp();
+
+            } catch (e) {
+                lockMessage.innerText = e.message;
+                unlockBtn.disabled = false;
+                unlockBtn.innerText = "Login";
+            }
+        });
+
+        function launchApp() {
+            const lockScreenEl = document.getElementById('lock-screen');
+            const navbarEl = document.getElementById('navbar-container');
+            const appFrameEl = document.getElementById('app-frame');
+
+            if (lockScreenEl) lockScreenEl.classList.add('hidden');
+            if (navbarEl) navbarEl.style.display = 'flex';
+            if (appFrameEl) appFrameEl.style.display = 'block';
+            
+            // Determine start page
+            let startPage = 'dashboard.html';
+            const lastPage = localStorage.getItem(LAST_PAGE_KEY);
+            const pinned = localStorage.getItem(PINNED_PAGE_KEY);
+            
+            // Priority: Last Page > Pinned > Default
+            if (lastPage) {
+                 const isValid = Object.values(PAGE_DATA).some(p => p.url === lastPage);
+                 if (isValid) startPage = lastPage;
+            } else if (pinned) {
+                const isValid = Object.values(PAGE_DATA).some(p => p.url === pinned);
+                if (isValid) startPage = pinned;
+            }
+            
+            loadPage(startPage);
+            
+            // --- Apply Saved Theme on Startup ---
+            try {
+                const savedThemeRaw = localStorage.getItem('user-navbar-theme');
+                if (savedThemeRaw) {
+                    const savedTheme = JSON.parse(savedThemeRaw);
+                    applyTheme(savedTheme);
+                }
+            } catch(e) { console.error("Error applying saved theme:", e); }
+        }
+
+        // --- Page Loader ---
+        window.loadPage = function(pageName) {
+            // Intercept Settings
+            if (pageName === 'settings.html' || pageName === 'settings') {
+                window.lastLoadedPage = 'settings.html';
+                localStorage.setItem(LAST_PAGE_KEY, 'settings.html');
+                renderNavbar(BASE_URL + 'settings.html');
+                openSettings();
+                return;
+            }
+            
+            // Close Settings if open
+            const settingsOverlay = document.getElementById('settings-overlay');
+            if (settingsOverlay) settingsOverlay.classList.add('hidden');
+
+            // Normalize path
+            if (pageName.startsWith('./')) pageName = pageName.substring(2);
+            if (pageName.startsWith('../')) pageName = pageName.substring(3);
+            if (pageName.startsWith(BASE_URL)) pageName = pageName.substring(BASE_URL.length);
+
+            window.lastLoadedPage = pageName;
+            localStorage.setItem(LAST_PAGE_KEY, pageName);
+            renderNavbar(pageName);
+
+            // --- SPECIAL HANDLING FOR GAMES.HTML ---
+            if (pageName === 'games.html') {
+                const template = document.getElementById('games-page-template');
+                if (template) {
+                     // Create new iframe
+                    const oldFrame = document.getElementById('app-frame');
+                    const newFrame = document.createElement('iframe');
+                    newFrame.id = 'app-frame';
+                    
+                    if (oldFrame) {
+                        newFrame.style.cssText = oldFrame.style.cssText;
+                        if (oldFrame.parentNode) oldFrame.parentNode.replaceChild(newFrame, oldFrame);
+                    } else {
+                        newFrame.style.width = '100%';
+                        newFrame.style.height = '100%';
+                        newFrame.style.border = 'none';
+                        newFrame.style.display = 'block';
+                        newFrame.style.flexGrow = '1';
+                        document.body.appendChild(newFrame);
+                    }
+                    appFrame = newFrame;
+                    
+                    const doc = newFrame.contentWindow.document;
+                    doc.open();
+                    
+                    // We still need the base tag for certain resources, but imports inside template use absolute
+                    const baseTag = '<base href="' + BASE_URL + '">';
+                    
+                    // Client bridge script
+                    const patchScript = `
+                        <script>
+                            window._LOCAL_MODE = true;
+                            window._CURRENT_PAGE_NAME = "${pageName}";
+                            
+                            window.currentUser = {
+                                uid: '${currentUser ? currentUser.uid : "client-user"}',
+                                displayName: '${currentUser ? currentUser.username : "Client User"}',
+                                email: '${currentUser ? currentUser.email : "local@client"}',
+                                photoURL: null,
+                                providerData: []
+                            };
+
+                            window.openSettings = function() { window.parent.openSettings(); };
+                            
+                            // Forward keydown to parent for panic key
+                            window.addEventListener('keydown', function(e) {
+                                if(window.parent.handlePanic) window.parent.handlePanic(e);
+                            });
+                        <\/script>
+                    `;
+                    
+                    // Inject template content
+                    let templateContent = template.innerHTML;
+                    let modifiedHtml = templateContent.replace('<head>', '<head>' + baseTag + patchScript);
+                    doc.write(modifiedHtml);
+                    doc.close();
+                    return;
+                }
+            }
+
+            // Normal fetch flow for other pages
+            const url = BASE_URL + pageName;
+            
+            fetch(url)
+                .then(res => res.text())
+                .then(html => {
+                    const oldFrame = document.getElementById('app-frame');
+                    const newFrame = document.createElement('iframe');
+                    newFrame.id = 'app-frame';
+                    
+                    if (oldFrame) {
+                        newFrame.style.cssText = oldFrame.style.cssText;
+                        if (oldFrame.parentNode) {
+                            oldFrame.parentNode.replaceChild(newFrame, oldFrame);
+                        }
+                    } else {
+                        newFrame.style.width = '100%';
+                        newFrame.style.height = '100%';
+                        newFrame.style.border = 'none';
+                        newFrame.style.display = 'block';
+                        newFrame.style.flexGrow = '1';
+                        document.body.appendChild(newFrame);
+                    }
+                    
+                    appFrame = newFrame; 
+
+                    const doc = newFrame.contentWindow.document;
+                    doc.open();
+                    
+                    const baseTag = '<base href="' + BASE_URL + '">';
+                    
+                    const patchScript = `
+                        <script>
+                            window._LOCAL_MODE = true;
+                            window._CURRENT_PAGE_NAME = "${pageName}";
+                            
+                            window.currentUser = {
+                                uid: '${currentUser ? currentUser.uid : "client-user"}',
+                                displayName: '${currentUser ? currentUser.username : "Client User"}',
+                                email: '${currentUser ? currentUser.email : "local@client"}',
+                                photoURL: null,
+                                providerData: []
+                            };
+
+                            // --- Parent Communication ---
+                            window.openSettings = function() {
+                                window.parent.openSettings();
+                            };
+                            
+                            // Forward keydown to parent for panic key
+                            window.addEventListener('keydown', function(e) {
+                                if(window.parent.handlePanic) window.parent.handlePanic(e);
+                            });
+
+                            document.addEventListener('click', e => {
+                                const link = e.target.closest('a');
+                                if (link && link.href) {
+                                    const href = link.getAttribute('href');
+                                    // Check if it's settings
+                                    if (href.includes('settings.html') || href === '#settings') {
+                                        e.preventDefault();
+                                        window.parent.openSettings();
+                                        return;
+                                    }
+                                    
+                                    e.preventDefault();
+                                    window.parent.loadPage(href);
+                                }
+                            });
+                        <\/script>
+                    `;
+                    
+                    let modifiedHtml = html.replace('<head>', '<head>' + baseTag + patchScript);
+                    doc.write(modifiedHtml);
+                    doc.close();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Failed to load page: " + pageName);
+                });
+        };
+
+        // --- Settings Logic ---
+        const settingsOverlay = document.getElementById('settings-overlay');
+        const settingsTabs = document.querySelectorAll('.settings-tab');
+        const settingsSections = document.querySelectorAll('.settings-section');
+        
+        window.openSettings = function() {
+            settingsOverlay.classList.remove('hidden');
+            loadSettingsData();
+        };
+        
+        // Tab Switching
+        settingsTabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update buttons
+                settingsTabs.forEach(b => {
+                    b.classList.remove('active', 'text-white', 'bg-[#1a1a1a]'); 
+                    b.classList.add('text-gray-300'); 
+                });
+                btn.classList.add('active', 'text-white', 'bg-[#1a1a1a]');
+                btn.classList.remove('text-gray-300');
+                
+                // Show Content
+                const tabId = btn.dataset.tab;
+                settingsSections.forEach(sec => {
+                    if (sec.id === `tab-${tabId}`) sec.classList.remove('hidden');
+                    else sec.classList.add('hidden');
+                });
+            });
+        });
+
+        // --- Settings Data & Actions ---
+        
+        // --- 1. General: Username ---
+        const settingsUsernameInput = document.getElementById('settings-username-input');
+        const saveUsernameBtn = document.getElementById('save-username-btn');
+        const usernameMsg = document.getElementById('username-msg');
+        
+        async function checkProfanity(text) {
+            try {
+                const res = await fetch(`https://www.purgomalum.com/service/containsprofanity?text=${encodeURIComponent(text)}`);
+                return (await res.text()) === 'true';
+            } catch { return false; }
+        }
+
+        saveUsernameBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+            const newName = settingsUsernameInput.value.trim();
+            usernameMsg.innerText = "Checking...";
+            usernameMsg.className = "text-gray-500 text-xs mt-2 min-h-[20px]";
+            
+            if (newName.length < 3 || newName.length > 20) {
+                usernameMsg.innerText = "Username must be 3-20 characters.";
+                usernameMsg.className = "text-red-400 text-xs mt-2 min-h-[20px]";
+                return;
+            }
+            
+            if (await checkProfanity(newName)) {
+                usernameMsg.innerText = "Username not allowed.";
+                usernameMsg.className = "text-red-400 text-xs mt-2 min-h-[20px]";
+                return;
+            }
+            
+            try {
+                // Check if taken
+                const q = query(collection(db, "users"), where("username", "==", newName));
+                const snap = await getDocs(q);
+                if (!snap.empty && snap.docs[0].id !== currentUser.uid) {
+                    usernameMsg.innerText = "Username taken.";
+                    usernameMsg.className = "text-red-400 text-xs mt-2 min-h-[20px]";
+                    return;
+                }
+                
+                // Save
+                await updateDoc(doc(db, "users", currentUser.uid), { username: newName });
+                currentUser.username = newName;
+                localStorage.setItem(USER_DATA_KEY, JSON.stringify(currentUser));
+                updateUIWithUser(currentUser);
+                usernameMsg.innerText = "Saved!";
+                usernameMsg.className = "text-green-400 text-xs mt-2 min-h-[20px]";
+                
+            } catch (e) {
+                console.error(e);
+                usernameMsg.innerText = "Error saving.";
+                usernameMsg.className = "text-red-400 text-xs mt-2 min-h-[20px]";
+            }
+        });
+
+        // --- 2. Personalization ---
+        // Letter Avatar Setup
+        const letterColors = ['EF4444', 'F97316', 'F59E0B', '84CC16', '10B981', '06B6D4', '3B82F6', '6366F1', '8B5CF6', 'EC4899', '6B7280'];
+        const pfpModeBtns = document.querySelectorAll('.pfp-mode-btn');
+        const pfpLetterOptions = document.getElementById('pfp-letter-options');
+        const pfpUploadOptions = document.getElementById('pfp-upload-options');
+        const pfpPreview = document.getElementById('pfp-preview');
+        const saveLetterPfpBtn = document.getElementById('save-letter-pfp-btn');
+        
+        let pfpState = { mode: 'letter', letterColor: '#3B82F6' };
+
+        pfpModeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                pfpModeBtns.forEach(b => b.classList.remove('active', 'bg-[#222]'));
+                btn.classList.add('active', 'bg-[#222]');
+                
+                const mode = btn.dataset.mode;
+                pfpState.mode = mode;
+                
+                if (mode === 'letter') {
+                    pfpLetterOptions.classList.remove('hidden');
+                    pfpUploadOptions.classList.add('hidden');
+                    updatePfpPreview();
+                } else {
+                    pfpLetterOptions.classList.add('hidden');
+                    pfpUploadOptions.classList.remove('hidden');
+                }
+            });
+        });
+        
+        // Render Color Grid
+        const gridContainer = pfpLetterOptions.querySelector('.grid');
+        gridContainer.innerHTML = ''; // Clear prev to avoid dups on re-run
+        letterColors.forEach(color => {
+            const div = document.createElement('div');
+            div.className = 'w-8 h-8 rounded-full cursor-pointer hover:scale-110 transition border-2 border-transparent';
+            div.style.backgroundColor = '#' + color;
+            div.onclick = () => {
+                pfpState.letterColor = '#' + color;
+                updatePfpPreview();
+            };
+            gridContainer.appendChild(div);
+        });
+
+        function updatePfpPreview() {
+            if (pfpState.mode === 'letter') {
+                const initial = currentUser ? (currentUser.username || "U").charAt(0).toUpperCase() : "U";
+                pfpPreview.style.backgroundImage = 'none';
+                pfpPreview.style.backgroundColor = pfpState.letterColor;
+                pfpPreview.innerText = initial;
+            }
+        }
+        
+        saveLetterPfpBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+            saveLetterPfpBtn.innerText = "Saving...";
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    pfpType: 'letter',
+                    pfpLetterBg: pfpState.letterColor,
+                    letterAvatarColor: pfpState.letterColor // Legacy support
+                });
+                // Update local logic if needed
+                currentUser.pfpType = 'letter';
+                currentUser.pfpLetterBg = pfpState.letterColor;
+                localStorage.setItem(USER_DATA_KEY, JSON.stringify(currentUser));
+                saveLetterPfpBtn.innerText = "Saved!";
+                setTimeout(() => saveLetterPfpBtn.innerText = "Set Letter Avatar", 2000);
+            } catch(e) {
+                console.error(e);
+                saveLetterPfpBtn.innerText = "Error";
+            }
+        });
+
+        // --- CROPPER LOGIC ---
+        const pfpUploadInput = document.getElementById('pfp-upload-input');
+        const saveUploadPfpBtn = document.getElementById('save-upload-pfp-btn');
+        const cropperModal = document.getElementById('cropperModal');
+        const cropperCanvas = document.getElementById('cropperCanvas');
+        const cancelCropBtn = document.getElementById('cancelCropBtn');
+        const submitCropBtn = document.getElementById('submitCropBtn');
+        const ctx = cropperCanvas.getContext('2d');
+
+        let cropperImage = null;
+        let cropState = { x: 0, y: 0, radius: 100 };
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+
+        pfpUploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 2 * 1024 * 1024) {
+                alert('File is too large (max 2MB).');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                cropperImage = new Image();
+                cropperImage.onload = () => {
+                    // Setup canvas with fixed height for consistency
+                    const fixedHeight = 400;
+                    const scale = fixedHeight / cropperImage.height;
+                    cropperCanvas.height = fixedHeight;
+                    cropperCanvas.width = cropperImage.width * scale;
+                    
+                    // Initial crop state: center, 1/3 min dim
+                    cropState = {
+                        x: cropperCanvas.width / 2,
+                        y: cropperCanvas.height / 2,
+                        radius: Math.min(cropperCanvas.width, cropperCanvas.height) / 3
+                    };
+                    
+                    cropperModal.style.display = 'flex';
+                    requestAnimationFrame(drawCropper);
+                };
+                cropperImage.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        const drawCropper = () => {
+            if (!cropperImage) return;
+            const w = cropperCanvas.width;
+            const h = cropperCanvas.height;
+            ctx.clearRect(0, 0, w, h);
+            
+            // Draw image filling canvas
+            ctx.drawImage(cropperImage, 0, 0, w, h);
+            
+            // Draw overlay
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.beginPath();
+            ctx.rect(0, 0, w, h);
+            // Cut hole
+            ctx.arc(cropState.x, cropState.y, cropState.radius, 0, 2 * Math.PI, true);
+            ctx.fill();
+            
+            // Draw dashed border
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 4]); // Dashed pattern
+            ctx.beginPath();
+            ctx.arc(cropState.x, cropState.y, cropState.radius, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset
+        };
+
+        const handleStart = (x, y) => {
+            const dx = x - cropState.x;
+            const dy = y - cropState.y;
+            if (dx*dx + dy*dy < cropState.radius * cropState.radius) {
+                isDragging = true;
+                dragStart = { x, y };
+            }
+        };
+        
+        const handleMove = (x, y) => {
+            if (isDragging) {
+                const dx = x - dragStart.x;
+                const dy = y - dragStart.y;
+                
+                let newX = cropState.x + dx;
+                let newY = cropState.y + dy;
+                
+                const r = cropState.radius;
+                const w = cropperCanvas.width;
+                const h = cropperCanvas.height;
+                
+                newX = Math.max(r, Math.min(newX, w - r));
+                newY = Math.max(r, Math.min(newY, h - r));
+                
+                cropState.x = newX;
+                cropState.y = newY;
+                
+                dragStart = { x, y };
+                requestAnimationFrame(drawCropper);
+            }
+        };
+
+        const handleEnd = () => { isDragging = false; };
+        
+        const handleScroll = (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -5 : 5;
+            let newRadius = cropState.radius + delta;
+            const w = cropperCanvas.width;
+            const h = cropperCanvas.height;
+            const maxPossibleRadius = Math.min(w, h) / 2;
+            newRadius = Math.max(20, Math.min(newRadius, maxPossibleRadius));
+            const minX = newRadius;
+            const maxX = w - newRadius;
+            const minY = newRadius;
+            const maxY = h - newRadius;
+            cropState.x = Math.max(minX, Math.min(cropState.x, maxX));
+            cropState.y = Math.max(minY, Math.min(cropState.y, maxY));
+            cropState.radius = newRadius;
+            requestAnimationFrame(drawCropper);
+        };
+
+        cropperCanvas.addEventListener('mousedown', e => handleStart(e.offsetX, e.offsetY));
+        cropperCanvas.addEventListener('mousemove', e => handleMove(e.offsetX, e.offsetY));
+        cropperCanvas.addEventListener('mouseup', handleEnd);
+        cropperCanvas.addEventListener('mouseleave', handleEnd);
+        cropperCanvas.addEventListener('wheel', handleScroll);
+        
+        cancelCropBtn.addEventListener('click', () => {
+            cropperModal.style.display = 'none';
+            pfpUploadInput.value = ''; 
+        });
+
+        submitCropBtn.addEventListener('click', async () => {
+            const tempCanvas = document.createElement('canvas');
+            const size = 128; // Output size
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            const tCtx = tempCanvas.getContext('2d');
+            
+            const scale = cropperCanvas.height / cropperImage.height;
+            const sourceX = (cropState.x - cropState.radius) / scale;
+            const sourceY = (cropState.y - cropState.radius) / scale;
+            const sourceSize = (cropState.radius * 2) / scale;
+            
+            tCtx.drawImage(cropperImage, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
+            const base64 = tempCanvas.toDataURL('image/jpeg', 0.8);
+            
+            // Save to Firestore
+            try {
+                submitCropBtn.disabled = true;
+                submitCropBtn.textContent = "Saving...";
+                await updateDoc(doc(db, "users", currentUser.uid), { 
+                    customPfp: base64,
+                    pfpType: 'custom'
+                });
+                
+                currentUser.customPfp = base64;
+                currentUser.pfpType = 'custom';
+                localStorage.setItem(USER_DATA_KEY, JSON.stringify(currentUser));
+                
+                // Update UI
+                pfpPreview.innerText = "";
+                pfpPreview.style.backgroundImage = `url('${base64}')`;
+                pfpPreview.style.backgroundColor = "transparent";
+                pfpPreview.style.backgroundSize = "cover";
+                
+                cropperModal.style.display = 'none';
+                saveUploadPfpBtn.innerText = "Saved!"; // Feedback on the main btn too
+            } catch (e) {
+                console.error(e);
+                alert('Failed to save image.');
+            } finally {
+                submitCropBtn.disabled = false;
+                submitCropBtn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Submit';
+            }
+        });
+        
+        saveUploadPfpBtn.addEventListener('click', () => {
+             // Just triggers the file input again if clicked after logic
+             pfpUploadInput.click();
+        });
+
+
+        // Theme Logic
+        const themeGrid = document.getElementById('theme-picker-container');
+        
+        async function loadThemes() {
+            try {
+                const res = await fetch('https://cdn.jsdelivr.net/npm/4sp-dv@latest/themes.json'); 
+                if (!res.ok) return;
+                let themes = await res.json();
+                
+                // --- Sorting Logic from settings.js ---
+                const orderedThemeNames = ['Dark', 'Light', 'Christmas'];
+                const sortedThemes = [];
+
+                orderedThemeNames.forEach(name => {
+                    const theme = themes.find(t => t.name === name);
+                    if (theme) {
+                        sortedThemes.push(theme);
+                        themes = themes.filter(t => t.name !== name);
+                    }
+                });
+
+                const colorMap = {
+                    'Crimson': 1, 'Fire': 1, 'Orange': 2, 'Sunset': 2, 'Rust': 2, 'Ember': 2, 'Copper': 2,
+                    'Gold': 3, 'Green': 4, 'Forest': 4, 'Matrix': 4, 'Mint': 5, 'Ocean': 6, 'Deep Blue': 6,
+                    'Purple': 7, 'Royal': 7, 'Haze': 7, 'Lavender': 7, 'Pink': 8, 'Coral': 8, 'Rose Gold': 8,
+                    'Clanker': 9, 'Monochrome': 9, 'Silver': 9, 'Slate': 9
+                };
+                
+                const getThemeType = (t) => (t['logo-src'] && t['logo-src'].includes('logo-dark.png')) ? 1 : 0;
+
+                themes.sort((a, b) => {
+                    const colorA = colorMap[a.name] || 100;
+                    const colorB = colorMap[b.name] || 100;
+                    if (colorA !== colorB) return colorA - colorB;
+                    const typeA = getThemeType(a);
+                    const typeB = getThemeType(b);
+                    if (typeA !== typeB) return typeA - typeB;
+                    return a.name.localeCompare(b.name);
+                });
+
+                themes = [...sortedThemes, ...themes];
+                // --- End Sorting Logic ---
+
+                const savedThemeRaw = localStorage.getItem('user-navbar-theme');
+                let savedTheme = null;
+                try { if(savedThemeRaw) savedTheme = JSON.parse(savedThemeRaw); } catch(e){}
+
+                themeGrid.innerHTML = '';
+                themes.forEach(theme => {
+                    const isActive = savedTheme && savedTheme.name === theme.name;
+                    const previewBg = theme['navbar-bg'] || '#000000';
+                    const previewText = theme['navbar-text'] || '#c0c0c0';
+                    const previewBorder = theme['tab-active-border'] || '#4f46e5';
+
+                    const btn = document.createElement('button');
+                    btn.className = `theme-button ${isActive ? 'active' : ''}`;
+                    btn.style.backgroundColor = previewBg;
+                    btn.style.borderColor = previewBorder;
+                    btn.innerHTML = `<div class="theme-button-name" style="color: ${previewText};">${theme.name}</div>`;
+                    
+                    btn.onclick = () => {
+                        applyTheme(theme);
+                        document.querySelectorAll('.theme-button').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    };
+                    themeGrid.appendChild(btn);
+                });
+            } catch(e) { console.error("Themes error", e); }
+        }
+        
+        const lightThemeNames = ['Light', 'Lavender', 'Rose Gold', 'Mint', 'Pink'];
+
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            
+            // --- Logo Path Modification ---
+            let logoSrc;
+            if (lightThemeNames.includes(theme.name)) {
+                logoSrc = 'https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/logo-dark.png'; 
+            } else if (theme.name === 'Christmas') {
+                logoSrc = 'https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/logo-christmas.png';
+            } else {
+                logoSrc = 'https://cdn.jsdelivr.net/npm/4sp-asset-library@latest/logo.png';
+            }
+
+            // Apply CSS Variables
+            for (const [key, value] of Object.entries(theme)) {
+                if (key !== 'logo-src' && key !== 'name') {
+                    root.style.setProperty(`--${key}`, value);
+                }
+            }
+
+            // Apply Logo & Tinting
+            const logoImg = document.getElementById('navbar-logo');
+            if (logoImg) {
+                // Update Source (Use absolute path comparison or specific logic)
+                // We just set it. Browser handles cache.
+                // Note: The original navigation.js checked src endsWith to avoid reload flicker, but simple assignment is okay.
+                if (!logoImg.src.includes(logoSrc)) {
+                     logoImg.src = logoSrc;
+                }
+
+                // Apply Tinting
+                const noFilterThemes = ['Dark', 'Light', 'Christmas'];
+                if (noFilterThemes.includes(theme.name)) {
+                    logoImg.style.filter = ''; 
+                    logoImg.style.transform = '';
+                } else {
+                    const tintColor = theme['tab-active-text'] || '#ffffff';
+                    // The original navigation.js used this trick for SVG coloring via filter
+                    logoImg.style.filter = `drop-shadow(100px 0 0 ${tintColor})`;
+                    logoImg.style.transform = 'translateX(-100px)';
+                }
+            }
+
+            // Save to local storage for persistence on reload
+            localStorage.setItem('user-navbar-theme', JSON.stringify(theme));
+            
+            // Also update user doc if logged in
+            if (currentUser) {
+                updateDoc(doc(db, "users", currentUser.uid), { navbarTheme: theme }).catch(console.error);
+            }
+        }
+
+        // --- 3. Privacy: Panic Key Logic ---
+        
+        const DB_NAME = 'userLocalSettingsDB';
+        const STORE_NAME = 'panicKeyStore';
+
+        // --- IndexedDB Helpers ---
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME);
+                request.onupgradeneeded = event => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function getPanicKeySettings() {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.getAll();
+                request.onsuccess = () => {
+                    const settingsMap = new Map(request.result.map(item => [item.id, item]));
+                    db.close();
+                    resolve(settingsMap);
+                };
+                request.onerror = () => {
+                     db.close();
+                    reject(request.error);
+                };
+            });
+        }
+        
+        async function savePanicKeySettings(settingsArray) {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                
+                let completed = 0;
+                const total = settingsArray.length;
+
+                settingsArray.forEach(setting => {
+                    const request = store.put(setting);
+                    request.onsuccess = () => {
+                        completed++;
+                        if (completed === total) {
+                            db.close();
+                            resolve();
+                        }
+                    };
+                    request.onerror = () => {
+                         db.close();
+                        reject(request.error); 
+                    };
+                });
+                
+                if (total === 0) {
+                     db.close();
+                    resolve();
+                }
+            });
+        }
+
+        // Global store for active keys (in-memory)
+        window.activePanicKeys = [];
+
+        async function loadPanicKeys() {
+            try {
+                const settingsMap = await getPanicKeySettings();
+                window.activePanicKeys = []; // Reset
+                
+                // Populate UI if settings panel is open (though this runs globally too)
+                const panicKey1 = document.getElementById('panicKey1');
+                const panicUrl1 = document.getElementById('panicUrl1');
+                const panicKey2 = document.getElementById('panicKey2');
+                const panicUrl2 = document.getElementById('panicUrl2');
+                const panicKey3 = document.getElementById('panicKey3');
+                const panicUrl3 = document.getElementById('panicUrl3');
+
+                const key1 = settingsMap.get('panicKey1');
+                const key2 = settingsMap.get('panicKey2');
+                const key3 = settingsMap.get('panicKey3');
+
+                if (key1) {
+                    if (panicKey1) panicKey1.value = key1.key || '';
+                    if (panicUrl1) panicUrl1.value = key1.url || '';
+                    if (key1.key && key1.url) window.activePanicKeys.push(key1);
+                }
+                if (key2) {
+                    if (panicKey2) panicKey2.value = key2.key || '';
+                    if (panicUrl2) panicUrl2.value = key2.url || '';
+                     if (key2.key && key2.url) window.activePanicKeys.push(key2);
+                }
+                if (key3) {
+                    if (panicKey3) panicKey3.value = key3.key || '';
+                    if (panicUrl3) panicUrl3.value = key3.url || '';
+                     if (key3.key && key3.url) window.activePanicKeys.push(key3);
+                }
+            } catch (e) {
+                console.error("Error loading panic keys:", e);
+            }
+        }
+
+        // Panic Key UI Logic
+        const applyPanicKeyBtn = document.getElementById('applyPanicKeyBtn');
+        const panicKeyMessage = document.getElementById('panicKeyMessage');
+        const panicKeyInputs = document.querySelectorAll('.panic-key-input');
+
+        // Input Validation
+        const validKeyRegex = /^[a-z0-9`\-=\[\]\\;',\.\/]$/;
+        panicKeyInputs.forEach(input => {
+            input.addEventListener('keydown', e => {
+                if (e.key.length > 1 && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Tab') {
+                    e.preventDefault(); return;
+                }
+                const lowerKey = e.key.toLowerCase();
+                if (lowerKey.length === 1 && !validKeyRegex.test(lowerKey)) {
+                     e.preventDefault(); 
+                     if(panicKeyMessage) panicKeyMessage.innerHTML = `<span class="text-yellow-400">Invalid key. Only a-z, 0-9, and \` - = [ ] \\ ; ' , . / are allowed.</span>`;
+                } else if (lowerKey.length === 1) {
+                    e.preventDefault(); input.value = lowerKey; 
+                    if(panicKeyMessage) panicKeyMessage.innerText = ''; 
+                }
+            });
+        });
+
+        if (applyPanicKeyBtn) {
+            applyPanicKeyBtn.addEventListener('click', async () => {
+                if(panicKeyMessage) panicKeyMessage.innerText = '';
+                const keys = [
+                    document.getElementById('panicKey1').value,
+                    document.getElementById('panicKey2').value,
+                    document.getElementById('panicKey3').value
+                ];
+                const urls = [
+                    document.getElementById('panicUrl1').value,
+                    document.getElementById('panicUrl2').value,
+                    document.getElementById('panicUrl3').value
+                ];
+                
+                const settingsToSave = [];
+                let hasError = false;
+
+                for (let i = 0; i < 3; i++) {
+                    const key = keys[i];
+                    let url = urls[i]; 
+                    const id = `panicKey${i + 1}`;
+                    
+                    if (!key && !url) { settingsToSave.push({ id, key: '', url: '' }); continue; }
+                    
+                    if ( (key && !url) || (!key && url) ) {
+                        panicKeyMessage.innerHTML = `<span class="text-red-400">Panic Key ${i+1} is incomplete. Both key and URL must be filled, or both empty.</span>`;
+                        hasError = true; break;
+                    }
+
+                    if (url.startsWith('/') || url.startsWith('../') || url.startsWith('./')) {
+                         panicKeyMessage.innerHTML = `<span class="text-red-400">Panic Key ${i+1} must be a full web address (e.g., google.com).</span>`;
+                        hasError = true; break;
+                    }
+
+                    if (!url.startsWith('https://') && !url.startsWith('http://')) { url = 'https://' + url; }
+
+                    try { new URL(url); } catch (e) {
+                         panicKeyMessage.innerHTML = `<span class="text-red-400">Panic Key ${i+1} has an invalid URL.</span>`;
+                        hasError = true; break;
+                    }
+                    settingsToSave.push({ id, key, url }); 
+                }
+
+                if (hasError) return;
+
+                const filledKeys = settingsToSave.map(s => s.key).filter(k => k);
+                if (new Set(filledKeys).size !== filledKeys.length) {
+                     panicKeyMessage.innerHTML = `<span class="text-red-400">Duplicate panic keys found. Keys must be unique.</span>`;
+                    return;
+                }
+                
+                try {
+                    applyPanicKeyBtn.disabled = true;
+                    panicKeyMessage.innerHTML = `<span class="text-yellow-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Saving...</span>`;
+                    await savePanicKeySettings(settingsToSave);
+                    panicKeyMessage.innerHTML = `<span class="text-green-400">Panic key settings saved successfully! Reloading...</span>`;
+                    setTimeout(() => location.reload(), 1000); 
+                } catch (e) {
+                    console.error("Error saving panic key settings:", e);
+                    panicKeyMessage.innerHTML = `<span class="text-red-400">An error occurred while saving.</span>`;
+                } finally {
+                    applyPanicKeyBtn.disabled = false;
+                }
+            });
+        }
+        
+        // --- Global Key Listener for Panic ---
+        window.handlePanic = function(e) {
+            if (!window.activePanicKeys || window.activePanicKeys.length === 0) return;
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
+
+            const pressedKey = e.key.toLowerCase();
+            const match = window.activePanicKeys.find(s => s.key.toLowerCase() === pressedKey);
+            
+            if (match && match.url) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = match.url;
+            }
+        };
+        window.addEventListener('keydown', window.handlePanic);
+
+
+        // --- Helper: Load Data into Settings ---
+        function loadSettingsData() {
+            if (currentUser) {
+                settingsUsernameInput.value = currentUser.username || "";
+                pfpState.letterColor = currentUser.pfpLetterBg || '#3B82F6';
+                updatePfpPreview();
+            }
+            loadThemes();
+            loadPanicKeys(); // Refresh inputs when settings open
+        }
+
+        checkAutoLogin();
+        loadPanicKeys(); // Initial load for global listener
+
+    </script>
+</body>
+</html>
