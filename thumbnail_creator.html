@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4SP Thumbnail Creator V2</title>
+    <title>4SP Thumbnail Creator V3</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,7 +47,6 @@
             border-bottom: 1px solid #1a1a1a;
         }
 
-        /* Inputs */
         .control-group { margin-bottom: 1rem; }
         .control-group:last-child { margin-bottom: 0; }
 
@@ -81,14 +80,13 @@
             cursor: pointer;
         }
 
-        /* Collapsible Details (Custom Dropdown) */
+        /* Collapsible Details */
         details {
             background: #151515;
             border: 1px solid #333;
             border-radius: 0.5rem;
             overflow: hidden;
         }
-        
         details summary {
             padding: 0.75rem;
             cursor: pointer;
@@ -101,20 +99,10 @@
             align-items: center;
             background: #1a1a1a;
         }
-        
         details summary::-webkit-details-marker { display: none; }
-        
-        details summary::after {
-            content: '+'; 
-            font-weight: bold;
-        }
+        details summary::after { content: '+'; font-weight: bold; }
         details[open] summary::after { content: '-'; }
-
-        .details-content {
-            padding: 1rem;
-            background: #0a0a0a;
-            border-top: 1px solid #333;
-        }
+        .details-content { padding: 1rem; background: #0a0a0a; border-top: 1px solid #333; }
 
         /* --- STAGE --- */
         #stage-container {
@@ -128,7 +116,6 @@
             background-color: #000;
         }
 
-        /* 16:9 Frame */
         #thumbnail-frame {
             width: 100%;
             max-width: 1280px; 
@@ -141,7 +128,6 @@
             user-select: none;
         }
 
-        /* Background Layer (Full Bleed) */
         #bg-layer {
             position: absolute;
             inset: 0;
@@ -152,26 +138,23 @@
             z-index: 0;
         }
 
-        /* Safe Area (Handles Padding) */
+        /* Safe Area */
+        /* This container is resized by JS based on padding X/Y */
         #safe-area {
             position: absolute;
-            inset: 0;
+            /* Inset values are set via JS */
             z-index: 10;
-            /* Padding is set via JS */
-            padding: 4rem; 
-            box-sizing: border-box; 
         }
 
         /* Title */
         #thumb-title {
-            width: 55%; 
-            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 60%; 
             color: white;
             font-family: 'Geist', sans-serif;
             margin: 0;
-            /* Typography set via JS */
-            font-weight: 700;
-            font-size: 4.5rem; 
             line-height: 1;
             letter-spacing: -0.03em;
             text-shadow: 0 4px 12px rgba(0,0,0,0.8);
@@ -183,13 +166,11 @@
             position: absolute;
             top: 0;
             right: 0;
-            /* Instead of padding on the image, we rely on the safe-area container */
             width: 120px; 
             height: auto;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
         }
 
-        /* --- UTILS --- */
         .btn-action {
             background: white;
             color: black;
@@ -207,7 +188,6 @@
         }
         .btn-action:hover { opacity: 0.9; }
 
-        /* Fullscreen Mode */
         body.is-fullscreen #controls-panel { display: none; }
         body.is-fullscreen #stage-container { padding: 0; background: black; }
         body.is-fullscreen #thumbnail-frame { 
@@ -243,7 +223,7 @@
                             </div>
                             <div class="control-group">
                                 <label>Font Size: <span id="val-size">4.5rem</span></label>
-                                <input type="range" id="range-size" min="2" max="8" step="0.1" value="4.5">
+                                <input type="range" id="range-size" min="2" max="10" step="0.1" value="4.5">
                             </div>
                             <div class="control-group">
                                 <label>Shadow Opacity: <span id="val-shadow-op">80%</span></label>
@@ -260,9 +240,12 @@
 
             <div class="panel-section">
                 <div class="control-group">
-                    <label>Global Padding: <span id="val-padding">64px</span></label>
-                    <input type="range" id="range-padding" min="0" max="150" step="4" value="64">
-                    <p class="text-[10px] text-gray-500 mt-1">Adjusts spacing from edges for Logo & Title.</p>
+                    <label>Padding X (Sides): <span id="val-pad-x">64px</span></label>
+                    <input type="range" id="range-pad-x" min="0" max="250" step="4" value="64">
+                </div>
+                <div class="control-group">
+                    <label>Padding Y (Top/Bot): <span id="val-pad-y">64px</span></label>
+                    <input type="range" id="range-pad-y" min="0" max="250" step="4" value="64">
                 </div>
             </div>
 
@@ -297,7 +280,7 @@
                 <div id="safe-area">
                     <h1 id="thumb-title">The Rapid Evolution of 4SP</h1>
                     
-                    <img id="thumb-logo" src="../images/logo.png" onerror="this.style.opacity='0.5'; this.title='Logo not found at ../images/logo.png'" alt="4SP Logo">
+                    <img id="thumb-logo" src="../images/logo.png" onerror="this.style.opacity='0.5'" alt="4SP Logo">
                 </div>
             </div>
         </main>
@@ -313,42 +296,52 @@
             // Sliders
             rangeBlur: document.getElementById('range-blur'),
             rangeBright: document.getElementById('range-bright'),
-            rangePadding: document.getElementById('range-padding'),
+            
+            rangePadX: document.getElementById('range-pad-x'),
+            rangePadY: document.getElementById('range-pad-y'),
+
             rangeWeight: document.getElementById('range-weight'),
             rangeSize: document.getElementById('range-size'),
             rangeShadowOp: document.getElementById('range-shadow-op'),
             rangeShadowBlur: document.getElementById('range-shadow-blur'),
 
-            // Value Labels
+            // Labels
             valBlur: document.getElementById('val-blur'),
             valBright: document.getElementById('val-bright'),
-            valPadding: document.getElementById('val-padding'),
+            valPadX: document.getElementById('val-pad-x'),
+            valPadY: document.getElementById('val-pad-y'),
             valWeight: document.getElementById('val-weight'),
             valSize: document.getElementById('val-size'),
             valShadowOp: document.getElementById('val-shadow-op'),
             valShadowBlur: document.getElementById('val-shadow-blur'),
 
-            // Stage Elements
+            // Stage
             thumbTitle: document.getElementById('thumb-title'),
             bgLayer: document.getElementById('bg-layer'),
             safeArea: document.getElementById('safe-area'),
             btnFullscreen: document.getElementById('btn-fullscreen')
         };
 
-        // --- UPDATE FUNCTIONS ---
-
+        // --- UPDATE VISUALS ---
         function updateVisuals() {
-            // Background Filters
+            // Background
             const blur = els.rangeBlur.value;
             const bright = els.rangeBright.value;
             els.bgLayer.style.filter = `blur(${blur}px) brightness(${bright}%)`;
             els.valBlur.innerText = `${blur}px`;
             els.valBright.innerText = `${bright}%`;
 
-            // Global Padding
-            const pad = els.rangePadding.value;
-            els.safeArea.style.padding = `${pad}px`;
-            els.valPadding.innerText = `${pad}px`;
+            // Split Padding (Applying to Safe Area Inset)
+            const padX = els.rangePadX.value;
+            const padY = els.rangePadY.value;
+            
+            els.safeArea.style.left = `${padX}px`;
+            els.safeArea.style.right = `${padX}px`;
+            els.safeArea.style.top = `${padY}px`;
+            els.safeArea.style.bottom = `${padY}px`;
+            
+            els.valPadX.innerText = `${padX}px`;
+            els.valPadY.innerText = `${padY}px`;
 
             // Typography
             const weight = els.rangeWeight.value;
@@ -367,11 +360,7 @@
         }
 
         // --- LISTENERS ---
-
-        // Text Input
         els.inputTitle.addEventListener('input', (e) => els.thumbTitle.innerText = e.target.value);
-
-        // Background Image Handling
         els.inputBgUrl.addEventListener('input', (e) => { if(e.target.value) els.bgLayer.src = e.target.value; });
         els.inputFile.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -382,14 +371,15 @@
             }
         });
 
-        // Attach listeners to all range inputs
+        // Loop add listeners
         const ranges = [
-            els.rangeBlur, els.rangeBright, els.rangePadding, 
+            els.rangeBlur, els.rangeBright, 
+            els.rangePadX, els.rangePadY, 
             els.rangeWeight, els.rangeSize, els.rangeShadowOp, els.rangeShadowBlur
         ];
         ranges.forEach(range => range.addEventListener('input', updateVisuals));
 
-        // --- FULLSCREEN LOGIC ---
+        // Fullscreen
         els.btnFullscreen.addEventListener('click', () => {
             const elem = document.documentElement;
             if (elem.requestFullscreen) elem.requestFullscreen();
@@ -404,7 +394,6 @@
 
         // Init
         updateVisuals();
-
     </script>
 </body>
 </html>
