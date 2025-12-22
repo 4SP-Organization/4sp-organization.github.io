@@ -318,13 +318,13 @@
     <div id="lock-screen" class="w-full h-full flex flex-col items-center justify-center p-4">
         <div class="max-w-5xl w-full bg-[#040404] flex flex-col md:flex-row border border-[#252525] rounded-3xl overflow-hidden shadow-2xl">
             <div class="flex-1 p-8 flex flex-col justify-center items-center border-b md:border-b-0 md:border-r border-[#252525]">
-                <h2 class="text-3xl text-[#c0c0c0] mb-6 text-center w-full font-light tracking-tighter">4SP v5 Client</h2>
+                <h2 class="text-3xl text-[#c0c0c0] mb-6 text-center w-full font-light tracking-tighter">4SP Version 5 Client (DV)</h2>
                 <p class="text-[#505050] text-center mb-8 text-sm">Enter your 12-character access code.</p>
                 
                 <input type="text" id="codeInput" class="w-full max-w-xs bg-[#111] border border-[#252525] text-white rounded-xl p-3 text-center tracking-[0.2em] mb-4 outline-none focus:border-indigo-500 transition" placeholder="XXXX-XXXX-XXXX">
                 
                 <button id="unlockBtn" class="w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl text-indigo-500 bg-indigo-500/10 border border-indigo-500 hover:bg-indigo-500/20 transition mb-4">
-                    Login
+                    Access
                 </button>
                 
                 <p id="lockMessage" class="text-red-400 text-xs mt-2 min-h-[20px] text-center"></p>
@@ -2116,8 +2116,8 @@
             if (pageName.startsWith(BASE_URL)) pageName = pageName.substring(BASE_URL.length);
 
             // --- OVERLAY LOGIC SWITCH ---
-            // If page is 'games.html' or 'settings.html', do NOT use overlay mode.
-            if (pageName.includes('games') || pageName.includes('settings')) {
+            // If page is 'games.html', 'settings.html', or 'messenger-v2.html', do NOT use overlay mode.
+            if (pageName.includes('games') || pageName.includes('settings') || pageName.includes('messenger')) {
                 document.body.classList.remove('nav-overlay-mode');
             } else {
                 document.body.classList.add('nav-overlay-mode');
