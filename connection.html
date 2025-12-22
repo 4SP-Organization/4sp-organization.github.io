@@ -79,7 +79,7 @@
             border-radius: 0.5rem;
             width: 100%;
             text-align: center;
-            margin-bottom: 0.5rem; /* Reduced margin to fit status text */
+            margin-bottom: 0.5rem;
             color: #fff;
         }
     </style>
@@ -178,13 +178,13 @@
         import { 
             getFirestore, 
             doc, 
-            setDoc, 
+            setDoc,
+            deleteDoc, // Added import
             serverTimestamp,
             query,
             where,
             getDocs,
             limit,
-            orderBy,
             collection,
             writeBatch
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -223,13 +223,12 @@
                 authView.classList.remove('hidden');
                 userEmailSpan.textContent = user.email;
 
-                // Check for existing code
+                // CHECK FOR EXISTING CODE
+                // Removed "orderBy" and "active=true" to fix index issues and find *any* code owned by user
                 try {
                     const q = query(
                         collection(db, "access_codes"), 
                         where("ownerUid", "==", user.uid),
-                        where("active", "==", true),
-                        orderBy("createdAt", "desc"),
                         limit(1)
                     );
                     const querySnapshot = await getDocs(q);
@@ -312,20 +311,22 @@
             const formattedCode = rawCode.match(/.{1,4}/g).join('-');
 
             try {
-                // Deactivate old codes first
+                // 1. DELETE ANY OLD CODES
+                // We find ANY code owned by this user and delete it to keep it clean (1 user = 1 code)
                 const q = query(
                     collection(db, "access_codes"), 
-                    where("ownerUid", "==", auth.currentUser.uid),
-                    where("active", "==", true)
+                    where("ownerUid", "==", auth.currentUser.uid)
                 );
                 const querySnapshot = await getDocs(q);
+                
+                // Use a batch to delete all found (usually just 1)
                 const batch = writeBatch(db);
                 querySnapshot.forEach((doc) => {
-                    batch.update(doc.ref, { active: false });
+                    batch.delete(doc.ref);
                 });
                 await batch.commit();
 
-                // Create new code
+                // 2. CREATE NEW CODE
                 await setDoc(doc(db, "access_codes", rawCode), {
                     active: true,
                     claimed: false,
@@ -361,7 +362,6 @@
         copyBtn.addEventListener('click', () => {
             const code = codeOutput.innerText;
             navigator.clipboard.writeText(code).then(() => {
-                // Temporary success message in the main message area
                 const prevText = messageArea.innerText;
                 const prevClass = messageArea.className;
                 
