@@ -160,7 +160,7 @@ const applyCounterZoom = () => {
         const container = document.getElementById('navbar-container');
         if (!container) return;
 
-        const logoPath = "/images/logo.png";
+        const logoPath = "/images/potato.png";
 
         const loggedOutView = () => `
             <div class="relative">
