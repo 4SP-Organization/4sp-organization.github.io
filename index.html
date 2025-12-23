@@ -12,17 +12,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="navbar.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="navbar-loader.js" defer></script>
 
     <style>
-        :root {
-            --menu-bg: #000000;
-            --menu-border: #333;
-            --menu-text: #d1d5db;
-            --tab-hover-text: #ffffff;
-        }
-
         /* --- NOTES.HTML AESTHETIC REPLICATION --- */
         body { 
             font-family: 'Geist', sans-serif; 
@@ -45,38 +40,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        }
-
-        /* --- NAVIGATION STYLES (Matching notes.html) --- */
-        .org-navbar { 
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; 
-            background: #040404;
-            border-bottom: 1px solid #1a1a1a; 
-            height: 4rem; 
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 1rem;
-        }
-
-        /* Pill-shaped buttons from notes.html */
-        .btn-toolbar-style {
-            background: var(--menu-bg, #000000);
-            border: 1px solid var(--menu-border, #333);
-            border-radius: 0.75rem;
-            color: var(--menu-text, #d1d5db);
-            padding: 0.5rem 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            font-size: 0.875rem;
-        }
-        .btn-toolbar-style:hover {
-            background-color: var(--menu-bg, #000000);
-            border-color: #fff;
-            color: var(--tab-hover-text, #ffffff);
         }
 
         /* --- HERO BUTTON --- */
@@ -149,7 +112,7 @@
     <header class="org-navbar">
         <div class="flex items-center space-x-4">
             <a href="#" id="logo-link" class="flex items-center space-x-2">
-                <img src="/images/logo.png" alt="4SP Logo" class="h-8 w-auto">
+                <img src="/images/logo.png" alt="4SP Logo" class="h-8 w-auto" id="navbar-logo">
             </a>
         </div>
         

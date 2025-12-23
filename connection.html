@@ -11,7 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="../navigation-mini.js"></script>
+    <link rel="stylesheet" href="navbar.css">
+    <script src="navbar-loader.js" defer></script>
 
     <script>
         // Unified Tailwind CSS configuration for a consistent dark theme
@@ -43,6 +44,7 @@
             color: rgb(var(--geist-foreground));
             transition: all 0.3s ease;
             font-weight: 300;
+            padding-top: 4rem;
         }
 
         h1, h2, h3, .font-bold, .font-semibold, strong, .tracking-tighter {
@@ -85,6 +87,29 @@
     </style>
 </head>
 <body class="bg-custom-darkest-gray text-custom-white-gray min-h-screen flex flex-col">
+
+    <header class="org-navbar">
+        <div class="flex items-center space-x-4">
+            <a href="index.html" id="logo-link" class="flex items-center space-x-2">
+                <img src="/images/logo.png" alt="4SP Logo" class="h-8 w-auto" id="navbar-logo">
+            </a>
+        </div>
+        
+        <nav class="flex items-center gap-2">
+            <a href="index.html#history-summary" class="btn-toolbar-style" title="View the History of 4SP">
+                <i class="fa-solid fa-clock-rotate-left w-4"></i>
+                History
+            </a>
+            <a href="index.html#project-full-summary" class="btn-toolbar-style" title="Read the full project brief">
+                <i class="fa-solid fa-book-open w-4"></i>
+                Summary
+            </a>
+            <a href="connection.html" class="btn-toolbar-style ml-2" title="Connect to 4SP Local">
+                <i class="fa-solid fa-rocket w-4"></i>
+                Connect
+            </a>
+        </nav>
+    </header>
 
     <main class="flex-grow flex items-stretch justify-center p-0">
         <div class="auth-split-container bg-custom-darkest-gray flex flex-wrap w-full border-0 overflow-hidden p-0">
