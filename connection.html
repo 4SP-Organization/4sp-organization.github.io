@@ -196,15 +196,13 @@
                         </div>
                         <div id="messageArea" class="message-area mt-4 text-center text-sm"></div>
 
-                        <div class="w-full mt-6 pt-4 border-t border-custom-medium-gray/30 flex flex-col items-center">
-                            <p class="text-custom-light-gray text-sm font-light mb-4">
+                        <div class="w-full mt-6 text-center border-t border-custom-medium-gray/30 pt-4">
+                            <p class="text-custom-light-gray text-sm font-light">
                                 Need the client? 
+                                <a href="../4simpleproblems_v5_latest.html" download="4simpleproblems_v5_latest.html" class="text-cyan-500 hover:text-cyan-400 transition hover:underline cursor-pointer ml-1" title="Download 4SP Client">
+                                    Download Here
+                                </a>
                             </p>
-                            <a href="../4simpleproblems_v5_latest.html" download="4simpleproblems_v5_latest.html" 
-                               class="w-full max-w-xs py-2 px-4 text-sm font-medium rounded-2xl text-cyan-500 bg-cyan-500/10 border border-cyan-500 hover:bg-cyan-500/20 transition flex items-center justify-center gap-2 decoration-0 group" 
-                               title="Download 4SP Client">
-                                <i class="fa-solid fa-download group-hover:animate-bounce"></i> Download Client
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -252,7 +250,7 @@
                                 <strong class="text-white">1. Generate Code:</strong> Click the button on the left to create a unique pairing key.
                             </p>
                             <p>
-                                <strong class="text-white">2. Open Client:</strong> Launch the 4SP desktop application on your computer via the Files app.
+                                <strong class="text-white">2. Open Client:</strong> Launch the 4SP desktop application on your computer.
                             </p>
                             <p>
                                 <strong class="text-white">3. Link:</strong> Enter the code into the client to sync your account and unlock the toolkit.
@@ -297,6 +295,7 @@
         import { 
             getFirestore, 
             doc, 
+            getDoc, // Added missing import
             setDoc,
             deleteDoc, 
             serverTimestamp,
@@ -326,7 +325,7 @@
         // UI References
         const unauthLoginContainer = document.getElementById('unauth-login-container');
         const resetPasswordContainer = document.getElementById('resetPasswordContainer');
-        const signupContainer = document.getElementById('signupContainer'); // New
+        const signupContainer = document.getElementById('signupContainer');
         const unauthSocialContainer = document.getElementById('unauth-social-container');
         
         const authCodeContainer = document.getElementById('auth-code-container');
@@ -343,7 +342,7 @@
         
         const loginMessage = document.getElementById('loginMessage');
         const resetMessage = document.getElementById('resetMessage');
-        const signupMessage = document.getElementById('signupMessage'); // New
+        const signupMessage = document.getElementById('signupMessage');
         
         const INDIGO_CLASSES = "text-indigo-500 bg-indigo-500/10 border-indigo-500 hover:bg-indigo-500/20";
         const CYAN_CLASSES = "text-cyan-500 bg-cyan-500/10 border-cyan-500 hover:bg-cyan-500/20";
@@ -351,20 +350,16 @@
         let unsubscribeCodeListener = null;
 
         // --- Helper: View Switcher ---
-        // This function guarantees clean switching between Login, Reset, and Signup
         function switchView(viewName) {
-            // Hide all
             [unauthLoginContainer, resetPasswordContainer, signupContainer].forEach(el => {
                 el.classList.add('hidden');
-                el.style.display = 'none'; // Explicitly set none to override any stuck inline styles
+                el.style.display = 'none';
             });
             
-            // Clear messages
             loginMessage.innerText = "";
             resetMessage.innerText = "";
             signupMessage.innerText = "";
             
-            // Show requested
             const target = {
                 'login': unauthLoginContainer,
                 'reset': resetPasswordContainer,
@@ -388,7 +383,7 @@
                 // VERIFICATION CHECK
                 if (!user.emailVerified) {
                     await signOut(auth);
-                    switchView('login'); // Ensure we are on login view
+                    switchView('login');
                     
                     loginMessage.innerHTML = 'Your email is not verified. Please check your inbox. <a href="#" id="resend-link" class="underline cursor-pointer hover:text-white">Resend email</a>';
                     loginMessage.className = "message-area w-full mt-4 text-center text-sm error-message";
@@ -407,7 +402,6 @@
                 }
 
                 // LOGGED IN & VERIFIED
-                // Hide all unauth panels
                 [unauthLoginContainer, resetPasswordContainer, signupContainer, unauthSocialContainer].forEach(el => {
                     el.classList.add('hidden');
                     el.style.display = 'none';
@@ -432,9 +426,7 @@
 
             } else {
                 // LOGGED OUT
-                switchView('login'); // Default to login view
-                
-                // IMPORTANT FIX: Ensure social buttons are visible and inline style is reset to flex
+                switchView('login');
                 unauthSocialContainer.classList.remove('hidden'); 
                 unauthSocialContainer.style.display = 'flex'; 
                 
@@ -458,7 +450,6 @@
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                // State change handled by onAuthStateChanged
             } catch (error) {
                 let msg = 'Invalid email or password.';
                 if (error.code === 'auth/too-many-requests') msg = 'Access temporarily disabled due to too many failed login attempts.';
@@ -499,7 +490,7 @@
             }
         });
 
-        // --- Sign Up Handler (New) ---
+        // --- Sign Up Handler ---
         function validatePassword(password) {
             if (password.length < 8) return 'Password must be at least 8 characters.';
             if (!/[0-9]/.test(password)) return 'Password must contain at least one number.';
@@ -525,7 +516,6 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await sendEmailVerification(userCredential.user);
                 
-                // Create user doc
                 let rawUsername = email.split('@')[0];
                 let username = rawUsername.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
                 if (username.length < 6) username = `User${userCredential.user.uid.substring(0, 8)}`;
@@ -538,7 +528,7 @@
                     emailVerified: false
                 });
 
-                await signOut(auth); // Force sign out so they have to login after verifying
+                await signOut(auth); 
                 
                 switchView('login');
                 loginMessage.innerText = `Account created! Verification email sent to ${email}. Please verify before logging in.`;
@@ -555,7 +545,46 @@
             }
         });
 
-        // --- Common Helpers ---
+        // --- Social Auth Sync Fix ---
+        async function handleSocialAuth(provider) {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+
+                // Sync: Check if user document exists, create if missing
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (!userDoc.exists()) {
+                    let username = user.displayName || user.email.split('@')[0];
+                    username = username.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
+                    if (username.length < 6) username = `User${user.uid.substring(0, 8)}`;
+
+                    await setDoc(userDocRef, {
+                        email: user.email,
+                        authMethod: provider.providerId,
+                        createdAt: serverTimestamp(),
+                        username: username,
+                        emailVerified: user.emailVerified,
+                        photoURL: user.photoURL || null
+                    });
+                    console.log("User Synced to Firestore");
+                }
+                // onAuthStateChanged will handle the UI redirect
+            } catch (error) {
+                console.error("Auth error:", error);
+                alert("Authentication failed.");
+            }
+        }
+
+        document.getElementById('googleAuthBtn').addEventListener('click', () => handleSocialAuth(new GoogleAuthProvider()));
+        document.getElementById('githubAuthBtn').addEventListener('click', () => handleSocialAuth(new GithubAuthProvider()));
+        document.getElementById('twitterAuthBtn').addEventListener('click', () => handleSocialAuth(new TwitterAuthProvider()));
+        document.getElementById('microsoftAuthBtn').addEventListener('click', () => handleSocialAuth(new OAuthProvider('microsoft.com')));
+        
+        logoutBtn.addEventListener('click', () => signOut(auth));
+
+        // --- Code Generator Logic ---
         function renderCodeState(docSnapshot) {
             const docData = docSnapshot.data();
             codeOutput.innerText = docSnapshot.id.match(/.{1,4}/g).join('-');
@@ -568,7 +597,6 @@
                 messageArea.className = "message-area mt-4 text-center text-sm text-gray-500";
             } else {
                 codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
-                // UPDATED: No longer injecting the download link here. It is static in HTML now.
                 messageArea.innerHTML = "Code generated. Enter it in your 4SP Local Client.";
                 messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
             }
@@ -588,21 +616,6 @@
             generateBtn.disabled = false;
             messageArea.innerText = "";
         }
-
-        async function handleSocialAuth(provider) {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Auth error:", error);
-                alert("Authentication failed.");
-            }
-        }
-
-        document.getElementById('googleAuthBtn').addEventListener('click', () => handleSocialAuth(new GoogleAuthProvider()));
-        document.getElementById('githubAuthBtn').addEventListener('click', () => handleSocialAuth(new GithubAuthProvider()));
-        document.getElementById('twitterAuthBtn').addEventListener('click', () => handleSocialAuth(new TwitterAuthProvider()));
-        document.getElementById('microsoftAuthBtn').addEventListener('click', () => handleSocialAuth(new OAuthProvider('microsoft.com')));
-        logoutBtn.addEventListener('click', () => signOut(auth));
 
         function generateRandomCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
