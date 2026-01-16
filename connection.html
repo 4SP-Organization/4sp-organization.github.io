@@ -84,9 +84,45 @@
             margin-bottom: 0.5rem;
             color: #fff;
         }
+
+        /* Toast Notifications */
+        #notification-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .notification-toast {
+            background-color: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            min-width: 200px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: auto;
+        }
+        .notification-toast.show { transform: translateX(0); opacity: 1; }
+        .notification-toast i { font-size: 1.1em; }
+        .notification-toast.info i { color: #3b82f6; }
+        .notification-toast.success i { color: #22c55e; }
+        .notification-toast.error i { color: #ef4444; }
     </style>
 </head>
 <body class="bg-custom-darkest-gray text-custom-white-gray min-h-screen flex flex-col">
+
+    <div id="notification-container"></div>
 
     <header class="org-navbar">
         <div class="flex items-center space-x-4">
@@ -349,6 +385,47 @@
 
         let unsubscribeCodeListener = null;
 
+        // --- Notification Logic ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            const toast = document.createElement('div');
+            toast.className = `notification-toast ${type}`;
+            
+            let icon = 'fa-circle-info';
+            if (type === 'success') icon = 'fa-check-circle';
+            if (type === 'error') icon = 'fa-circle-exclamation';
+            
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Animate in
+            requestAnimationFrame(() => toast.classList.add('show'));
+            
+            // Remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- Helper: Sync User Document ---
+        async function syncUserDocument(user) {
+            const userDocRef = doc(db, "users", user.uid);
+            let username = user.displayName || user.email.split('@')[0];
+            username = username.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
+            if (username.length < 6) username = `User${user.uid.substring(0, 8)}`;
+
+            await setDoc(userDocRef, {
+                email: user.email,
+                authMethod: user.providerData[0]?.providerId || 'unknown',
+                createdAt: serverTimestamp(),
+                username: username,
+                emailVerified: user.emailVerified,
+                photoURL: user.photoURL || null
+            });
+        }
+
         // --- Helper: View Switcher ---
         function switchView(viewName) {
             [unauthLoginContainer, resetPasswordContainer, signupContainer].forEach(el => {
@@ -399,6 +476,25 @@
                         }
                     });
                     return; 
+                }
+
+                // 1. Check if user document exists in Firestore
+                const userDocRef = doc(db, "users", user.uid);
+                try {
+                    const docSnap = await getDoc(userDocRef);
+                    if (!docSnap.exists()) {
+                        // Document missing -> Trigger Auto-Sync
+                        showToast("Data is being synced currently...", "info");
+                        try {
+                            await syncUserDocument(user);
+                            showToast("Data synced successfully!", "success");
+                        } catch (syncErr) {
+                            console.error("Sync failed:", syncErr);
+                            showToast("Sync failed. Please contact support.", "error");
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error checking user doc:", err);
                 }
 
                 // LOGGED IN & VERIFIED
@@ -545,29 +641,20 @@
             }
         });
 
-        // --- Social Auth with Sync ---
+        // --- Social Auth Sync ---
         async function handleSocialAuth(provider) {
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
 
-                // Sync Logic: Ensure user exists in Firestore
+                // Check for existing doc and create if missing
                 const userDocRef = doc(db, "users", user.uid);
                 const userDoc = await getDoc(userDocRef);
 
                 if (!userDoc.exists()) {
-                    let username = user.displayName || user.email.split('@')[0];
-                    username = username.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
-                    if (username.length < 6) username = `User${user.uid.substring(0, 8)}`;
-
-                    await setDoc(userDocRef, {
-                        email: user.email,
-                        authMethod: provider.providerId,
-                        createdAt: serverTimestamp(),
-                        username: username,
-                        emailVerified: user.emailVerified,
-                        photoURL: user.photoURL || null
-                    });
+                    showToast("Syncing your data...", "info");
+                    await syncUserDocument(user);
+                    showToast("Data synced!", "success");
                 }
             } catch (error) {
                 console.error("Auth error:", error);
@@ -635,28 +722,15 @@
                 const userDoc = await getDoc(userDocRef);
 
                 if (!userDoc.exists()) {
-                    // If user is missing from DB, try to auto-heal (sync)
-                    messageArea.innerText = "Account missing from database. Attempting to sync...";
-                    messageArea.className = "message-area mt-4 text-center text-sm warning-message";
+                    // Try to auto-sync one last time
+                    showToast("Account missing. Attempting final sync...", "warning");
+                    await syncUserDocument(auth.currentUser);
                     
-                    let username = auth.currentUser.displayName || auth.currentUser.email.split('@')[0];
-                    username = username.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
-                    if (username.length < 6) username = `User${auth.currentUser.uid.substring(0, 8)}`;
-
-                    await setDoc(userDocRef, {
-                        email: auth.currentUser.email,
-                        authMethod: auth.currentUser.providerData[0]?.providerId || 'unknown',
-                        createdAt: serverTimestamp(),
-                        username: username,
-                        emailVerified: auth.currentUser.emailVerified,
-                        photoURL: auth.currentUser.photoURL || null
-                    });
-                    
-                    // Re-check after attempt
                     const retryDoc = await getDoc(userDocRef);
                     if (!retryDoc.exists()) {
                         throw new Error("Sync failed.");
                     }
+                    showToast("Sync successful. Generating code...", "success");
                 }
 
                 // If check passes, proceed with generation
