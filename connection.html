@@ -15,17 +15,16 @@
     <script src="navbar-loader.js" defer></script>
 
     <script>
-        // Unified Tailwind CSS configuration for a consistent dark theme
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'custom-darkest-gray': '#040404', // Body background
-                        'custom-dark-gray': '#111111',    // Form container background
-                        'custom-medium-gray': '#252525', // Borders, inputs, buttons
-                        'custom-light-gray': '#505050',  // Labels and secondary text
-                        'custom-lighter-gray': '#808080', // Hover states and subtle text
-                        'custom-white-gray': '#c0c0c0',  // Main text and headings
+                        'custom-darkest-gray': '#040404',
+                        'custom-dark-gray': '#111111',
+                        'custom-medium-gray': '#252525',
+                        'custom-light-gray': '#505050',
+                        'custom-lighter-gray': '#808080',
+                        'custom-white-gray': '#c0c0c0',
                     }
                 }
             }
@@ -34,8 +33,8 @@
     
     <style>
         :root {
-            --geist-foreground: 192, 192, 192; /* custom-white-gray */
-            --geist-background: 7, 7, 7;       /* custom-darkest-gray */
+            --geist-foreground: 192, 192, 192; 
+            --geist-background: 7, 7, 7;
         }
 
         body {
@@ -333,6 +332,7 @@
             doc, 
             getDoc, 
             setDoc,
+            updateDoc,
             deleteDoc, 
             serverTimestamp,
             query,
@@ -394,6 +394,7 @@
             let icon = 'fa-circle-info';
             if (type === 'success') icon = 'fa-check-circle';
             if (type === 'error') icon = 'fa-circle-exclamation';
+            if (type === 'warning') icon = 'fa-triangle-exclamation';
             
             toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
             
@@ -409,21 +410,52 @@
             }, 3000);
         }
 
-        // --- Helper: Sync User Document ---
-        async function syncUserDocument(user) {
-            const userDocRef = doc(db, "users", user.uid);
-            let username = user.displayName || user.email.split('@')[0];
-            username = username.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
-            if (username.length < 6) username = `User${user.uid.substring(0, 8)}`;
+        // --- ROBUST USER SYNC FUNCTION ---
+        // Ensures user doc matches UID, creates if missing, updates if incomplete
+        async function ensureUserDocument(user) {
+            const userDocRef = doc(db, "users", user.uid); // STRICT: Force ID to be UID
+            
+            try {
+                const userSnap = await getDoc(userDocRef);
+                
+                // 1. Determine safe username (use existing if available, else generate)
+                let existingData = userSnap.exists() ? userSnap.data() : {};
+                let finalUsername = existingData.username;
 
-            await setDoc(userDocRef, {
-                email: user.email,
-                authMethod: user.providerData[0]?.providerId || 'unknown',
-                createdAt: serverTimestamp(),
-                username: username,
-                emailVerified: user.emailVerified,
-                photoURL: user.photoURL || null
-            });
+                if (!finalUsername) {
+                    let raw = user.displayName || user.email.split('@')[0];
+                    raw = raw.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
+                    if (raw.length < 6) raw = `User${user.uid.substring(0, 8)}`;
+                    finalUsername = raw;
+                }
+
+                // 2. Prepare payload (Always update these to keep sync)
+                const userData = {
+                    email: user.email,
+                    authMethod: user.providerData[0]?.providerId || 'unknown',
+                    emailVerified: user.emailVerified,
+                    photoURL: user.photoURL || null,
+                    username: finalUsername,
+                    lastSeen: serverTimestamp()
+                };
+
+                // 3. Add createdAt only if creating new doc
+                if (!userSnap.exists()) {
+                    userData.createdAt = serverTimestamp();
+                    showToast("Creating your user profile...", "info");
+                } else if (!existingData.email || !existingData.username) {
+                    // It exists but is broken/incomplete
+                    showToast("Repairing user profile...", "warning");
+                }
+
+                // 4. WRITE: setDoc with MERGE true prevents data loss of other fields
+                await setDoc(userDocRef, userData, { merge: true });
+                return true;
+
+            } catch (err) {
+                console.error("User Sync Error:", err);
+                return false;
+            }
         }
 
         // --- Helper: View Switcher ---
@@ -461,7 +493,6 @@
                 if (!user.emailVerified) {
                     await signOut(auth);
                     switchView('login');
-                    
                     loginMessage.innerHTML = 'Your email is not verified. Please check your inbox. <a href="#" id="resend-link" class="underline cursor-pointer hover:text-white">Resend email</a>';
                     loginMessage.className = "message-area w-full mt-4 text-center text-sm error-message";
                     
@@ -478,26 +509,12 @@
                     return; 
                 }
 
-                // 1. Check if user document exists in Firestore
-                const userDocRef = doc(db, "users", user.uid);
-                try {
-                    const docSnap = await getDoc(userDocRef);
-                    if (!docSnap.exists()) {
-                        // Document missing -> Trigger Auto-Sync
-                        showToast("Data is being synced currently...", "info");
-                        try {
-                            await syncUserDocument(user);
-                            showToast("Data synced successfully!", "success");
-                        } catch (syncErr) {
-                            console.error("Sync failed:", syncErr);
-                            showToast("Sync failed. Please contact support.", "error");
-                        }
-                    }
-                } catch (err) {
-                    console.error("Error checking user doc:", err);
-                }
+                // --- KEY CHANGE: Always Ensure Doc Exists on Login ---
+                // We run this in background so it doesn't block UI if possible, 
+                // but for safety we await it.
+                await ensureUserDocument(user);
 
-                // LOGGED IN & VERIFIED
+                // LOGGED IN & VERIFIED UI
                 [unauthLoginContainer, resetPasswordContainer, signupContainer, unauthSocialContainer].forEach(el => {
                     el.classList.add('hidden');
                     el.style.display = 'none';
@@ -612,17 +629,8 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await sendEmailVerification(userCredential.user);
                 
-                let rawUsername = email.split('@')[0];
-                let username = rawUsername.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
-                if (username.length < 6) username = `User${userCredential.user.uid.substring(0, 8)}`;
-                
-                await setDoc(doc(db, 'users', userCredential.user.uid), {
-                    email: email, 
-                    authMethod: 'email', 
-                    createdAt: serverTimestamp(),
-                    username: username, 
-                    emailVerified: false
-                });
+                // Explicitly create doc here too for safety
+                await ensureUserDocument(userCredential.user);
 
                 await signOut(auth); 
                 
@@ -645,17 +653,7 @@
         async function handleSocialAuth(provider) {
             try {
                 const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-
-                // Check for existing doc and create if missing
-                const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-
-                if (!userDoc.exists()) {
-                    showToast("Syncing your data...", "info");
-                    await syncUserDocument(user);
-                    showToast("Data synced!", "success");
-                }
+                // onAuthStateChanged will handle the sync automatically now
             } catch (error) {
                 console.error("Auth error:", error);
                 alert("Authentication failed.");
@@ -717,23 +715,10 @@
             messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
 
             try {
-                // SECURITY CHECK: Verify user exists in DB before generating code
-                const userDocRef = doc(db, "users", auth.currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
+                // Use robust check again just in case
+                await ensureUserDocument(auth.currentUser);
 
-                if (!userDoc.exists()) {
-                    // Try to auto-sync one last time
-                    showToast("Account missing. Attempting final sync...", "warning");
-                    await syncUserDocument(auth.currentUser);
-                    
-                    const retryDoc = await getDoc(userDocRef);
-                    if (!retryDoc.exists()) {
-                        throw new Error("Sync failed.");
-                    }
-                    showToast("Sync successful. Generating code...", "success");
-                }
-
-                // If check passes, proceed with generation
+                // Proceed with generation
                 generateBtn.innerText = "Generating...";
                 
                 const q = query(collection(db, "access_codes"), where("ownerUid", "==", auth.currentUser.uid));
