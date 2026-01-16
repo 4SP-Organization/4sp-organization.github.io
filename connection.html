@@ -295,7 +295,7 @@
         import { 
             getFirestore, 
             doc, 
-            getDoc, // Added missing import
+            getDoc, 
             setDoc,
             deleteDoc, 
             serverTimestamp,
@@ -545,13 +545,13 @@
             }
         });
 
-        // --- Social Auth Sync Fix ---
+        // --- Social Auth with Sync ---
         async function handleSocialAuth(provider) {
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
 
-                // Sync: Check if user document exists, create if missing
+                // Sync Logic: Ensure user exists in Firestore
                 const userDocRef = doc(db, "users", user.uid);
                 const userDoc = await getDoc(userDocRef);
 
@@ -568,9 +568,7 @@
                         emailVerified: user.emailVerified,
                         photoURL: user.photoURL || null
                     });
-                    console.log("User Synced to Firestore");
                 }
-                // onAuthStateChanged will handle the UI redirect
             } catch (error) {
                 console.error("Auth error:", error);
                 alert("Authentication failed.");
@@ -624,10 +622,46 @@
             return result;
         }
 
+        // --- SECURED: Generate Code Handler ---
         generateBtn.addEventListener('click', async () => {
             generateBtn.disabled = true;
-            generateBtn.innerText = "Generating...";
+            generateBtn.innerText = "Verifying...";
+            messageArea.innerText = "";
+            messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
+
             try {
+                // SECURITY CHECK: Verify user exists in DB before generating code
+                const userDocRef = doc(db, "users", auth.currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (!userDoc.exists()) {
+                    // If user is missing from DB, try to auto-heal (sync)
+                    messageArea.innerText = "Account missing from database. Attempting to sync...";
+                    messageArea.className = "message-area mt-4 text-center text-sm warning-message";
+                    
+                    let username = auth.currentUser.displayName || auth.currentUser.email.split('@')[0];
+                    username = username.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
+                    if (username.length < 6) username = `User${auth.currentUser.uid.substring(0, 8)}`;
+
+                    await setDoc(userDocRef, {
+                        email: auth.currentUser.email,
+                        authMethod: auth.currentUser.providerData[0]?.providerId || 'unknown',
+                        createdAt: serverTimestamp(),
+                        username: username,
+                        emailVerified: auth.currentUser.emailVerified,
+                        photoURL: auth.currentUser.photoURL || null
+                    });
+                    
+                    // Re-check after attempt
+                    const retryDoc = await getDoc(userDocRef);
+                    if (!retryDoc.exists()) {
+                        throw new Error("Sync failed.");
+                    }
+                }
+
+                // If check passes, proceed with generation
+                generateBtn.innerText = "Generating...";
+                
                 const q = query(collection(db, "access_codes"), where("ownerUid", "==", auth.currentUser.uid));
                 const querySnapshot = await getDocs(q);
                 const batch = writeBatch(db);
@@ -639,11 +673,13 @@
                     ownerEmail: auth.currentUser.email, ownerUid: auth.currentUser.uid,
                     createdAt: serverTimestamp()
                 });
+
             } catch (e) {
                 console.error("Error creating code:", e);
-                alert("Failed to generate code.");
+                messageArea.innerText = "Account verification failed. Please contact support.";
+                messageArea.className = "message-area mt-4 text-center text-sm error-message";
                 generateBtn.disabled = false;
-                generateBtn.innerText = "Regenerate Code";
+                generateBtn.innerText = "Generate Code";
             }
         });
 
