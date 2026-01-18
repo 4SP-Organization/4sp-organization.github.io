@@ -14,18 +14,29 @@
     <script src="navbar-loader.js" defer></script>
 
     <style>
-        body { 
-            font-family: 'Geist', sans-serif; 
-            background-color: #040404; 
-            color: #c0c0c0; 
-            padding-top: 4rem;
-            font-weight: 300; 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        /* --- ANIMATION & THEME VARIABLES FROM PROVIDED CODE --- */
+        :root {
+            --bg-page: #040404; --bg-container: #000000; --border-color: #333;
+            --text-primary: #c0c0c0; --text-light-grey: #d1d5db; --accent-color: #6366f1;
+            --navbar-bg: #000000; --navbar-border: #1f2937;
+            --tab-text: #9ca3af; --tab-hover-text: #ffffff;
+            --tab-active-text: #4f46e5; --tab-active-bg: rgba(79, 70, 229, 0.1);
+            --tab-active-border: #4f46e5;
         }
 
-        strong, h1, h3, h4, .font-bold, h2 {
+        body { 
+            background-color: var(--bg-page); 
+            color: var(--text-primary); 
+            font-family: 'Geist', sans-serif; 
+            min-height: 100vh; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            font-weight: 300;
+            padding-top: 4rem;
+        }
+
+        h1, h2, h3, .font-bold, .font-semibold, strong, b, .tracking-widest {
             font-weight: 400 !important;
         }
 
@@ -37,40 +48,77 @@
             font-weight: 600 !important;
         }
 
-        .content-box {
-            background-color: #0d0d0d; 
-            border: 1px solid #1a1a1a; 
-            border-radius: 24px; 
-            padding: 2rem;
-            color: #c0c0c0;
+        /* --- STYLES PORTED FROM CLIENT CODE --- */
+        .settings-box { 
+            border: 1px solid var(--border-color); 
+            border-radius: 1rem; 
+            background-color: var(--bg-container); 
+            padding: 1.5rem; 
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
             max-width: 600px;
             margin: 0 auto;
         }
-
-        /* Form Inputs */
-        input[type="text"], textarea {
-            background-color: #111;
-            border: 1px solid #333;
-            color: #fff;
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            width: 100%;
-            font-family: inherit;
-            transition: all 0.2s ease;
+        
+        .input-text-style {
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid #252525; 
+            background-color: #111111; 
+            border-radius: 0.5rem; 
+            color: var(--text-primary); 
+            transition: all 0.2s;
             outline: none;
+            font-family: inherit;
         }
 
-        input[type="text"]:focus, textarea:focus {
-            border-color: #666;
-            background-color: #161616;
+        .input-text-style:focus { 
+            border-color: #505050; 
+            box-shadow: 0 0 0 2px rgba(80, 80, 80, 0.5);
+            transform: scale(1.01);
         }
 
-        /* Checkboxes */
+        .btn-toolbar-style {
+            background: #0a0a0a; 
+            border: 1px solid #333; 
+            border-radius: 14px;
+            color: #d1d5db; 
+            padding: 0.75rem 1.25rem; 
+            font-weight: 500; 
+            cursor: pointer;
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); 
+            position: relative;
+            transition: all 0.2s ease;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .btn-toolbar-style:hover {
+            transform: scale(1.02) translateY(-1px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
+            border-color: #fff; 
+            color: #ffffff;
+            z-index: 50;
+        }
+        
+        .btn-toolbar-style:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Checkboxes Custom Styling */
         .checkbox-group {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
             margin-top: 0.5rem;
+            user-select: none; /* REQUESTED FEATURE */
         }
 
         .checkbox-label {
@@ -80,7 +128,7 @@
             padding: 0.5rem 1rem;
             background-color: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 99px;
+            border-radius: 14px;
             transition: all 0.2s ease;
             font-size: 0.9rem;
         }
@@ -88,41 +136,18 @@
         .checkbox-label:hover {
             background-color: rgba(255, 255, 255, 0.08);
             border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
         }
 
-        .checkbox-label input {
-            display: none;
-        }
+        .checkbox-label input { display: none; }
 
-        .checkbox-label input:checked + span {
-            color: #fff;
-        }
+        .checkbox-label input:checked + span { color: #fff; }
         
         .checkbox-label.checked {
             background-color: rgba(168, 85, 247, 0.1);
             border-color: rgba(168, 85, 247, 0.5);
             color: #d8b4fe;
-        }
-
-        /* Submit Button */
-        .submit-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #fff;
-            color: #000;
-            border-radius: 12px;
-            font-weight: 500;
-            margin-top: 1.5rem;
-            transition: opacity 0.2s;
-        }
-        
-        .submit-btn:hover {
-            opacity: 0.9;
-        }
-        
-        .submit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
         }
 
         .char-count {
@@ -136,15 +161,15 @@
         #auth-loading {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: #040404;
+            background: var(--bg-page);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 50;
         }
 
-         /* Toast Notifications */
-         #notification-container {
+        /* Notifications */
+        #notification-container {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
@@ -155,21 +180,12 @@
             pointer-events: none;
         }
         .notification-toast {
-            background-color: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.9rem;
-            min-width: 200px;
-            transform: translateX(120%);
+            background-color: #0a0a0a; border: 1px solid #333; border-radius: 14px;
+            padding: 0.75rem 1.25rem; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem;
+            min-width: 200px; transform: translateX(120%);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-            opacity: 0;
-            pointer-events: auto;
+            opacity: 0; pointer-events: auto;
         }
         .notification-toast.show { transform: translateX(0); opacity: 1; }
         .notification-toast.success i { color: #22c55e; }
@@ -192,8 +208,8 @@
             </a>
         </div>
         <nav class="flex items-center gap-2">
-            <a href="index.html" class="btn-toolbar-style">Home</a>
-            <a href="connection.html" class="btn-toolbar-style ml-2">Account</a>
+            <a href="index.html" class="btn-toolbar-style" style="margin-top: 0; width: auto;">Home</a>
+            <a href="connection.html" class="btn-toolbar-style ml-2" style="margin-top: 0; width: auto;">Account</a>
         </nav>
     </header>
 
@@ -209,17 +225,18 @@
                 </p>
             </div>
 
-            <div class="content-box">
+            <!-- USING NEW SETTINGS BOX STYLE -->
+            <div class="settings-box">
                 <form id="feedbackForm">
                     
                     <div class="mb-6">
-                        <label class="block text-gray-400 text-sm mb-2">Title</label>
-                        <input type="text" id="title" maxlength="40" placeholder="Brief summary (e.g. 'Dark mode bug')" required>
+                        <label class="block text-gray-400 text-sm mb-2 font-light">Title</label>
+                        <input type="text" id="title" class="input-text-style" maxlength="40" placeholder="Brief summary (e.g. 'Dark mode bug')" required>
                         <div class="char-count"><span id="titleCount">0</span>/40</div>
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-400 text-sm mb-2">Category</label>
+                        <label class="block text-gray-400 text-sm mb-2 font-light">Category</label>
                         <div class="checkbox-group">
                             <label class="checkbox-label">
                                 <input type="checkbox" name="category" value="Bug Report">
@@ -241,12 +258,12 @@
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-400 text-sm mb-2">Details</label>
-                        <textarea id="details" rows="5" maxlength="400" placeholder="Describe your suggestion or issue..." required></textarea>
+                        <label class="block text-gray-400 text-sm mb-2 font-light">Details</label>
+                        <textarea id="details" class="input-text-style" rows="5" maxlength="400" placeholder="Describe your suggestion or issue..." required></textarea>
                         <div class="char-count"><span id="detailsCount">0</span>/400</div>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="submit-btn">
+                    <button type="submit" id="submitBtn" class="btn-toolbar-style">
                         Submit Feedback
                     </button>
                 </form>
