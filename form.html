@@ -93,8 +93,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); 
             position: relative;
             transition: all 0.2s ease;
-            width: 100%;
-            margin-top: 1.5rem;
+            text-decoration: none; /* Ensure links don't have underline */
         }
 
         .btn-toolbar-style:hover {
@@ -111,6 +110,12 @@
             transform: none;
             box-shadow: none;
         }
+        
+        /* Submit Button specific overrides */
+        #submitBtn {
+             width: 100%;
+             margin-top: 1.5rem;
+        }
 
         /* Checkboxes Custom Styling */
         .checkbox-group {
@@ -118,7 +123,7 @@
             flex-wrap: wrap;
             gap: 1rem;
             margin-top: 0.5rem;
-            user-select: none; /* REQUESTED FEATURE */
+            user-select: none;
         }
 
         .checkbox-label {
@@ -207,9 +212,10 @@
                 <img src="/images/logo.png" alt="4SP Logo" class="h-8 w-auto" id="navbar-logo">
             </a>
         </div>
-        <nav class="flex items-center gap-2">
+        <nav class="flex items-center gap-2" id="nav-items-container">
             <a href="index.html" class="btn-toolbar-style" style="margin-top: 0; width: auto;">Home</a>
             <a href="connection.html" class="btn-toolbar-style ml-2" style="margin-top: 0; width: auto;">Account</a>
+            <!-- Admin button will be injected here -->
         </nav>
     </header>
 
@@ -291,6 +297,10 @@
         const authLoading = document.getElementById('auth-loading');
         const feedbackForm = document.getElementById('feedbackForm');
         const submitBtn = document.getElementById('submitBtn');
+        const navContainer = document.getElementById('nav-items-container');
+
+        // Allowed Admins
+        const allowedAdmins = ['4simpleproblems@gmail.com', 'belkwy30@minerva.sparcc.org'];
 
         // Character Counts
         const titleInput = document.getElementById('title');
@@ -313,6 +323,38 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 authLoading.style.display = 'none';
+                
+                // Admin Check
+                if (allowedAdmins.includes(user.email)) {
+                    // Check if button already exists
+                    if (!document.getElementById('admin-results-btn')) {
+                        const adminBtn = document.createElement('a');
+                        adminBtn.id = 'admin-results-btn';
+                        adminBtn.href = 'feedback_results.html';
+                        adminBtn.className = 'btn-toolbar-style ml-2';
+                        adminBtn.style.marginTop = '0';
+                        adminBtn.style.width = 'auto';
+                        adminBtn.style.color = '#a855f7'; // Purple accent
+                        adminBtn.style.borderColor = 'rgba(168, 85, 247, 0.5)';
+                        adminBtn.style.backgroundColor = 'rgba(168, 85, 247, 0.1)';
+                        adminBtn.innerHTML = '<i class="fa-solid fa-list-check w-4"></i> Admin';
+                        
+                        // Hover effect specific to this button
+                        adminBtn.addEventListener('mouseenter', () => {
+                            adminBtn.style.backgroundColor = 'rgba(168, 85, 247, 0.2)';
+                            adminBtn.style.borderColor = '#a855f7';
+                            adminBtn.style.color = '#fff';
+                        });
+                        adminBtn.addEventListener('mouseleave', () => {
+                             adminBtn.style.backgroundColor = 'rgba(168, 85, 247, 0.1)';
+                             adminBtn.style.borderColor = 'rgba(168, 85, 247, 0.5)';
+                             adminBtn.style.color = '#a855f7';
+                        });
+
+                        navContainer.appendChild(adminBtn);
+                    }
+                }
+
             } else {
                 // Redirect to connection.html with return param
                 window.location.href = `connection.html?redirect=form.html`;
