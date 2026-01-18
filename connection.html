@@ -510,9 +510,20 @@
                 }
 
                 // --- KEY CHANGE: Always Ensure Doc Exists on Login ---
-                // We run this in background so it doesn't block UI if possible, 
-                // but for safety we await it.
                 await ensureUserDocument(user);
+
+                // --- REDIRECT LOGIC ---
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectTarget = urlParams.get('redirect') || (window.location.hash ? window.location.hash.substring(1) : null);
+
+                if (redirectTarget) {
+                     // Basic validation to prevent open redirect vulnerabilities to other domains
+                     // Only allow relative paths or simple filenames
+                     if (/^[a-zA-Z0-9_\-\.\/]+$/.test(redirectTarget) && !redirectTarget.startsWith('http')) {
+                         window.location.href = redirectTarget;
+                         return;
+                     }
+                }
 
                 // LOGGED IN & VERIFIED UI
                 [unauthLoginContainer, resetPasswordContainer, signupContainer, unauthSocialContainer].forEach(el => {

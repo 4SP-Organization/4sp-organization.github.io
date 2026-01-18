@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4SP - FEEDBACK</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="navbar.css">
+    <script src="navbar-loader.js" defer></script>
+
+    <style>
+        body { 
+            font-family: 'Geist', sans-serif; 
+            background-color: #040404; 
+            color: #c0c0c0; 
+            padding-top: 4rem;
+            font-weight: 300; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        strong, h1, h3, h4, .font-bold, h2 {
+            font-weight: 400 !important;
+        }
+
+        .gradient-text {
+            background-image: linear-gradient(90deg, #0070f3, #f81ce5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600 !important;
+        }
+
+        .content-box {
+            background-color: #0d0d0d; 
+            border: 1px solid #1a1a1a; 
+            border-radius: 24px; 
+            padding: 2rem;
+            color: #c0c0c0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Form Inputs */
+        input[type="text"], textarea {
+            background-color: #111;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: #666;
+            background-color: #161616;
+        }
+
+        /* Checkboxes */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 99px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-label:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .checkbox-label input {
+            display: none;
+        }
+
+        .checkbox-label input:checked + span {
+            color: #fff;
+        }
+        
+        .checkbox-label.checked {
+            background-color: rgba(168, 85, 247, 0.1);
+            border-color: rgba(168, 85, 247, 0.5);
+            color: #d8b4fe;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #fff;
+            color: #000;
+            border-radius: 12px;
+            font-weight: 500;
+            margin-top: 1.5rem;
+            transition: opacity 0.2s;
+        }
+        
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 0.25rem;
+        }
+
+        /* Loading Overlay */
+        #auth-loading {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #040404;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+         /* Toast Notifications */
+         #notification-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .notification-toast {
+            background-color: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            min-width: 200px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: auto;
+        }
+        .notification-toast.show { transform: translateX(0); opacity: 1; }
+        .notification-toast.success i { color: #22c55e; }
+        .notification-toast.error i { color: #ef4444; }
+
+    </style>
+</head>
+<body>
+
+    <div id="auth-loading">
+        <i class="fas fa-circle-notch fa-spin text-2xl text-gray-500"></i>
+    </div>
+
+    <div id="notification-container"></div>
+
+    <header class="org-navbar">
+        <div class="flex items-center space-x-4">
+            <a href="index.html" class="flex items-center space-x-2">
+                <img src="/images/logo.png" alt="4SP Logo" class="h-8 w-auto" id="navbar-logo">
+            </a>
+        </div>
+        <nav class="flex items-center gap-2">
+            <a href="index.html" class="btn-toolbar-style">Home</a>
+            <a href="connection.html" class="btn-toolbar-style ml-2">Account</a>
+        </nav>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        
+        <div class="w-full">
+            <div class="text-center mb-10">
+                <h1 class="text-4xl sm:text-5xl mb-4 tracking-tighter">
+                    <span class="gradient-text">Submit Feedback</span>
+                </h1>
+                <p class="text-gray-500 max-w-lg mx-auto">
+                    Help us improve 4SP. Suggest features, report bugs, or just tell us what you think.
+                </p>
+            </div>
+
+            <div class="content-box">
+                <form id="feedbackForm">
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-400 text-sm mb-2">Title</label>
+                        <input type="text" id="title" maxlength="40" placeholder="Brief summary (e.g. 'Dark mode bug')" required>
+                        <div class="char-count"><span id="titleCount">0</span>/40</div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-400 text-sm mb-2">Category</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="category" value="Bug Report">
+                                <span>Bug Report</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="category" value="Feature Request">
+                                <span>Feature Request</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="category" value="General Feedback">
+                                <span>General Feedback</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="category" value="Other">
+                                <span>Other</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-400 text-sm mb-2">Details</label>
+                        <textarea id="details" rows="5" maxlength="400" placeholder="Describe your suggestion or issue..." required></textarea>
+                        <div class="char-count"><span id="detailsCount">0</span>/400</div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="submit-btn">
+                        Submit Feedback
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="border-t border-[#1a1a1a] py-6 bg-[#040404] mt-auto">
+        <div class="mx-auto max-w-7xl px-4 text-center text-gray-600 text-sm">
+            &copy; 2026 4SP Organization.
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { firebaseConfig } from "./firebase-config.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const authLoading = document.getElementById('auth-loading');
+        const feedbackForm = document.getElementById('feedbackForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Character Counts
+        const titleInput = document.getElementById('title');
+        const detailsInput = document.getElementById('details');
+        const titleCount = document.getElementById('titleCount');
+        const detailsCount = document.getElementById('detailsCount');
+
+        titleInput.addEventListener('input', () => titleCount.innerText = titleInput.value.length);
+        detailsInput.addEventListener('input', () => detailsCount.innerText = detailsInput.value.length);
+
+        // Checkbox styling logic
+        document.querySelectorAll('input[name="category"]').forEach(cb => {
+            cb.addEventListener('change', function() {
+                if(this.checked) this.parentElement.classList.add('checked');
+                else this.parentElement.classList.remove('checked');
+            });
+        });
+
+        // Auth Check
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authLoading.style.display = 'none';
+            } else {
+                // Redirect to connection.html with return param
+                window.location.href = `connection.html?redirect=form.html`;
+            }
+        });
+
+        // Notification Helper
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const toast = document.createElement('div');
+            toast.className = `notification-toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Form Submission
+        feedbackForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const title = titleInput.value.trim();
+            const details = detailsInput.value.trim();
+            const categories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
+
+            if (!title || !details) {
+                showToast("Please fill in all required fields.", "error");
+                return;
+            }
+
+            if (categories.length === 0) {
+                showToast("Please select at least one category.", "error");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+
+            try {
+                await addDoc(collection(db, "feedback"), {
+                    title: title,
+                    details: details,
+                    categories: categories,
+                    userId: user.uid,
+                    userEmail: user.email, // Optional: useful for follow-up
+                    createdAt: serverTimestamp(),
+                    status: 'new'
+                });
+
+                showToast("Feedback submitted successfully!");
+                feedbackForm.reset();
+                document.querySelectorAll('.checkbox-label').forEach(l => l.classList.remove('checked'));
+                titleCount.innerText = "0";
+                detailsCount.innerText = "0";
+
+            } catch (error) {
+                console.error("Error submitting feedback:", error);
+                showToast("Error submitting feedback. Please try again.", "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Feedback";
+            }
+        });
+
+    </script>
+</body>
+</html>
