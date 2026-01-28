@@ -7,175 +7,95 @@
     <title>4SP - ORGANIZATION HOME</title>
     
     <meta name="title" content="4SP Organization - Official Home & V5 Download">
-    <meta name="description" content="The official home of 4simpleproblems (4SP). Download Version 5 DV for a secure, and unblockable student toolkit featuring soundboards, productivity apps, and local utilities.">
-    <meta name="keywords" content="4simpleproblems, 4SP, student toolkit, software tools, school utilities, Version 5 DV, secure dashboard, productivity apps, local web tools, npm">
+    <meta name="description" content="The official home of 4simpleproblems (4SP). The history of the project and home to the V5 Downloadable Version.">
+    <meta name="keywords" content="4simpleproblems, 4SP, student toolkit, software tools, Version 5 DV, secure dashboard, local platform">
     <meta name="author" content="4SP Organization">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#040404">
+    <meta name="theme-color" content="#000000">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://4sp-organization.github.io/">
-    <meta property="og:title" content="4SP Organization - The Secure Student Toolkit">
-    <meta property="og:description" content="Download Version 5 DV: The fully unblockable toolkit for students. Features soundboards, notes, and essential utilities hosted on NPM for maximum resilience.">
+    <meta property="og:title" content="4SP Organization - Student Toolkit History">
+    <meta property="og:description" content="Download Version 5 DV: The fully local toolkit for students.">
 
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://4sp-organization.github.io/">
-    <meta property="twitter:title" content="4SP Organization - The Secure Student Toolkit">
-    <meta property="twitter:description" content="The official home of 4SP. Get the new Version 5 DV for secure access to student utilities and soundboards.">
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "4simpleproblems (4SP)",
-      "operatingSystem": "Web, Windows, macOS, ChromeOS",
-      "applicationCategory": "UtilitiesApplication",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "description": "A secure, local toolkit for students featuring soundboards and productivity utilities.",
-      "author": {
-          "@type": "Organization",
-          "name": "4SP Organization",
-          "url": "https://4sp-organization.github.io/"
-      }
-    }
-    </script>
-    <link rel="icon" type="image/png" href="/images/logo.png">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="navbar.css">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="navbar-loader.js" defer></script>
 
     <style>
-        /* --- AESTHETIC REPLICATION --- */
-        body { 
-            font-family: 'Geist', sans-serif; 
-            background-color: #040404; 
-            color: #c0c0c0; 
-            padding-top: 4rem;
-            overflow-y: scroll;
-            font-weight: 300; 
+        :root {
+            --geist-foreground: 255, 255, 255;
+            --geist-background: 0, 0, 0;
         }
-
-        strong, h1, h3, h4, .font-bold, h2:not(.organization-title) {
-            font-weight: 400 !important;
-        }
-
-        .organization-title .gradient-text { font-weight: 700 !important; }
+        .dark { color-scheme: dark; }
+        body { font-family: 'Geist', sans-serif; }
         
+        /* Gradient Text Animation */
         .gradient-text {
-            background-image: linear-gradient(90deg, #0070f3, #f81ce5);
+            background-image: linear-gradient(90deg, #0070f3, #f81ce5, #0070f3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            background-size: 300% auto;
+            animation: shine 8s linear infinite;
         }
 
-        /* --- HERO BUTTON --- */
-        .hero-connect-btn {
+        @keyframes shine {
+            to { background-position: 300% center; }
+        }
+
+        /* Dynamic Background */
+        #dynamic-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #000000 100%);
+            opacity: 0;
+            z-index: -10;
+            pointer-events: none;
+            transition: opacity 0.1s linear;
+        }
+
+        /* Button Styles */
+        .hero-btn-base {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem 2rem;
-            font-size: 1rem;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.875rem;
             font-weight: 400;
             color: #ffffff;
-            background-color: rgba(147, 51, 234, 0.1); 
-            border: 1px solid rgba(192, 132, 252, 0.5); 
             border-radius: 14px; 
             text-decoration: none;
             transition: all 0.2s ease;
         }
-        .hero-connect-btn:hover {
+
+        .btn-style-purple {
+            background-color: rgba(147, 51, 234, 0.1); 
+            border: 1px solid rgba(192, 132, 252, 0.5); 
+        }
+        .btn-style-purple:hover {
             background-color: rgba(192, 132, 252, 0.2);
             border-color: rgba(192, 132, 252, 1);
             box-shadow: 0 0 15px rgba(192, 132, 252, 0.3);
         }
 
-        /* --- CREATE LINK BUTTON (Orange) --- */
-        .hero-create-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 2rem;
-            font-size: 1rem;
-            font-weight: 400;
-            color: #ffffff;
+        .btn-style-orange {
             background-color: rgba(249, 115, 22, 0.1); 
             border: 1px solid rgba(253, 186, 116, 0.5); 
-            border-radius: 14px; 
-            text-decoration: none;
-            transition: all 0.2s ease;
-            margin-left: 1rem;
         }
-        .hero-create-btn:hover {
+        .btn-style-orange:hover {
             background-color: rgba(253, 186, 116, 0.2);
             border-color: rgba(253, 186, 116, 1);
         }
 
-        /* --- CONTENT BOXES --- */
-        .content-box {
-            background-color: #0d0d0d; 
-            border: 1px solid #1a1a1a; 
-            border-radius: 36px; 
-            padding: 2rem;
-            color: #c0c0c0;
-            height: 100%;
-            transition: border-color 0.2s ease;
-        }
-        
-        .content-box:hover {
-            border-color: #333;
-        }
-
-        body::-webkit-scrollbar { display: none; }
-        body { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* --- SUMMARY SECTION STYLING --- */
-        .summary-header {
-            border-bottom: 1px solid #1a1a1a;
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .summary-sub-heading {
-            color: #fff;
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-        }
-        
-        .summary-sub-heading i {
-            margin-right: 0.75rem;
-            opacity: 0.7;
-        }
-
-        .summary-list { list-style-type: none; padding-left: 0; }
-        .summary-list li { 
-            margin-bottom: 0.75rem; 
-            color: #9ca3af; 
-            display: flex;
-            align-items: start;
-        }
-        .summary-list li i {
-            margin-right: 0.75rem;
-            margin-top: 0.3rem;
-            font-size: 0.8rem;
-            color: #555;
-        }
-        
-        /* Timeline styling */
+        /* Timeline Styling */
         .timeline-container {
-            border-left: 2px solid #1a1a1a;
+            border-left: 2px solid #1f2937;
             padding-left: 2rem;
             margin-left: 0.5rem;
         }
@@ -188,309 +108,321 @@
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: -2.45rem;
+            left: -2.4rem;
             top: 0.4rem;
             width: 12px;
             height: 12px;
-            background: #0d0d0d;
-            border: 2px solid #333;
+            background: #000;
+            border: 2px solid #374151;
             border-radius: 50%;
             transition: all 0.3s ease;
         }
 
         .timeline-item.active::before {
-            background: #a855f7; /* Purple for active/latest */
+            background: #a855f7;
             border-color: #a855f7;
             box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
         }
 
-        .tag-badge {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 99px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-left: 1rem;
+        /* Black Container Override */
+        .content-container-black {
+            background-color: #000000 !important;
+            border: 1px solid #1f2937; 
+            border-radius: 40px !important; /* Heavily rounded corners */
+        }
+        .content-container-black:hover {
+            border-color: #374151; 
         }
 
-        .tag-completed { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
-        .tag-legacy { background: rgba(255, 255, 255, 0.05); color: #6b7280; border: 1px solid rgba(255, 255, 255, 0.1); }
+        /* --- CUSTOM CITATION STYLES --- */
+        .citation-badge {
+            display: inline-block;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: #a855f7; /* Purple-500 */
+            background-color: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 6px;
+            padding: 0 6px;
+            margin-left: 4px;
+            vertical-align: 1px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
 
+        .citation-badge:hover {
+            background-color: rgba(168, 85, 247, 0.4);
+            color: #ffffff;
+            box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
-<body class="min-h-screen">
-
-    <header class="org-navbar">
-        <div class="flex items-center space-x-4">
-            <a href="#" id="logo-link" class="flex items-center space-x-2">
-                <img src="/images/logo.png" alt="4SP Logo" class="h-8 w-auto" id="navbar-logo">
-            </a>
-        </div>
-        
-        <nav class="flex items-center gap-2">
-            <button class="btn-toolbar-style scroll-to-link" data-target="history-summary" title="View the History of 4SP">
-                History
-            </button>
-            <button class="btn-toolbar-style scroll-to-link" data-target="project-full-summary" title="Read the full project brief">
-                Summary
-            </button>
-            <a href="create_link.html" class="btn-toolbar-style ml-2" title="Create your own 4SP link">
-                Create Link
-            </a>
-            <a id="redirect-button" href="../connection.html" target="_blank" class="btn-toolbar-style ml-2" title="Download 4SP Local">
-                <i class="fa-solid fa-download w-4"></i>
-                Download
-            </a>
-        </nav>
-    </header>
+<body class="bg-black text-white min-h-screen relative">
     
+    <div id="dynamic-background"></div>
+
     <main>
-        <section id="hero" class="text-center border-b border-[#1a1a1a]" style="padding-top: 0rem">
-            <div class="mx-auto max-w-4xl px-4 pt-16 pb-12">
-                <h1 class="text-3xl sm:text-4xl text-gray-400 tracking-tighter mb-4 leading-tight">
-                    Complexity is a choice. Simple is a standard.
-                </h1>
-                <h2 class="text-5xl sm:text-6xl tracking-tighter mb-6 leading-tight organization-title">
-                    <span class="gradient-text">The 4SP Organization.</span>
+        <section class="text-center border-b border-gray-900 relative overflow-hidden" style="padding-top: 4rem">
+            
+            <div class="mx-auto max-w-5xl px-4 pb-16">
+                
+                <h1 class="text-3xl sm:text-4xl font-light text-gray-300 tracking-tighter mb-4 leading-tight">
+                    From Soundboard to Local Platform.
+                 </h1>
+                <h2 class="text-5xl sm:text-7xl font-light tracking-tighter mb-6 leading-tight">
+                    <span class="gradient-text font-bold">The 4SP Organization.</span>
                 </h2>
-                <p class="text-xl text-gray-500 max-w-2xl mx-auto mb-8 font-light">
-                    This is the official organizational home for <strong class="text-white">4simpleproblems (4SP)</strong>. 
-                    <strong class="text-purple-400">Version 5 DV (Downloadable Version)</strong> is now complete. 
-                    Experience unblockable access, full local security, and it's hosted on npm.
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-8 font-light leading-relaxed">
+                    The official history of the 4SP project. 
+                    <strong class="text-purple-400">Version 5 DV</strong> is now complete—a fully decentralized ecosystem that runs locally on your device to bypass network restrictions.
                 </p>
-                <div class="mb-8 flex justify-center items-center">
-                    <a id="hero-redirect-button" href="../connection.html" target="_blank" class="hero-connect-btn">
+                
+                <div class="space-y-4">
+                    <a href="../connection.html" target="_blank"
+                       class="inline-flex items-center justify-center px-8 py-4 border border-[#333] text-lg font-normal shadow-sm text-white bg-black hover:bg-[#0a0a0a] hover:border-gray-600 hover:scale-105 transition duration-300"
+                       style="border-radius: 22px;">
                         Download V5 Local <i class="fas fa-download ml-2"></i>
                     </a>
-                    <a href="create_link.html" class="hero-create-btn">
-                        Create a Link <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div>
-                
-                <p class="text-base text-gray-600 mt-2 mb-4 italic font-light">
-                    <a href="https://discord.gg/zcADhddGQz" target="_blank" class="text-gray-500 hover:text-white transition">
-                        Go to Discord Server
-                    </a>
-                    <span class="mx-2">|</span>
-                    <a href="https://linktr.ee/4simpleproblems" target="_blank" class="text-gray-500 hover:text-white transition">
-                        Go to Linktree
-                    </a>
-                </p>
-
-            </div>
-        </section>
-
-        <section id="history-summary" class="py-20 mx-auto max-w-7xl px-4 border-b border-[#1a1a1a]">
-             <h2 class="text-3xl text-center mb-4 text-white">The Rapid Evolution</h2>
-             <p class="text-center text-gray-500 mb-12 max-w-2xl mx-auto">From a simple joke page to a professional local platform in under a year.</p>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="col-span-1 content-box flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mb-4 border border-purple-500/20 text-purple-400">
-                            <i class="fa-solid fa-lightbulb"></i>
-                        </div>
-                        <h3 class="text-2xl mb-2 text-white">The Vision</h3>
-                        <p class="text-sm text-gray-500 mb-4 font-mono">MARCH 13, 2025</p>
-                        <p class="text-base text-gray-400 leading-relaxed">
-                            Founded to provide a basic soundboard for students. It was small, simple, and relied on external hosting.
-                        </p>
-                    </div>
                 </div>
 
-                <div class="col-span-1 content-box flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20 text-blue-400">
-                            <i class="fa-solid fa-layer-group"></i>
-                        </div>
-                        <h3 class="text-2xl mb-2 text-white">The Turning Point</h3>
-                        <p class="text-sm text-gray-500 mb-4 font-mono">AUGUST 2025 (V4)</p>
-                        <p class="text-base text-gray-400 leading-relaxed">
-                            Introduced the dashboard, widgets, and the "Panic Key." This version defined the modern aesthetic but faced blocking issues.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="col-span-1 content-box flex flex-col justify-between" style="border-color: rgba(34, 197, 94, 0.3);">
-                    <div>
-                        <div class="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mb-4 border border-green-500/20 text-green-400">
-                            <i class="fa-solid fa-shield-halved"></i>
-                        </div>
-                        <h3 class="text-2xl mb-2 text-white">The Rebuild</h3>
-                        <p class="text-sm text-gray-500 mb-4 font-mono">DECEMBER 2025 (V5)</p>
-                        <p class="text-base text-gray-400 leading-relaxed">
-                            A complete rewrite focusing on <strong>local security</strong>. Version 5 DV is the culmination: unblockable and local.
-                        </p>
-                    </div>
+                <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
+                    <a href="create_link.html" class="hero-btn-base btn-style-orange">
+                        <i class="fas fa-plus mr-2"></i> Create Link
+                    </a>
+                    <a href="https://discord.gg/zcADhddGQz" target="_blank" class="hero-btn-base btn-style-purple">
+                        <i class="fa-brands fa-discord mr-2"></i> Discord
+                    </a>
+                    <a href="https://linktr.ee/4simpleproblems" target="_blank" class="hero-btn-base btn-style-purple">
+                        <i class="fas fa-link mr-2"></i> Linktree
+                    </a>
                 </div>
             </div>
         </section>
 
-        <section id="project-full-summary" class="py-20 mx-auto max-w-6xl px-4 border-b border-[#1a1a1a]">
-            
-            <div class="text-center mb-16">
-                <h2 class="text-3xl mb-4 text-white">Project Brief</h2>
-                <p class="text-gray-500 text-lg italic">"The definitive summary of the 4simpleproblems project."</p>
-            </div>
-
-            <div class="content-box mb-8">
-                <div class="summary-header">
-                    <h3 class="text-2xl text-white">Overview</h3>
-                </div>
-                <p class="text-gray-400 leading-loose text-lg font-light">
-                    4simpleproblems (4SP) is a student-made web platform designed for bored school days. It blends utilities, multimedia tools, and soundboards into a tool that feels fast, personal, and strictly non-corporate. What began as a joke page has evolved into a robust, dashboard-style platform with advanced local security features.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-                <div class="content-box">
-                    <h3 class="summary-sub-heading text-purple-400">
-                        <i class="fa-solid fa-bullseye"></i> Core Philosophy
-                    </h3>
-                    <ul class="summary-list">
-                        <li><i class="fa-solid fa-check"></i> Feel personal, not "fake-professional."</li>
-                        <li><i class="fa-solid fa-check"></i> Hosted on npm so it uses official platforms.</li>
-                        <li><i class="fa-solid fa-check"></i> Fast load times, highly resilient.</li>
-                        <li><i class="fa-solid fa-check"></i> Provide entertainment without tracking.</li>
-                    </ul>
-                </div>
-                <div class="content-box">
-                    <h3 class="summary-sub-heading text-blue-400">
-                        <i class="fa-solid fa-code"></i> Tech Stack
-                    </h3>
-                    <ul class="summary-list">
-                        <li><i class="fa-solid fa-terminal"></i> HTML5, CSS3, Vanilla JavaScript.</li>
-                        <li><i class="fa-solid fa-server"></i> Firebase (Auth/Functions) for online tiers.</li>
-                        <li><i class="fa-solid fa-wind"></i> Tailwind CSS via CDN.</li>
-                        <li><i class="fa-solid fa-lock"></i> Client-side focus for maximum privacy.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="max-w-4xl mx-auto">
-                <h3 class="text-2xl text-white mb-10 pl-4">Version History</h3>
-                
-                <div class="timeline-container">
-                    
-                    <div class="timeline-item active">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                            <div class="flex items-center">
-                                <h4 class="text-white text-xl font-medium">Version 5 DV</h4>
-                                <span class="tag-badge tag-completed">Completed</span>
-                            </div>
-                            <span class="text-xs text-purple-400 font-mono mt-1 sm:mt-0">DEC 16, 2025</span>
-                        </div>
-                        <p class="text-gray-300 text-sm leading-relaxed mb-3">
-                            <strong>The Downloadable Version.</strong> The final form of the V5 rewrite. It offers completely unblockable access, retaining the customizable navigation bar, multimedia tools, and all utilities. It removes reliance on live URLs, making it virtually unblockable.
-                        </p>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                            <div class="flex items-center">
-                                <h4 class="text-gray-300 text-lg">Version 5</h4>
-                                <span class="tag-badge tag-legacy">Production</span>
-                            </div>
-                            <span class="text-xs text-gray-600 font-mono mt-1 sm:mt-0">DEC 2, 2025</span>
-                        </div>
-                        <p class="text-gray-500 text-sm leading-relaxed">
-                            The "Professional Rebuild." A complete rewrite focusing on security and design after V4 was blocked. Introduced the new utility collections.
-                        </p>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                            <h4 class="text-gray-400 text-lg">Version 4</h4>
-                            <span class="text-xs text-gray-600 font-mono">AUG 22, 2025</span>
-                        </div>
-                        <p class="text-gray-500 text-sm leading-relaxed">
-                            The "Dashboard Launch." Introduced the dark grey/purple scheme, sidebar dashboard, Tab Disguising, and the Panic Key.
-                        </p>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                            <h4 class="text-gray-400 text-lg">Version 3</h4>
-                            <span class="text-xs text-gray-600 font-mono">MAY 15, 2025</span>
-                        </div>
-                        <p class="text-gray-500 text-sm leading-relaxed">
-                            The "Visual Redesign." Shifted to a light theme and Outfit font. Minimal functional updates.
-                        </p>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                            <h4 class="text-gray-400 text-lg">Version 2</h4>
-                            <span class="text-xs text-gray-600 font-mono">APR 11, 2025</span>
-                        </div>
-                        <p class="text-gray-500 text-sm leading-relaxed">
-                            The "Great Expansion." 36 new pages, multimedia features, and playlists. The project became cluttered and unorganized.
-                        </p>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                            <h4 class="text-gray-400 text-lg">Version 1</h4>
-                            <span class="text-xs text-gray-600 font-mono">MAR 13, 2025</span>
-                        </div>
-                        <p class="text-gray-500 text-sm leading-relaxed">
-                            The "Genesis." A simple two-page site with a basic soundboard.
-                        </p>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <section class="py-12 mx-auto max-w-7xl px-4 text-center">
-            <h2 class="text-xl text-gray-500 mb-2">Developed and Maintained by the Organization</h2>
-            <p class="text-gray-600 text-lg font-light">
-                Built using modern web standards for a secure, reliable, and continuously updated student toolkit.
+        <section class="py-12 mx-auto max-w-7xl px-4 text-center border-b border-gray-900">
+            <h2 class="text-xl font-light text-gray-500 mb-2">Independently Developed and Maintained, serving</h2>
+            <p class="text-3xl sm:text-4xl font-light text-white mt-2">
+                370+ Users. 13+ Cities.
             </p>
         </section>
+
+        <section id="history-cards" class="py-12 mx-auto max-w-7xl px-4">
+             <h2 class="text-3xl font-light text-center mb-12 text-gray-500">Technical Evolution</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="content-container-black p-8 transition duration-300">
+                    <div class="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mb-4 border border-purple-500/20 text-purple-400">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </div>
+                    <h3 class="text-2xl mb-2 font-light text-white">Initial Release</h3>
+                    <p class="text-xs text-purple-400 mb-4 font-mono tracking-widest">MARCH 13, 2025</p>
+                    <p class="text-gray-400 font-light leading-relaxed">
+                        V1 was a basic soundboard created for entertainment on school networks. It established the project name and initial user base 
+                        <a href="../4sp_history.html?start=13&end=16#source-13" class="citation-badge" title="View Source 13-16" target="_blank">CODE: 13-16</a>
+                    </p>
+                </div>
+
+                <div class="content-container-black p-8 transition duration-300">
+                    <div class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20 text-blue-400">
+                        <i class="fa-solid fa-server"></i>
+                    </div>
+                    <h3 class="text-2xl mb-2 font-light text-white">Major Expansion</h3>
+                    <p class="text-xs text-blue-400 mb-4 font-mono tracking-widest">AUGUST 23, 2025</p>
+                    <p class="text-gray-400 font-light leading-relaxed">
+                        V4 launched with a library of over 1,000 games and a sidebar navigation. Its large scale led to it being flagged and blocked on October 10th 
+                        <a href="../4sp_history.html?start=32&end=36#source-32" class="citation-badge" title="View Source 32-36" target="_blank">CODE: 32-36</a>
+                    </p>
+                </div>
+
+                <div class="content-container-black p-8 transition duration-300">
+                    <div class="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mb-4 border border-green-500/20 text-green-400">
+                        <i class="fa-solid fa-download"></i>
+                    </div>
+                    <h3 class="text-2xl mb-2 font-light text-white">Local Execution</h3>
+                    <p class="text-xs text-green-400 mb-4 font-mono tracking-widest">JANUARY 3, 2026</p>
+                    <p class="text-gray-400 font-light leading-relaxed">
+                        With V5 DV, the project shifted to a downloadable file structure. This removed the reliance on a central URL, effectively bypassing standard network blocks 
+                        <a href="../4sp_history.html?start=54&end=57#source-54" class="citation-badge" title="View Source 54-57" target="_blank">CODE: 54-57</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="project-data" class="pt-8 pb-16 mx-auto max-w-7xl px-4">
+            <div class="content-container-black p-10 w-full">
+                <span class="text-sm font-light text-blue-400 uppercase tracking-widest mb-2 block">The Data</span>
+                <h3 class="text-4xl font-light mb-6 text-white">Project Brief & Timeline</h3>
+                <p class="text-xl text-gray-400 mb-8 font-light leading-relaxed max-w-4xl">
+                    4simpleproblems (4SP) is a student-developed web platform designed for use in restricted environments. It has grown from a simple webpage into a distributed software toolkit.
+                </p>
+                
+                <div class="lg:grid lg:grid-cols-2 lg:gap-12 border-t border-gray-800 pt-8">
+                    
+                    <div>
+                        <div class="space-y-8">
+                             <div>
+                                <h4 class="flex items-center text-lg text-white mb-2"><i class="fa-solid fa-shield-halved text-purple-500 mr-3"></i> Core Strategy</h4>
+                                <p class="text-gray-500 font-light ml-8">
+                                    Decentralization and the use of official repositories (npm) to maintain uptime and availability.
+                                </p>
+                             </div>
+                             <div>
+                                <h4 class="flex items-center text-lg text-white mb-2"><i class="fa-solid fa-code text-blue-500 mr-3"></i> Technical Stack</h4>
+                                <p class="text-gray-500 font-light ml-8">
+                                    Evolved from basic iframes in V2 to a complex client-side application in V5 MAX.
+                                </p>
+                             </div>
+                             <div>
+                                <h4 class="flex items-center text-lg text-white mb-2"><i class="fa-solid fa-globe text-green-500 mr-3"></i> Global Footprint</h4>
+                                <p class="text-gray-500 font-light ml-8">
+                                    Active user base spanning 13+ cities, including major clusters in Minerva (OH), Baton Rouge (LA), and international nodes in Luton (UK) and Murcia (Spain) 
+                                    <a href="../4sp_history.html?start=96&end=107#source-96" class="citation-badge" title="View Source 96-107" target="_blank">CODE: 96-107</a>
+                                </p>
+                             </div>
+                             <div>
+                                <h4 class="flex items-center text-lg text-white mb-2"><i class="fa-solid fa-chart-line text-yellow-500 mr-3"></i> Resilience Metrics</h4>
+                                <p class="text-gray-500 font-light ml-8">
+                                    User retention remained stable during the "Great Blocks" of Oct and Dec 2025, validating the decentralized distribution strategy
+                                    <a href="../4sp_history.html?start=85&end=86#source-85" class="citation-badge" title="View Source 85-86" target="_blank">CODE: 85-86</a>
+                                </p>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 lg:mt-0">
+                        <div class="timeline-container">
+                            <div class="timeline-item active">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1">
+                                    <h4 class="text-white text-lg font-normal">V5 DV (Downloadable)</h4>
+                                    <span class="text-xs text-purple-400 font-mono bg-purple-500/10 px-2 py-1 rounded">JAN 3, 2026</span>
+                                </div>
+                                <p class="text-gray-400 text-sm font-light">
+                                    <strong>Local Version.</strong> A self-contained package that runs locally. Triggered a significant increase in user sign-ups.
+                                </p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1">
+                                    <h4 class="text-gray-300 text-lg font-normal">V5 (The Rebuild)</h4>
+                                    <span class="text-xs text-gray-600 font-mono">DEC 3, 2025</span>
+                                </div>
+                                <p class="text-gray-500 text-sm font-light">
+                                    A complete code rewrite featuring user authentication. Blocked on Dec 16.
+                                </p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1">
+                                    <h4 class="text-gray-400 text-lg font-normal">V4 (Dashboard)</h4>
+                                    <span class="text-xs text-gray-600 font-mono">AUG 23, 2025</span>
+                                </div>
+                                <p class="text-gray-500 text-sm font-light">
+                                    Introduced the sidebar UI and expanded the game library. Blocked on Oct 10.
+                                </p>
+                            </div>
+                             <div class="timeline-item">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1">
+                                    <h4 class="text-gray-400 text-lg font-normal">V3 (Redesign)</h4>
+                                    <span class="text-xs text-gray-600 font-mono">MAY 11, 2025</span>
+                                </div>
+                                <p class="text-gray-500 text-sm font-light">
+                                    Strategic shift to a polished UI/UX to improve user retention 
+                                    <a href="../4sp_history.html?start=26&end=29#source-26" class="citation-badge" title="View Source 26-29" target="_blank">CODE: 26-29</a>
+                                </p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1">
+                                    <h4 class="text-gray-400 text-lg font-normal">V2 (Expansion)</h4>
+                                    <span class="text-xs text-gray-600 font-mono">APR 11, 2025</span>
+                                </div>
+                                <p class="text-gray-500 text-sm font-light">
+                                    Added games and a web proxy. Utilized iframes for content obfuscation 
+                                    <a href="../4sp_history.html?start=17&end=22#source-17" class="citation-badge" title="View Source 17-22" target="_blank">CODE: 17-22</a>
+                                </p>
+                            </div>
+                             <div class="timeline-item">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1">
+                                    <h4 class="text-gray-400 text-lg font-normal">V1 (Initial Release)</h4>
+                                    <span class="text-xs text-gray-600 font-mono">MAR 13, 2025</span>
+                                </div>
+                                <p class="text-gray-500 text-sm font-light">
+                                    The original soundboard. Simple and shareable 
+                                    <a href="../4sp_history.html?start=12&end=14#source-12" class="citation-badge" title="View Source 12-14" target="_blank">CODE: 12-14</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <footer class="border-t border-[#1a1a1a] py-6 bg-[#040404]">
-        <div class="mx-auto max-w-7xl px-4 text-center text-gray-600 text-sm">
-            &copy; 2026 4SP Organization. 
+    <footer class="border-t border-gray-900 py-6">
+        <div class="mx-auto max-w-7xl px-4 text-center text-gray-500 text-sm">
+            &copy; 2026 4SP Organization.
             <span class="mx-2">|</span>
-            <a href="../legal.html#terms-of-service" target="_blank" class="hover:text-gray-400">Terms of Service</a>
+            <a href="../legal.html#terms-of-service" class="hover:underline">Terms</a>
             <span class="mx-2">|</span>
-            <a href="../legal.html#privacy-policy" target="_blank" class="hover:text-gray-400">Privacy Policy</a>
+            <a href="../legal.html#privacy-policy" class="hover:underline">Privacy</a>
         </div>
     </footer>
-    
+
+    <div id="mobile-warning-overlay" class="fixed inset-0 bg-black/95 z-[10000] flex items-center justify-center p-6" style="display: none;">
+        <div class="max-w-md w-full text-center space-y-6">
+            <div class="text-5xl mb-4">🖥️</div>
+            <h2 class="text-3xl font-light text-white tracking-tight">Desktop Recommended</h2>
+            <p class="text-gray-400 text-lg font-light leading-relaxed">
+                The Organization Portal is best experienced on a larger screen to view the timeline and analytics.
+                <br><br>
+                Please use a desktop for the intended experience.
+            </p>
+            <button id="dismiss-mobile-warning" class="inline-flex items-center justify-center px-8 py-3 border border-gray-600 text-base font-normal rounded-xl text-white bg-transparent hover:bg-white/10 transition duration-200">
+                Dismiss
+            </button>
+        </div>
+    </div>
+
     <script>
+        // Dynamic Background Logic
+        window.addEventListener('scroll', () => {
+            const bgLayer = document.getElementById('dynamic-background');
+            const scrollPos = window.scrollY;
+            const triggerHeight = 600; 
+            let opacity = scrollPos / triggerHeight;
+            if (opacity > 1) opacity = 1;
+            if (bgLayer) bgLayer.style.opacity = opacity;
+        });
+
+        // Mobile Warning Logic
         (function() {
-            const redirectButtons = document.querySelectorAll('#redirect-button, #hero-redirect-button');
-            redirectButtons.forEach(button => {
-                button.href = "../connection.html";
-            });
-
-            document.querySelectorAll('.scroll-to-link').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    const targetId = this.getAttribute('data-target');
-                    const targetElement = document.getElementById(targetId);
-                    if (targetElement) {
-                        e.preventDefault();
-                        const headerOffset = 80;
-                        const elementPosition = targetElement.getBoundingClientRect().top;
-                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                    
-                        window.scrollTo({
-                            top: offsetPosition,
-                            behavior: "smooth"
-                        });
-                    }
+            const mobileOverlay = document.getElementById('mobile-warning-overlay');
+            const dismissBtn = document.getElementById('dismiss-mobile-warning');
+            const STORAGE_KEY = '4sp-org-mobile-dismissed';
+            function checkAspectRatio() {
+                if (localStorage.getItem(STORAGE_KEY) === 'true') return;
+                if (window.innerHeight > window.innerWidth) {
+                    mobileOverlay.style.display = 'flex';
+                    document.body.style.overflow = 'hidden'; 
+                } else {
+                    mobileOverlay.style.display = 'none';
+                    document.body.style.overflow = ''; 
+                }
+            }
+            checkAspectRatio();
+            window.addEventListener('resize', checkAspectRatio);
+            if (dismissBtn) {
+                dismissBtn.addEventListener('click', () => {
+                    mobileOverlay.style.display = 'none';
+                    document.body.style.overflow = '';
+                    localStorage.setItem(STORAGE_KEY, 'true');
                 });
-            });
-
-            document.getElementById('logo-link').addEventListener('click', function(e){
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
+            }
         })();
     </script>
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -502,26 +434,14 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user && allowedAdmins.includes(user.email)) {
-                const createBtn = document.querySelector('.hero-create-btn');
-                if (createBtn) {
+                // Find container for extra admin buttons
+                const btnContainer = document.querySelector('.flex.flex-wrap.gap-4');
+                if (btnContainer) {
                     const analyticsBtn = document.createElement('a');
                     analyticsBtn.href = 'analytics.html';
-                    analyticsBtn.className = 'hero-create-btn'; 
-                    analyticsBtn.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-                    analyticsBtn.style.borderColor = 'rgba(59, 130, 246, 0.5)';
-                    analyticsBtn.style.color = '#60a5fa'; // lighter blue text
-                    analyticsBtn.innerHTML = 'View Analytics <i class="fas fa-chart-line ml-2"></i>';
-                    
-                    analyticsBtn.onmouseover = () => {
-                        analyticsBtn.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
-                        analyticsBtn.style.borderColor = '#3b82f6';
-                    };
-                    analyticsBtn.onmouseout = () => {
-                        analyticsBtn.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-                        analyticsBtn.style.borderColor = 'rgba(59, 130, 246, 0.5)';
-                    };
-
-                    createBtn.parentNode.insertBefore(analyticsBtn, createBtn.nextSibling);
+                    analyticsBtn.className = 'hero-btn-base btn-style-orange';
+                    analyticsBtn.innerHTML = '<i class="fas fa-chart-line mr-2"></i> Analytics';
+                    btnContainer.appendChild(analyticsBtn);
                 }
             }
         });
