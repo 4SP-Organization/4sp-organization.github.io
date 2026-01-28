@@ -253,10 +253,11 @@ let db;
         const getAuthControlsHtml = () => {
             const user = currentUser;
             const userData = currentUserData;
+            const isHomePage = window.location.pathname.endsWith('/') || window.location.pathname.endsWith('index.html');
 
             // Shared Links
             const menuLinks = `
-                <a href="/" class="auth-menu-link"><i class="fa-solid fa-house w-4"></i>Home</a>
+                ${isHomePage ? '<a href="connection.html" class="auth-menu-link"><i class="fa-solid fa-download w-4"></i>Download V5 DV</a>' : '<a href="/" class="auth-menu-link"><i class="fa-solid fa-house w-4"></i>Home</a>'}
                 <a href="../4sp_history.html" class="auth-menu-link"><i class="fa-solid fa-clock-rotate-left w-4"></i>4SP History</a>
                 <a href="../legal.html" class="auth-menu-link"><i class="fa-solid fa-gavel w-4"></i>Terms & Policies</a>
                 <a href="https://buymeacoffee.com/4simpleproblems" class="auth-menu-link" target="_blank"><i class="fa-solid fa-mug-hot w-4"></i>Donate</a>
@@ -310,6 +311,8 @@ let db;
                     }
                 }
                 
+                const adminButton = currentIsPrivileged ? '<a href="https://4sp-max.giize.com/logged-in/analytics.html" class="auth-menu-link" style="background-color: #3b82f6; color: white;"><i class="fa-solid fa-star w-4"></i>4SP MAX</a>' : '';
+
                 return `
                     <div id="auth-button-container" class="relative flex-shrink-0 flex items-center">
                         <button id="auth-toggle" class="w-10 h-10 border border-gray-600 overflow-hidden" style="border-radius: 14px;">${avatarHtml}</button>
@@ -321,6 +324,7 @@ let db;
                                 </div>
                             </div>
                             ${menuLinks}
+                            ${adminButton}
                             <button id="logout-button" class="auth-menu-button text-red-400 hover:bg-red-900/50 hover:text-red-300"><i class="fa-solid fa-right-from-bracket w-4"></i>Log Out</button>
                         </div>
                     </div>
