@@ -3,303 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4SP - LEGAL</title>
-    <meta name="description" content="Terms of Service and Privacy Policy for 4simpleproblems.">
+    
+    <title>4SP - LEGAL INFORMATION</title>
+    
+    <meta name="description" content="Terms of Service and Privacy Policy for 4simpleproblems. Transparency regarding data usage and user rights.">
+    <meta name="theme-color" content="#000000">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="navbar.css">
-    <script src="navbar-loader.js" defer></script>
 
     <style>
         html { scroll-behavior: smooth; }
         :root {
             --geist-foreground: 255, 255, 255;
             --geist-background: 0, 0, 0;
+            --active-glow: #a855f7;
         }
         .dark { color-scheme: dark; }
-        body { font-family: 'Geist', sans-serif; padding-top: 4rem; }
+        body { font-family: 'Geist', sans-serif; }
         
+        /* Gradient Text Animation */
         .gradient-text {
-            background-image: linear-gradient(90deg, #0070f3, #f81ce5);
+            background-image: linear-gradient(90deg, #0070f3, #f81ce5, #0070f3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        }
-        
-        /* Custom scrollbar to match dark theme */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #000;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #444;
+            background-size: 300% auto;
+            animation: shine 8s linear infinite;
         }
 
-        .legal-list-item {
-            position: relative;
-            padding-left: 1.5rem;
+        @keyframes shine {
+            to { background-position: 300% center; }
         }
-        .legal-list-item::before {
-            content: "•";
-            position: absolute;
+
+        /* Dynamic Background */
+        #dynamic-background {
+            position: fixed;
+            top: 0;
             left: 0;
-            color: #6b7280; /* gray-500 */
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #000000 100%);
+            opacity: 0.15;
+            z-index: -10;
+            pointer-events: none;
+            transition: background 1s ease, opacity 0.5s ease;
         }
+
+        /* Black Container */
+        .content-container-black {
+            background-color: #000000 !important;
+            border: 1px solid #1f2937; 
+            border-radius: 40px !important;
+        }
+
+        /* Button Styles */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
+            color: #9ca3af;
+            border: 1px solid #374151;
+            border-radius: 16px; 
+            text-decoration: none;
+            transition: all 0.2s ease;
+            background: rgba(0,0,0,0.5);
+        }
+        .btn-back:hover {
+            color: white;
+            border-color: #6b7280;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* Tab Buttons */
+        .legal-tab {
+            padding: 0.75rem 2rem;
+            border-radius: 16px;
+            font-weight: 400;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            color: #6b7280;
+        }
+        .legal-tab:hover {
+            color: white;
+            background: rgba(255,255,255,0.05);
+        }
+        .legal-tab.active {
+            background: rgba(168, 85, 247, 0.1);
+            border-color: rgba(168, 85, 247, 0.3);
+            color: #a855f7;
+        }
+
+        /* Typography Overrides */
+        h2 { font-size: 2rem; color: white; margin-bottom: 1.5rem; font-weight: 300; }
+        h3 { font-size: 1.25rem; color: #e5e7eb; margin-bottom: 1rem; margin-top: 2rem; font-weight: 400; border-left: 2px solid #374151; padding-left: 1rem; }
+        h4 { font-size: 1rem; color: #d1d5db; margin-bottom: 0.5rem; font-weight: 500; }
+        p { color: #9ca3af; line-height: 1.7; margin-bottom: 1rem; font-weight: 300; }
+        ul { list-style: none; padding-left: 0; margin-bottom: 1.5rem; }
+        li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; color: #9ca3af; }
+        li::before { content: "•"; position: absolute; left: 0; color: #4b5563; }
+        a { transition: color 0.2s; }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col">
+<body class="bg-black text-white min-h-screen flex flex-col relative">
 
-    <header class="org-navbar">
-        <div class="flex items-center space-x-4">
-            <a href="index.html" id="logo-link" class="flex items-center space-x-2">
-                <img src="/images/logo.png" alt="4SP Logo" class="h-8 w-auto" id="navbar-logo">
-            </a>
-        </div>
-        
-         <nav class="flex items-center gap-2">
-            <a href="index.html" class="btn-toolbar-style" title="Go to Home">
-                <i class="fa-solid fa-home w-4"></i>
-                Home
-            </a>
-            <a href="create_link.html" class="btn-toolbar-style ml-2" title="Create your own 4SP link">
-                <i class="fa-solid fa-link w-4"></i>
-                Create Link
-            </a>
-            <a href="connection.html" class="btn-toolbar-style ml-2" title="Connect to 4SP">
-                <i class="fa-solid fa-rocket w-4"></i>
-                Connect
-            </a>
-        </nav>
-    </header>
+    <div id="dynamic-background"></div>
 
     <main class="flex-grow">
-        <!-- Header Section -->
-        <section class="text-center border-b border-gray-900 py-16">
+        <section class="text-center border-b border-gray-900 relative overflow-hidden" style="padding-top: 4rem; padding-bottom: 2rem;">
             <div class="mx-auto max-w-4xl px-4">
-                <h1 class="text-5xl sm:text-6xl font-light tracking-tighter mb-6 leading-tight">
+                <div class="mb-8">
+                    <a href="index.html" class="btn-back">
+                        <i class="fas fa-arrow-left mr-2"></i> Return to Home
+                    </a>
+                </div>
+                
+                <h1 class="text-4xl sm:text-6xl font-light tracking-tighter mb-4 leading-tight">
                     <span class="gradient-text font-bold">Legal Information.</span>
                 </h1>
                 <p class="text-xl text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
-                    Transparency is key. Below you will find our Terms of Service and Privacy Policy, outlining your rights and our responsibilities.
+                    Transparency is the foundation of trust. Below are the Terms of Service and Privacy Policy governing the 4SP platform.
                 </p>
-                
+
                 <div class="flex flex-wrap justify-center gap-4 mt-8">
-                    <a href="#terms-of-service" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-normal rounded-xl shadow-sm text-white bg-white/10 ring-1 ring-white/20 hover:bg-white/20 transition">
-                        Terms of Service
-                    </a>
-                    <a href="#privacy-policy" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-normal rounded-xl shadow-sm text-white bg-white/10 ring-1 ring-white/20 hover:bg-white/20 transition">
-                        Privacy Policy
-                    </a>
+                    <a href="#terms-of-service" class="legal-tab active">Terms of Service</a>
+                    <a href="#privacy-policy" class="legal-tab">Privacy Policy</a>
                 </div>
             </div>
         </section>
 
-        <!-- Content Section -->
-        <div class="mx-auto max-w-6xl px-4 py-16 space-y-24">
+        <section class="py-12 mx-auto max-w-5xl px-4">
+            <div class="content-container-black p-8 sm:p-12 space-y-24">
 
-            <!-- TERMS OF SERVICE -->
-            <section id="terms-of-service" class="scroll-mt-24">
-                <div class="mb-8">
-                    <span class="text-sm font-light text-blue-400 uppercase tracking-widest mb-2 block">Agreement</span>
-                    <h2 class="text-4xl font-light mb-6">Terms of Service</h2>
-                    <p class="text-xl text-gray-400 font-light leading-relaxed">
-                        Welcome to 4simpleproblems (4SP). By accessing or using our website, tools, or services, you agree to be bound by these Terms of Service. If you do not agree to all the terms and conditions, then you may not access the website or use any services.
+                <div id="terms-of-service" class="scroll-mt-32">
+                    <div class="mb-8">
+                        <span class="text-xs font-bold text-blue-500 uppercase tracking-widest mb-2 block">Agreement</span>
+                        <h2>Terms of Service</h2>
+                        <p class="text-lg">
+                            Welcome to 4simpleproblems (4SP). By accessing or using our website, tools, or services, you agree to be bound by these Terms.
+                        </p>
+                    </div>
+
+                    <h3>1. User Responsibility & Conduct</h3>
+                    <p>You are solely responsible for your conduct and any content you submit. You agree not to:</p>
+                    <ul>
+                        <li>Use the service for any illegal or unauthorized purpose.</li>
+                        <li>Modify, adapt, or hack the service to falsely imply association with 4SP.</li>
+                        <li>Transmit worms, viruses, or destructive code.</li>
+                    </ul>
+
+                    <h3>2. Feature Disclaimers</h3>
+                    <h4>Dailyphoto (User Generated Content)</h4>
+                    <p>4simpleproblems is <strong>NOT responsible</strong> for content uploaded by users. We assume no liability for what is posted, but reserve the right to remove violations.</p>
+                    
+                    <h4>Soundboard & Utilities</h4>
+                    <p>Features like the Soundboard, Panic Key, and Tab Disguiser are provided "as is." 4SP accepts no liability for disciplinary actions resulting from the misuse of these features in educational or professional environments.</p>
+
+                    <h3>3. Administration</h3>
+                    <p>The Owner (<span class="text-gray-300">4simpleproblems@gmail.com</span>) retains absolute authority. Administrators appointed by the Owner have the right to ban users and manage content. Banned users are prohibited from circumventing restrictions.</p>
+                </div>
+
+                <hr class="border-gray-800">
+
+                <div id="privacy-policy" class="scroll-mt-32">
+                    <div class="mb-8">
+                        <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2 block">Data Handling</span>
+                        <h2>Privacy Policy</h2>
+                        <p class="text-lg">
+                            We believe in minimizing data collection. Here is exactly what we know about you, and what we don't.
+                        </p>
+                    </div>
+
+                    <h3>1. Account Information (Firebase)</h3>
+                    <p>When you sign in via Google, we store basic authentication data to create your profile:</p>
+                    <ul>
+                        <li>Email address</li>
+                        <li>Display Name</li>
+                        <li>Unique User ID (UID)</li>
+                        <li>Profile Picture URL</li>
+                    </ul>
+
+                    <h3>2. Location Data & Analytics</h3>
+                    <p>We believe in transparency regarding location data.</p>
+                    
+                    <h4>A. Inferred Location (Email Analysis)</h4>
+                    <p>
+                        We may analyze the <strong>domain name</strong> of your registered email address (e.g., <code>@minerva.sparcc.org</code>) to infer your general geographic association (e.g., "Northeast Ohio"). This allows us to understand our demographic reach as seen on our History page. 
+                        <strong>This is a manual analysis of text strings; we do not track your physical location.</strong>
                     </p>
-                </div>
 
-                <div class="space-y-12">
-                    <!-- 1. Conduct -->
-                    <div class="border-l border-gray-800 pl-6">
-                        <h3 class="text-2xl font-light text-white mb-4">1. User Responsibility & Conduct</h3>
-                        <p class="text-lg text-gray-400 font-light mb-4">
-                            You are solely responsible for your conduct and any data, text, information, graphics, photos, profiles, audio, and video clips ("Content") that you submit, post, and display on the 4SP service.
-                        </p>
-                        <ul class="space-y-2 text-gray-400 font-light">
-                            <li class="legal-list-item">You must not use the service for any illegal or unauthorized purpose.</li>
-                            <li class="legal-list-item">You must not modify, adapt, or hack the service to falsely imply association with 4SP.</li>
-                            <li class="legal-list-item">You must not transmit worms, viruses, or destructive code.</li>
-                            <li class="legal-list-item">You must not violate any laws in your jurisdiction (including copyright laws).</li>
-                        </ul>
-                    </div>
-
-                    <!-- 2. Feature Disclaimers -->
-                    <div class="border-l border-gray-800 pl-6">
-                        <h3 class="text-2xl font-light text-white mb-4">2. Feature-Specific Disclaimers</h3>
-                        
-                        <div class="mb-8">
-                            <h4 class="text-lg text-gray-200 font-normal mb-2">Dailyphoto (User Generated Content)</h4>
-                            <p class="text-gray-400 font-light leading-relaxed">
-                                The "Dailyphoto" feature allows users to upload images. 
-                                <span class="text-red-400 font-normal">4simpleproblems is NOT responsible for the content uploaded by users.</span> 
-                                We do not claim ownership of your content, but by uploading, you grant us a license to display it. We reserve the right to remove any content that violates these terms without prior notice.
-                            </p>
-                        </div>
-
-                        <div class="mb-8">
-                            <h4 class="text-lg text-gray-200 font-normal mb-2">Soundboard Usage</h4>
-                            <p class="text-gray-400 font-light leading-relaxed">
-                                The Soundboard contains various audio clips, some of which may be loud or disruptive. 
-                                <span class="text-blue-400 font-normal">4simpleproblems accepts no liability for disciplinary actions, detentions, suspensions, or other consequences</span> 
-                                resulting from the misuse of this feature in educational, professional, or public environments. Use at your own risk.
-                            </p>
-                        </div>
-
-                        <div>
-                            <h4 class="text-lg text-gray-200 font-normal mb-2">Settings & Utilities (Panic Key, URL Changer)</h4>
-                            <p class="text-gray-400 font-light leading-relaxed">
-                                Features such as the "Panic Key" and "Tab Disguiser" are privacy tools provided for user convenience. Users are responsible for adhering to the Acceptable Use Policies of their respective networks. 4SP is not liable for violations of local network policies committed using these tools.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- 3. Governance -->
-                    <div class="border-l border-gray-800 pl-6">
-                        <h3 class="text-2xl font-light text-white mb-4">3. Administration & Governance</h3>
-                        <p class="text-lg text-gray-400 font-light mb-4">
-                            The Creator and Owner of 4simpleproblems (<span class="text-gray-200">4simpleproblems@gmail.com</span>) retains absolute authority over the platform.
-                        </p>
-                        <ul class="space-y-2 text-gray-400 font-light">
-                            <li class="legal-list-item">The Owner reserves the right to grant, revoke, or modify Administrator privileges at any time without notice.</li>
-                            <li class="legal-list-item">Administrators have the authority to <span class="text-red-400">ban users</span>, delete content, and manage site features.</li>
-                            <li class="legal-list-item">Banned users are prohibited from accessing the platform. Attempting to circumvent a ban may result in further action.</li>
-                            <li class="legal-list-item">The Owner is not liable for actions taken by appointed Administrators.</li>
-                        </ul>
-                    </div>
-
-                    <!-- 4. Liability -->
-                    <div class="border-l border-gray-800 pl-6">
-                        <h3 class="text-2xl font-light text-white mb-4">4. Limitation of Liability</h3>
-                        <p class="text-lg text-gray-400 font-light leading-relaxed">
-                            In no event shall 4simpleproblems be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- PRIVACY POLICY -->
-            <section id="privacy-policy" class="scroll-mt-24 pt-12 border-t border-gray-900">
-                <div class="mb-8">
-                    <span class="text-sm font-light text-purple-400 uppercase tracking-widest mb-2 block">Data Handling</span>
-                    <h2 class="text-4xl font-light mb-6">Privacy Policy</h2>
-                    <p class="text-xl text-gray-400 font-light leading-relaxed">
-                        Your privacy is important to us. This policy details exactly how we collect, use, and protect your information.
+                    <h4>B. No Real-Time Tracking</h4>
+                    <p>
+                        <strong class="text-white">4SP does NOT track your real-time location.</strong> We do not request access to your device's GPS, nor do we store specific location coordinates on our servers.
                     </p>
+
+                    <h4>C. Third-Party Analytics</h4>
+                    <p>
+                        We use <strong>Google Analytics</strong> to monitor site performance. Google may collect general IP-based location data to provide us with aggregate statistics (e.g., "10 visitors from Spain"). This data is anonymized and handled according to Google's policies.
+                    </p>
+                    <p>
+                        <a href="https://policies.google.com/technologies/partner-sites" target="_blank" class="text-blue-400 hover:underline text-sm"><i class="fas fa-external-link-alt mr-1"></i> How Google uses data when you use our partners' sites or apps</a>
+                    </p>
+
+                    <h3>3. Local Storage</h3>
+                    <p>To protect your privacy, the following features store data <strong>only on your device</strong> (LocalStorage/IndexedDB) and are never sent to our servers:</p>
+                    <ul>
+                        <li>Notes App content</li>
+                        <li>Theme preferences</li>
+                        <li>Panic Key settings</li>
+                        <li>Mibi Avatar configurations</li>
+                    </ul>
+
+                    <h3>4. Data Deletion</h3>
+                    <p>You have the right to be forgotten. You may delete your account permanently via the Settings page. This action is irreversible.</p>
+
+                    <h3>5. Contact</h3>
+                    <p>For legal inquiries or data requests, contact the Owner at <a href="mailto:4simpleproblems@gmail.com" class="text-blue-400 hover:underline">4simpleproblems@gmail.com</a>.</p>
                 </div>
 
-                <div class="space-y-12">
-                    <!-- 1. Info Collection -->
-                    <div class="border-l border-gray-800 pl-6">
-                        <h3 class="text-2xl font-light text-white mb-4">1. Information We Collect</h3>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-lg text-gray-200 font-normal mb-2">A. Account Information (Google Firebase)</h4>
-                            <p class="text-gray-400 font-light mb-2">When you sign in, we collect and store:</p>
-                            <ul class="space-y-1 text-gray-500 font-light text-sm">
-                                <li>• Email address</li>
-                                <li>• Display name/Username</li>
-                                <li>• Unique user identifier (UID)</li>
-                                <li>• Profile picture URL</li>
-                            </ul>
-                        </div>
-
-                        <div class="mb-6">
-                            <h4 class="text-lg text-gray-200 font-normal mb-2">B. Analytics (Google Analytics)</h4>
-                            <p class="text-gray-400 font-light mb-2">To understand usage, we may collect:</p>
-                            <ul class="space-y-1 text-gray-500 font-light text-sm">
-                                <li>• IP address and general location</li>
-                                <li>• Browser type and device info</li>
-                                <li>• Page visit duration</li>
-                            </ul>
-                        </div>
-
-                        <div class="mb-6">
-                            <h4 class="text-lg text-gray-200 font-normal mb-2">C. Internal Analytics</h4>
-                            <p class="text-gray-400 font-light mb-2">We use an internal tracking system to improve site navigation and content. This system records:</p>
-                            <ul class="space-y-1 text-gray-500 font-light text-sm">
-                                <li>• Pages visited and time spent on each page</li>
-                                <li>• Session duration</li>
-                                <li>• Timestamps of activity</li>
-                            </ul>
-                            <p class="text-gray-500 font-light text-sm mt-1">This data is stored securely in our Firestore database and is used solely for site improvement.</p>
-                        </div>
-
-                        <div>
-                            <h4 class="text-lg text-gray-200 font-normal mb-2">D. User Content</h4>
-                            <p class="text-gray-400 font-light leading-relaxed">
-                                Content you explicitly generate (Dailyphotos, comments, friend requests) is stored in our database and associated with your account.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- 2. Local Storage -->
-                    <div class="border-l border-gray-800 pl-6">
-                        <h3 class="text-2xl font-light text-white mb-4">2. Local Storage & IndexedDB</h3>
-                        <p class="text-lg text-gray-400 font-light mb-4">
-                            Certain features store data <span class="text-white font-normal">locally on your device</span>. This data is NOT sent to our servers unless explicitly uploaded (e.g. during an export/import).
-                        </p>
-                        <ul class="space-y-2 text-gray-400 font-light">
-                            <li class="legal-list-item"><strong>Notes App:</strong> Written notes are stored locally.</li>
-                            <li class="legal-list-item"><strong>Settings:</strong> Themes, Panic Keys, and Tab Disguiser settings.</li>
-                            <li class="legal-list-item"><strong>Personalization:</strong> Mibi Avatar configurations.</li>
-                            <li class="legal-list-item"><strong>Countdowns:</strong> Saved countdown timers.</li>
-                        </ul>
-                    </div>
-
-                    <!-- 3. Third Party -->
-                    <div class="border-l border-gray-800 pl-6">
-                        <h3 class="text-2xl font-light text-white mb-4">3. Third-Party Services</h3>
-                        <p class="text-lg text-gray-400 font-light mb-4">
-                            Our website interacts with third-party APIs:
-                        </p>
-                        <ul class="space-y-2 text-gray-400 font-light">
-                            <li class="legal-list-item"><strong>Weather API:</strong> Used to display weather data.</li>
-                            <li class="legal-list-item"><strong>Dictionary API:</strong> Used for definitions.</li>
-                        </ul>
-                        <p class="text-sm text-gray-500 mt-2">These sites have independent privacy policies. We are not liable for their content or activities.</p>
-                    </div>
-
-                    <!-- 4. Security -->
-                    <div class="border-l border-gray-800 pl-6">
-                        <h3 class="text-2xl font-light text-white mb-4">4. Data Security & Deletion</h3>
-                        <p class="text-lg text-gray-400 font-light leading-relaxed">
-                            We use Google Firebase to secure your data. You have the right to delete your account at any time via the Settings page. Deleting your account removes authentication credentials, though some logs may remain in backups for a limited period.
-                        </p>
-                    </div>
-
-                    <!-- 5. Contact -->
-                    <div class="border-l border-gray-800 pl-6">
-                        <h3 class="text-2xl font-light text-white mb-4">5. Contact</h3>
-                        <p class="text-lg text-gray-400 font-light">
-                            Questions? Contact the Owner at <a href="mailto:4simpleproblems@gmail.com" class="text-blue-400 hover:underline">4simpleproblems@gmail.com</a>.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-        </div>
+            </div>
+        </section>
     </main>
 
-    <footer class="border-t border-gray-900 py-8 mt-auto">
-        <div class="mx-auto max-w-7xl px-4 text-center text-gray-500 text-sm font-light">
-            &copy; 2026 4simpleproblems (4SP). Built for students.
-            <span class="mx-2 text-gray-800">|</span>
-            <a href="#terms-of-service" class="hover:text-gray-300 transition">Terms of Service</a>
-            <span class="mx-2 text-gray-800">|</span>
-            <a href="#privacy-policy" class="hover:text-gray-300 transition">Privacy Policy</a>
+    <footer class="border-t border-gray-900 py-6 bg-black">
+        <div class="mx-auto max-w-7xl px-4 text-center text-gray-500 text-sm">
+            &copy; 2026 4SP Organization.
+            <span class="mx-2">|</span>
+            <a href="#terms-of-service" class="hover:underline">Terms</a>
+            <span class="mx-2">|</span>
+            <a href="#privacy-policy" class="hover:underline">Privacy</a>
         </div>
     </footer>
 
+    <script>
+        // Dynamic Background Logic
+        window.addEventListener('scroll', () => {
+            const bgLayer = document.getElementById('dynamic-background');
+            const scrollPos = window.scrollY;
+            const triggerHeight = 600; 
+            let opacity = scrollPos / triggerHeight;
+            if (opacity > 1) opacity = 1;
+            if (bgLayer) bgLayer.style.opacity = 0.15 + (opacity * 0.2); // Subtle increase
+        });
+
+        // Tab Highlight Logic
+        const sections = document.querySelectorAll('div[id]');
+        const navLinks = document.querySelectorAll('.legal-tab');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 300)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
