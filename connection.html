@@ -3,53 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>4SP - CONNECT</title>
+    
     <meta name="description" content="Log into or create your 4SP account to access the student toolkit.">
+    <meta name="theme-color" content="#000000">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="navbar.css">
-    <script src="navbar-loader.js" defer></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'custom-darkest-gray': '#040404',
-                        'custom-dark-gray': '#111111',
-                        'custom-medium-gray': '#252525',
-                        'custom-light-gray': '#505050',
-                        'custom-lighter-gray': '#808080',
-                        'custom-white-gray': '#c0c0c0',
-                    }
-                }
-            }
-        }
-    </script>
-    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="navigation-mini.js"></script>
+
     <style>
         :root {
-            --geist-foreground: 192, 192, 192; 
-            --geist-background: 7, 7, 7;
+            --geist-foreground: 255, 255, 255;
+            --geist-background: 0, 0, 0;
         }
-
-        body {
-            font-family: 'Geist', sans-serif;
-            background-color: rgb(var(--geist-background));
-            color: rgb(var(--geist-foreground));
-            transition: all 0.3s ease;
-            font-weight: 300;
-            padding-top: 4rem;
-        }
-
-        h1, h2, h3, .font-bold, .font-semibold, strong, .tracking-tighter {
-            font-weight: 400 !important;
-        }
-
+        .dark { color-scheme: dark; }
+        body { font-family: 'Geist', sans-serif; }
+        
         .btn-social {
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
@@ -119,32 +94,9 @@
         .notification-toast.error i { color: #ef4444; }
     </style>
 </head>
-<body class="bg-custom-darkest-gray text-custom-white-gray min-h-screen flex flex-col">
+<body class="bg-black text-white min-h-screen flex flex-col">
 
     <div id="notification-container"></div>
-
-    <header class="org-navbar">
-        <div class="flex items-center space-x-4">
-            <a href="index.html" id="logo-link" class="flex items-center space-x-2">
-                <img src="/images/logo.png" alt="4SP Logo" class="h-8 w-auto" id="navbar-logo">
-            </a>
-        </div>
-        
-         <nav class="flex items-center gap-2">
-            <a href="index.html" class="btn-toolbar-style" title="Go to Home">
-                <i class="fa-solid fa-home w-4"></i>
-                Home
-            </a>
-            <a href="legal.html" class="btn-toolbar-style ml-2" title="View the Terms and Policies">
-                <i class="fa-solid fa-gavel w-4"></i>
-                Legal
-            </a>
-            <a href="create_link.html" class="btn-toolbar-style ml-2" title="Create your own 4SP link">
-                <i class="fa-solid fa-link w-4"></i>
-                Create Link
-            </a>
-        </nav>
-    </header>
 
     <main class="flex-grow flex items-stretch justify-center p-0">
         <div class="auth-split-container bg-custom-darkest-gray flex flex-wrap w-full border-0 overflow-hidden p-0">
@@ -306,10 +258,13 @@
 
     <footer class="border-t border-gray-900 py-6">
         <div class="mx-auto max-w-7xl px-4 text-center text-gray-500 text-sm">
-            &copy; 2026 4simpleproblems (4SP). Built for students.
+            &copy; 2026 4SP Organization.
+            <span class="mx-2">|</span>
+            <a href="legal.html" class="hover:underline">Terms</a>
+            <span class="mx-2">|</span>
+            <a href="legal.html" class="hover:underline">Privacy</a>
         </div>
     </footer>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import {
@@ -765,3 +720,4 @@
     </script>
 </body>
 </html>
+<!-- Made with ❤️ from 4SP -->
