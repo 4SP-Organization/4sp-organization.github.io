@@ -3,60 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>4SP - CONNECT</title>
-    
     <meta name="description" content="Log into or create your 4SP account to access the student toolkit.">
-    <meta name="theme-color" content="#000000">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="navigation-mini.js"></script>
 
     <style>
-        :root {
-            --geist-foreground: 255, 255, 255;
-            --geist-background: 0, 0, 0;
-        }
-        .dark { color-scheme: dark; }
-        body { font-family: 'Geist', sans-serif; }
-        
-        .btn-social {
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        .btn-social:hover {
-            background-color: rgba(37, 37, 37, 0.7);
-            border-color: #383838;
-        }
-        
-        .message-area { min-height: 20px; }
-        .error-message { color: #f87171; font-weight: 400; }
-        .success-message { color: #4ade80; font-weight: 400; }
-        .warning-message { color: #fbbf24; font-weight: 400; }
-        
-        .auth-split-container { max-width: 1200px; margin: 0 auto; min-height: 600px; }
-        @media (min-width: 768px) { .auth-col { } }
-        @media (max-width: 767px) {
-            .right-col { display: none; }
-            .left-col { border-right: none; }
+        body { 
+            font-family: 'Geist', sans-serif; 
+            background-color: #000000; 
+            color: #c0c0c0; 
+            font-weight: 300;
         }
 
+        h1, h2, h3, .font-bold, .font-semibold, strong, .tracking-tighter {
+            font-weight: 400 !important;
+        }
+
+        .auth-container {
+            background-color: #0a0a0a;
+            border: 1px solid #252525;
+            border-radius: 32px;
+            padding: 2rem;
+            min-height: 500px; /* Ensure visual balance */
+        }
+
+        .input-style {
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid #252525; 
+            background-color: #000000; 
+            border-radius: 18px; 
+            color: #c0c0c0; 
+            transition: all 0.2s;
+        }
+        .input-style:focus {
+            border-color: #505050; 
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(80, 80, 80, 0.5);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border-radius: 18px;
+            font-weight: 400;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: rgba(79, 70, 229, 0.1);
+            border: 1px solid #4f46e5;
+            color: #4f46e5;
+        }
+        .btn-primary:hover {
+            background-color: rgba(79, 70, 229, 0.15);
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+        .btn-secondary {
+            background-color: #111111;
+            color: #9ca3af;
+            border: 1px solid #333;
+        }
+        .btn-secondary:hover {
+            background-color: rgba(79, 70, 229, 0.05);
+            border-color: #d1d5db;
+            color: #ffffff;
+        }
+
+        /* Unique to Connection Page */
         .code-display {
-            font-family: monospace;
-            letter-spacing: 0.2em;
+            font-family: 'Geist Mono', monospace;
+            letter-spacing: 0.15em;
             font-size: 1.5rem;
             background: #000;
             border: 1px solid #333;
             padding: 1rem;
-            border-radius: 0.5rem;
+            border-radius: 18px;
             width: 100%;
             text-align: center;
             margin-bottom: 0.5rem;
             color: #fff;
+        }
+        
+        .btn-cyan {
+            background-color: rgba(6, 182, 212, 0.1);
+            border: 1px solid #06b6d4;
+            color: #06b6d4;
+        }
+        .btn-cyan:hover {
+            background-color: rgba(6, 182, 212, 0.15);
+            color: #22d3ee;
+        }
+
+        .message-area { min-height: 20px; }
+        .error-message { color: #f87171; }
+        .success-message { color: #4ade80; }
+        .warning-message { color: #fbbf24; }
+
+        @media (max-width: 767px) {
+            .right-col { display: none; }
         }
 
         /* Toast Notifications */
@@ -73,7 +129,7 @@
         .notification-toast {
             background-color: #0a0a0a;
             border: 1px solid #333;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 1rem 1.25rem;
             color: #fff;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
@@ -92,32 +148,34 @@
         .notification-toast.info i { color: #3b82f6; }
         .notification-toast.success i { color: #22c55e; }
         .notification-toast.error i { color: #ef4444; }
+        .notification-toast.warning i { color: #fbbf24; }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col">
+<body class="bg-[#040404] text-[#c0c0c0] min-h-screen flex flex-col">
 
+    <div id="navbar-container"></div>
     <div id="notification-container"></div>
 
-    <main class="flex-grow flex items-stretch justify-center p-0">
-        <div class="auth-split-container bg-custom-darkest-gray flex flex-wrap w-full border-0 overflow-hidden p-0">
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-4xl grid md:grid-cols-2 gap-0 auth-container overflow-hidden">
             
-            <div class="auth-col left-col flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray min-w-[300px] border-r border-custom-medium-gray/30">
+            <div class="left-col flex-1 p-8 flex flex-col justify-center items-center relative">
 
                 <div id="unauth-login-container" class="w-full flex flex-col items-center">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Login to Generate Code</h2>
+                    <h2 class="text-3xl font-normal text-white mb-6 text-center w-full tracking-tighter">Login to Generate Code</h2>
                     <form id="loginForm" class="w-full max-w-md"> 
                         <div class="mb-5">
                             <label for="loginEmail" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Email</label>
-                            <input type="email" id="loginEmail" placeholder="Enter your email" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
+                            <input type="email" id="loginEmail" placeholder="Enter your email" required class="input-style">
                         </div>
                         <div class="mb-5">
                             <label for="loginPassword" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Password</label>
-                            <input type="password" id="loginPassword" placeholder="Enter your password" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required class="input-style">
                         </div>
-                        <button type="submit" class="w-full p-3 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-white/5 hover:bg-white/10 transition">LOGIN</button>
+                        <button type="submit" class="btn btn-primary">LOGIN</button>
                     </form>
                     
-                    <div id="loginMessage" class="message-area w-full mt-4 text-center text-sm text-red-400"></div>
+                    <div id="loginMessage" class="message-area w-full max-w-md mt-4 text-center text-sm"></div>
                     
                     <div class="w-full max-w-md mt-4 text-center"> 
                         <a id="forgotPasswordLink" class="text-white hover:text-gray-300 font-normal text-sm cursor-pointer">Forgot Password?</a> 
@@ -130,14 +188,14 @@
                 </div>
 
                 <div id="resetPasswordContainer" class="w-full flex-col items-center hidden">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Reset Your Password</h2>
+                    <h2 class="text-3xl font-normal text-white mb-6 text-center w-full tracking-tighter">Reset Your Password</h2>
                     <p class="text-custom-light-gray text-base mb-6 text-center max-w-md font-normal">Enter your email address and we'll send you a link to reset your password.</p>
                     <form id="resetPasswordForm" novalidate class="w-full max-w-md">
                         <div class="mb-5">
                             <label for="resetEmail" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Email</label>
-                            <input type="email" id="resetEmail" placeholder="Enter your registered email" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
+                            <input type="email" id="resetEmail" placeholder="Enter your registered email" required class="input-style">
                         </div>
-                        <button type="submit" class="w-full p-3 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-white/5 hover:bg-white/10 transition">SEND RESET LINK</button>
+                        <button type="submit" class="btn btn-primary">SEND RESET LINK</button>
                     </form>
                     <div id="resetMessage" class="message-area w-full max-w-md mt-4 text-center text-sm"></div>
                     <div class="w-full max-w-md mt-6 text-center"> 
@@ -146,44 +204,44 @@
                 </div>
 
                 <div id="signupContainer" class="w-full flex-col items-center hidden">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Create Account</h2>
+                    <h2 class="text-3xl font-normal text-white mb-6 text-center w-full tracking-tighter">Create Account</h2>
                     <form id="signupForm" class="w-full max-w-md"> 
                         <div class="mb-5">
                             <label for="signupEmail" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Email</label>
-                            <input type="email" id="signupEmail" placeholder="Enter your email" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
+                            <input type="email" id="signupEmail" placeholder="Enter your email" required class="input-style">
                         </div>
                         <div class="mb-5">
                             <label for="signupPassword" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Password</label>
-                            <input type="password" id="signupPassword" placeholder="Create a password" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
+                            <input type="password" id="signupPassword" placeholder="Create a password" required class="input-style">
                             <p class="text-xs text-custom-lighter-gray mt-2 text-left font-light">At least 8 characters (1 number, 1 uppercase, 1 lowercase).</p>
                         </div>
-                        <button type="submit" class="w-full p-3 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-white/5 hover:bg-white/10 transition">CREATE ACCOUNT</button>
+                        <button type="submit" class="btn btn-primary">CREATE ACCOUNT</button>
                     </form>
-                    <div id="signupMessage" class="message-area w-full mt-4 text-center text-sm"></div>
+                    <div id="signupMessage" class="message-area w-full max-w-md mt-4 text-center text-sm"></div>
                     <div class="w-full max-w-md mt-6 text-center"> 
                         <a id="backToLoginFromSignup" class="text-white hover:text-gray-300 font-normal text-sm cursor-pointer">&larr; Back to Login</a> 
                     </div>
                 </div>
 
                 <div id="auth-code-container" class="w-full flex-col items-center hidden">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-2 text-center w-full tracking-tighter">Your Access Code</h2>
+                    <h2 class="text-3xl font-normal text-white mb-2 text-center w-full tracking-tighter">Your Access Code</h2>
                     <p class="text-custom-light-gray text-center mb-8">User: <span id="userEmail" class="text-white font-medium">...</span></p>
                     
                     <div id="generatorBox" class="flex flex-col items-center w-full max-w-md">
-                        <button id="generateBtn" class="w-full py-2 px-4 text-sm font-medium rounded-xl text-indigo-500 bg-indigo-500/10 border border-indigo-500 hover:bg-indigo-500/20 transition mb-6">
+                        <button id="generateBtn" class="btn btn-primary mb-6">
                             Generate Code
                         </button>
 
                         <div id="resultContainer" class="w-full hidden flex-col items-center">
                             <div class="code-display" id="codeOutput">XXXX-XXXX-XXXX</div>
                             <div id="codeStatus" class="text-sm mb-4 font-normal text-center w-full"></div>
-                            <button id="copyBtn" class="w-full p-3 text-base rounded-xl font-normal border border-custom-medium-gray text-custom-white-gray hover:bg-custom-medium-gray transition flex items-center justify-center gap-2">
+                            <button id="copyBtn" class="btn btn-secondary flex items-center justify-center gap-2">
                                 <i class="fa-regular fa-copy"></i> Copy to Clipboard
                             </button>
                         </div>
-                        <div id="messageArea" class="message-area mt-4 text-center text-sm"></div>
+                        <div id="messageArea" class="message-area w-full max-w-md mt-4 text-center text-sm"></div>
 
-                        <div class="w-full mt-6 text-center border-t border-custom-medium-gray/30 pt-4">
+                        <div class="w-full mt-6 text-center border-t border-gray-800 pt-4">
                             <p class="text-custom-light-gray text-sm font-light">
                                 Need the client? 
                                 <a href="../4simpleproblems_v5_latest.html" download="4simpleproblems_v5_latest.html" class="text-cyan-500 hover:text-cyan-400 transition hover:underline cursor-pointer ml-1" title="Download 4SP Client">
@@ -196,29 +254,29 @@
 
             </div>
 
-            <div class="auth-col right-col flex-1 p-8 flex flex-col items-center bg-custom-darkest-gray">
+            <div class="right-col flex-1 p-8 flex flex-col justify-center items-center">
                 
                 <div id="unauth-social-container" class="w-full h-full flex flex-col items-center justify-center">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Continue instantly</h2>
+                    <h2 class="text-3xl font-normal text-white mb-6 text-center w-full tracking-tighter">Continue instantly</h2>
                     <p class="text-lg text-custom-light-gray mb-8 text-center max-w-md font-normal">
                         Use a trusted provider to sign in or create an account in one click.
                     </p>
                     
-                    <button id="googleAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/google-icon.png" alt="Google Logo" class="w-6 h-6 mr-3">
+                    <button id="googleAuthBtn" class="btn btn-secondary mb-3">
+                        <img src="images/google-icon.png" alt="Google Logo" class="w-6 h-6 mr-3">
                         Continue with Google
                     </button>
-                    <button id="microsoftAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/microsoft.png" alt="Microsoft Logo" class="w-6 h-6 mr-3">
+                    <button id="microsoftAuthBtn" class="btn btn-secondary mb-3">
+                        <img src="images/microsoft.png" alt="Microsoft Logo" class="w-6 h-6 mr-3">
                         Continue with Microsoft
                     </button>
-                    <button id="githubAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/github-mark-white.png" alt="GitHub Logo" class="w-6 h-6 mr-3">
+                    <button id="githubAuthBtn" class="btn btn-secondary mb-3">
+                        <img src="images/github-mark-white.png" alt="GitHub Logo" class="w-6 h-6 mr-3">
                         Continue with GitHub
                     </button>
                     
-                    <button id="twitterAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/x.png" alt="X Logo" class="w-6 h-6 mr-3">
+                    <button id="twitterAuthBtn" class="btn btn-secondary mb-3">
+                        <img src="../images/x.png" alt="X Logo" class="w-6 h-6 mr-3">
                         Continue with X
                     </button>
 
@@ -231,7 +289,7 @@
 
                 <div id="auth-info-container" class="w-full h-full flex flex-col justify-between hidden">
                     <div class="flex flex-col items-center justify-center flex-grow">
-                        <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">How to Connect</h2>
+                        <h2 class="text-3xl font-normal text-white mb-6 text-center w-full tracking-tighter">How to Connect</h2>
                         <div class="max-w-md text-custom-light-gray text-lg font-light leading-relaxed space-y-4">
                             <p>
                                 <strong class="text-white">1. Generate Code:</strong> Click the button on the left to create a unique pairing key.
@@ -246,7 +304,7 @@
                     </div>
                     
                     <div class="w-full flex justify-end mt-8">
-                        <button id="logoutBtn" class="py-2 px-6 text-sm font-medium rounded-xl text-indigo-500 bg-indigo-500/10 border border-indigo-500 hover:bg-indigo-500/20 transition">
+                        <button id="logoutBtn" class="btn btn-primary" style="width: auto; padding-left: 1.5rem; padding-right: 1.5rem;">
                             Sign Out <i class="fa-solid fa-arrow-right-from-bracket ml-2"></i>
                         </button>
                     </div>
@@ -265,6 +323,7 @@
             <a href="legal.html" class="hover:underline">Privacy</a>
         </div>
     </footer>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import {
@@ -335,8 +394,9 @@
         const resetMessage = document.getElementById('resetMessage');
         const signupMessage = document.getElementById('signupMessage');
         
-        const INDIGO_CLASSES = "text-indigo-500 bg-indigo-500/10 border-indigo-500 hover:bg-indigo-500/20";
-        const CYAN_CLASSES = "text-cyan-500 bg-cyan-500/10 border-cyan-500 hover:bg-cyan-500/20";
+        // Classes used by JS to change button styles dynamically
+        const INDIGO_CLASSES = "btn btn-primary mb-6";
+        const CYAN_CLASSES = "btn btn-cyan mb-6"; // Updated to use CSS class
 
         let unsubscribeCodeListener = null;
 
@@ -355,25 +415,18 @@
             
             container.appendChild(toast);
             
-            // Animate in
             requestAnimationFrame(() => toast.classList.add('show'));
             
-            // Remove
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        // --- ROBUST USER SYNC FUNCTION ---
-        // Ensures user doc matches UID, creates if missing, updates if incomplete
         async function ensureUserDocument(user) {
-            const userDocRef = doc(db, "users", user.uid); // STRICT: Force ID to be UID
-            
+            const userDocRef = doc(db, "users", user.uid);
             try {
                 const userSnap = await getDoc(userDocRef);
-                
-                // 1. Determine safe username (use existing if available, else generate)
                 let existingData = userSnap.exists() ? userSnap.data() : {};
                 let finalUsername = existingData.username;
 
@@ -384,7 +437,6 @@
                     finalUsername = raw;
                 }
 
-                // 2. Prepare payload (Always update these to keep sync)
                 const userData = {
                     email: user.email,
                     authMethod: user.providerData[0]?.providerId || 'unknown',
@@ -394,16 +446,13 @@
                     lastSeen: serverTimestamp()
                 };
 
-                // 3. Add createdAt only if creating new doc
                 if (!userSnap.exists()) {
                     userData.createdAt = serverTimestamp();
                     showToast("Creating your user profile...", "info");
                 } else if (!existingData.email || !existingData.username) {
-                    // It exists but is broken/incomplete
                     showToast("Repairing user profile...", "warning");
                 }
 
-                // 4. WRITE: setDoc with MERGE true prevents data loss of other fields
                 await setDoc(userDocRef, userData, { merge: true });
                 return true;
 
@@ -413,11 +462,9 @@
             }
         }
 
-        // --- Helper: View Switcher ---
         function switchView(viewName) {
             [unauthLoginContainer, resetPasswordContainer, signupContainer].forEach(el => {
                 el.classList.add('hidden');
-                el.style.display = 'none';
             });
             
             loginMessage.innerText = "";
@@ -432,11 +479,9 @@
 
             if (target) {
                 target.classList.remove('hidden');
-                target.style.display = 'flex';
             }
         }
 
-        // --- Event Listeners for View Switching ---
         document.getElementById('forgotPasswordLink').addEventListener('click', () => switchView('reset'));
         document.getElementById('backToLoginFromReset').addEventListener('click', () => switchView('login'));
         document.getElementById('goToSignupLink').addEventListener('click', () => switchView('signup'));
@@ -444,7 +489,6 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // VERIFICATION CHECK
                 if (!user.emailVerified) {
                     await signOut(auth);
                     switchView('login');
@@ -464,31 +508,26 @@
                     return; 
                 }
 
-                // --- KEY CHANGE: Always Ensure Doc Exists on Login ---
                 await ensureUserDocument(user);
 
-                // --- REDIRECT LOGIC ---
                 const urlParams = new URLSearchParams(window.location.search);
                 const redirectTarget = urlParams.get('redirect') || (window.location.hash ? window.location.hash.substring(1) : null);
 
                 if (redirectTarget) {
-                     // Basic validation to prevent open redirect vulnerabilities to other domains
-                     // Only allow relative paths or simple filenames
                      if (/^[a-zA-Z0-9_\-\.\/]+$/.test(redirectTarget) && !redirectTarget.startsWith('http')) {
                          window.location.href = redirectTarget;
                          return;
                      }
                 }
 
-                // LOGGED IN & VERIFIED UI
                 [unauthLoginContainer, resetPasswordContainer, signupContainer, unauthSocialContainer].forEach(el => {
                     el.classList.add('hidden');
-                    el.style.display = 'none';
                 });
                 
                 authCodeContainer.classList.remove('hidden');
                 authCodeContainer.style.display = 'flex'; 
                 authInfoContainer.classList.remove('hidden');
+                authInfoContainer.style.display = 'flex';
                 
                 userEmailSpan.textContent = user.email;
 
@@ -504,14 +543,13 @@
                 } catch (e) { console.error("Error setting up listener:", e); }
 
             } else {
-                // LOGGED OUT
                 switchView('login');
                 unauthSocialContainer.classList.remove('hidden'); 
                 unauthSocialContainer.style.display = 'flex'; 
                 
-                authCodeContainer.style.display = 'none';
                 authCodeContainer.classList.add('hidden');
                 authInfoContainer.classList.add('hidden');
+                authInfoContainer.style.display = 'none';
                 
                 if (unsubscribeCodeListener) {
                     unsubscribeCodeListener();
@@ -520,7 +558,6 @@
             }
         });
 
-        // --- Login Handler ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
@@ -538,7 +575,6 @@
             }
         });
 
-        // --- Password Reset Handler ---
         document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('resetEmail').value.trim();
@@ -569,7 +605,6 @@
             }
         });
 
-        // --- Sign Up Handler ---
         function validatePassword(password) {
             if (password.length < 8) return 'Password must be at least 8 characters.';
             if (!/[0-9]/.test(password)) return 'Password must contain at least one number.';
@@ -595,7 +630,6 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await sendEmailVerification(userCredential.user);
                 
-                // Explicitly create doc here too for safety
                 await ensureUserDocument(userCredential.user);
 
                 await signOut(auth); 
@@ -615,14 +649,12 @@
             }
         });
 
-        // --- Social Auth Sync ---
         async function handleSocialAuth(provider) {
             try {
-                const result = await signInWithPopup(auth, provider);
-                // onAuthStateChanged will handle the sync automatically now
+                await signInWithPopup(auth, provider);
             } catch (error) {
                 console.error("Auth error:", error);
-                alert("Authentication failed.");
+                showToast("Authentication failed", "error");
             }
         }
 
@@ -633,7 +665,6 @@
         
         logoutBtn.addEventListener('click', () => signOut(auth));
 
-        // --- Code Generator Logic ---
         function renderCodeState(docSnapshot) {
             const docData = docSnapshot.data();
             codeOutput.innerText = docSnapshot.id.match(/.{1,4}/g).join('-');
@@ -647,20 +678,19 @@
             } else {
                 codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
                 messageArea.innerHTML = "Code generated. Enter it in your 4SP Local Client.";
-                messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
+                messageArea.className = "message-area mt-4 text-center text-sm text-white";
             }
             
             generateBtn.innerText = "Regenerate Code";
-            generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl border border-cyan-500 transition mb-6 ${CYAN_CLASSES}`;
+            generateBtn.className = CYAN_CLASSES;
             generateBtn.disabled = false;
             generateBtn.classList.remove('hidden');
         }
 
         function renderNoCodeState() {
             generateBtn.innerText = "Generate Code";
-            generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl border border-indigo-500 transition mb-6 ${INDIGO_CLASSES}`;
+            generateBtn.className = INDIGO_CLASSES;
             resultContainer.classList.add('hidden');
-            resultContainer.style.display = 'none'; 
             generateBtn.classList.remove('hidden');
             generateBtn.disabled = false;
             messageArea.innerText = "";
@@ -673,18 +703,15 @@
             return result;
         }
 
-        // --- SECURED: Generate Code Handler ---
         generateBtn.addEventListener('click', async () => {
             generateBtn.disabled = true;
             generateBtn.innerText = "Verifying...";
             messageArea.innerText = "";
-            messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
+            messageArea.className = "message-area mt-4 text-center text-sm text-white";
 
             try {
-                // Use robust check again just in case
                 await ensureUserDocument(auth.currentUser);
 
-                // Proceed with generation
                 generateBtn.innerText = "Generating...";
                 
                 const q = query(collection(db, "access_codes"), where("ownerUid", "==", auth.currentUser.uid));
@@ -720,4 +747,3 @@
     </script>
 </body>
 </html>
-<!-- Made with ❤️ from 4SP -->
