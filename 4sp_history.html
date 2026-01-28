@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>4SP - ARCHIVED HISTORY</title>
+    
+    <meta name="title" content="4SP History - Project Documentation">
+    <meta name="description" content="The comprehensive history of 4simpleproblems (4SP). A deep dive into the evolution, technical challenges, and growth of the platform.">
+    <meta name="author" content="4SP Organization">
+    <meta name="theme-color" content="#000000">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://4sp-organization.github.io/4sp_history.html">
+    <meta property="og:title" content="The Comprehensive History of 4SP">
+    <meta property="og:description" content="Documenting the rise from a soundboard to a decentralized toolkit.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --geist-foreground: 255, 255, 255;
+            --geist-background: 0, 0, 0;
+            --active-glow: #a855f7; /* Default Purple */
+        }
+        .dark { color-scheme: dark; }
+        body { font-family: 'Geist', sans-serif; }
+        
+        /* Gradient Text Animation */
+        .gradient-text {
+            background-image: linear-gradient(90deg, #0070f3, #f81ce5, #0070f3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 300% auto;
+            animation: shine 8s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 300% center; }
+        }
+
+        /* Dynamic Background */
+        #dynamic-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, var(--active-glow) 0%, #000000 100%);
+            opacity: 0.15;
+            z-index: -10;
+            pointer-events: none;
+            transition: background 1s ease, opacity 0.5s ease;
+        }
+
+        /* Accordion Container */
+        .accordion-item {
+            border: 1px solid #1f2937;
+            background-color: #000000;
+            margin-bottom: 1.5rem;
+            border-radius: 40px;
+            overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .accordion-item.active {
+            border-color: var(--active-glow);
+            box-shadow: 0 0 30px -10px var(--active-glow);
+        }
+
+        /* Accordion Header */
+        .accordion-header {
+            width: 100%;
+            padding: 2rem;
+            text-align: left;
+            background: transparent;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 300;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .accordion-header i {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1rem;
+            opacity: 0.5;
+        }
+
+        .accordion-item.active .accordion-header i {
+            transform: rotate(180deg);
+            opacity: 1;
+            color: var(--active-glow);
+        }
+
+        /* Accordion Content */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 2rem;
+            opacity: 0;
+            transform: translateY(10px);
+            /* Matched duration to JS timeout (0.6s) */
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 2000px; /* Arbitrary large height */
+            padding-bottom: 2rem;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Source Tag Styles */
+        .source-tag {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.75rem;
+            color: #4b5563; 
+            vertical-align: super;
+            margin-left: 2px;
+            cursor: default;
+            transition: all 0.3s ease;
+        }
+        
+        .source-tag.highlighted {
+            color: #a855f7; 
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+            animation: pulse-purple 2s infinite;
+        }
+
+        @keyframes pulse-purple {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* Custom List Styling */
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .location-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #333;
+            padding: 1rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        
+        .location-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #555;
+            transform: translateY(-2px);
+        }
+
+        .location-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Button Styles */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
+            color: #9ca3af;
+            border: 1px solid #374151;
+            border-radius: 16px; 
+            text-decoration: none;
+            transition: all 0.2s ease;
+            background: rgba(0,0,0,0.5);
+        }
+        .btn-back:hover {
+            color: white;
+            border-color: #6b7280;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* Typography */
+        h3 { margin-top: 1.5rem; margin-bottom: 0.75rem; color: #fff; font-size: 1.25rem; font-weight: 400; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #9ca3af; font-weight: 300; }
+        
+        /* List Styling */
+        ul.custom-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul.custom-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #9ca3af;
+        }
+        ul.custom-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.6rem;
+            width: 6px;
+            height: 6px;
+            background-color: #4b5563;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen relative">
+    
+    <div id="dynamic-background"></div>
+
+    <main>
+        <section class="text-center relative overflow-hidden" style="padding-top: 4rem; padding-bottom: 2rem;">
+            <div class="mx-auto max-w-4xl px-4">
+                <div class="mb-8">
+                    <a href="index.html" class="btn-back">
+                        <i class="fas fa-arrow-left mr-2"></i> Return to Home
+                    </a>
+                </div>
+                
+                <h1 class="text-4xl sm:text-6xl font-light tracking-tighter mb-4 leading-tight">
+                    <span class="gradient-text font-bold">The Archives.</span>
+                </h1>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
+                    The Comprehensive History of 4simpleproblems (4SP): <br>
+                    <span class="text-purple-400">Technical Documentation & Logs.</span>
+                </p>
+                <div class="mt-4 text-xs text-gray-600 font-mono">
+                    LAST UPDATED: JAN 26, 2026
+                </div>
+            </div>
+        </section>
+
+        <section class="py-8 mx-auto max-w-4xl px-4" id="history-content">
+            
+            <div class="accordion-item active" data-color="#a855f7">
+                <button class="accordion-header">
+                    <span>Introduction</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="accordion-content">
+                    <p><span id="source-1" class="source-tag"></span> This document serves as the technical history of 4simpleproblems (4SP).</p>
+                    <p><span id="source-2" class="source-tag"></span> It chronicles the development of the project born from adolescent ingenuity and the need for digital access.</p>
+                    <p><span id="source-3" class="source-tag"></span> It details the evolution of the platform from a basic soundboard into a sophisticated, decentralized ecosystem serving hundreds of users globally.</p>
+                    <p><span id="source-4" class="source-tag"></span> This documentation explores every iteration of 4SP—from V1 to V5 MAX and the Downloadable Version (DV).</p>
+                    <p><span id="source-5" class="source-tag"></span> Included are analyses of technical strategies, network restriction countermeasures, and development milestones.</p>
+                    <p><span id="source-8" class="source-tag"></span> Information herein is derived from project files, git commit histories, and internal logs to provide a comprehensive account.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-color="#3b82f6">
+                <button class="accordion-header">
+                    <span>Chapter 1: The Genesis (V1 - V4)</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="accordion-content">
+                    <p><span id="source-11" class="source-tag"></span> The early versions of 4SP established the project's foundational identity.</p>
+                    
+                    <h3>V1: The First Shot (March 2025)</h3>
+                    <p><span id="source-13" class="source-tag"></span> V1 was a simple soundboard designed to provide entertainment within a filtered network environment.</p>
+                    <p><span id="source-14" class="source-tag"></span> Its simplicity allowed it to remain engaging and shareable without immediately triggering network security alarms.</p>
+
+                    <h3>V2: Expansion (April 2025)</h3>
+                    <p><span id="source-18" class="source-tag"></span> This update significantly expanded the platform to include browser-based games and a web proxy.</p>
+                    <p><span id="source-22" class="source-tag"></span> V2 introduced "jumbled iframes" as an obfuscation technique.</p>
+                    <p><span id="source-24" class="source-tag"></span> By nesting content within complex iframe structures, V2 made it difficult for crawlers to categorize the page content.</p>
+
+                    <h3>V3: Strategic Redesign (May 2025)</h3>
+                    <p><span id="source-27" class="source-tag"></span> V3 was a complete redesign, prioritizing user experience (UX) over raw functionality.</p>
+                    <p><span id="source-28" class="source-tag"></span> The chaotic layout of V2 was replaced with a polished, professional interface.</p>
+
+                    <h3>V4: The Dashboard (August 2025)</h3>
+                    <p><span id="source-33" class="source-tag"></span> V4 featured a library of over 1,000 games, functioning as a comprehensive digital arcade.</p>
+                    <p><span id="source-36" class="source-tag"></span> On October 10th, 2025, V4 was blocked. This event, known as the first "great block," catalyzed a radical architectural transformation towards decentralization.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-color="#22c55e">
+                <button class="accordion-header">
+                    <span>Chapter 2: The Rise of V5</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="accordion-content">
+                    <p>The blocking of V4 necessitated a new approach found in V5.</p>
+
+                    <h3>V5: The Rebuild (December 2025)</h3>
+                    <p><span id="source-47" class="source-tag"></span> It was a complete rewrite of the codebase, utilizing a modern tech stack on GitHub Pages.</p>
+                    <p><span id="source-49" class="source-tag"></span> A robust authentication system was implemented, enabling user accounts and data persistence.</p>
+                    <p><span id="source-52" class="source-tag"></span> However, on December 16, 2025, V5 was also blocked.</p>
+
+                    <h3>V5 DV & MAX: Local Execution (January 2026)</h3>
+                    <p><span id="source-54" class="source-tag"></span> The Downloadable Version (DV) implemented the decentralized concept; by running locally, the central point of failure was removed.</p>
+                    <p><span id="source-60" class="source-tag"></span> The `4sp-max` file structure includes modules for user administration (`ban-enforcer.js`) and client-side manipulation.</p>
+                    <p><span id="source-63" class="source-tag"></span> This strategy resulted in a significant increase in the user base, growing to over 360 active users.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-color="#f59e0b">
+                <button class="accordion-header">
+                    <span>Chapter 3: Legacy & Development</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="accordion-content">
+                    <p><span id="source-66" class="source-tag"></span> The 4SP project represents a significant technical achievement, tracking growth in technical skill and strategic planning.</p>
+                    <p><span id="source-70" class="source-tag"></span> The strategy of using local files and official repositories (npm) constituted effective "shadow IT," building an immune infrastructure.</p>
+                    <p><span id="source-74" class="source-tag"></span> The project timeline reflects the work of a student managing real-world pressures while maintaining a complex system.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-color="#ef4444">
+                <button class="accordion-header">
+                    <span>Chapter 4: Data Analysis</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="accordion-content">
+                    <p><span id="source-77" class="source-tag"></span> User growth and origin analysis demonstrate the project's global reach, expanding far beyond its local origins.</p>
+                    
+                    <h3>Growth Metrics</h3>
+                    <p><span id="source-81" class="source-tag"></span> A massive influx of users occurred between December 3rd and 5th following the V5 launch.</p>
+                    <p><span id="source-85" class="source-tag"></span> Despite blocks, the user base remained stable, indicating high retention.</p>
+                    <p><span id="source-89" class="source-tag"></span> The unblockable nature of the DV decoupled growth from website uptime.</p>
+
+                    <h3>Geographic Distribution (Generalized)</h3>
+                    <p><span id="source-92" class="source-tag"></span> While the project originated in Northeast Ohio, data reveals a widespread network of users.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                        <div>
+                            <h4 class="text-white font-normal mb-3 border-b border-gray-800 pb-2">Countries</h4>
+                            <ul class="custom-list">
+                                <li>Spain</li>
+                                <li>United Kingdom</li>
+                                <li>United States</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-normal mb-3 border-b border-gray-800 pb-2">U.S. States</h4>
+                            <ul class="custom-list grid grid-cols-2 gap-x-4">
+                                <li>Arizona</li>
+                                <li>Florida</li>
+                                <li>Illinois</li>
+                                <li>Kentucky</li>
+                                <li>Louisiana</li>
+                                <li>Minnesota</li>
+                                <li>Ohio</li>
+                                <li>Rhode Island</li>
+                                <li>Texas</li>
+                                <li>Virginia</li>
+                                <li>Washington</li>
+                                <li>Wisconsin</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <p class="mt-6 text-xs text-gray-500"><span id="source-120" class="source-tag"></span> Plus a significant number of unverified users via generic email providers.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-color="#8b5cf6">
+                <button class="accordion-header">
+                    <span>Conclusion</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="accordion-content">
+                    <p><span id="source-122" class="source-tag"></span> 4SP demonstrates the ability of independent development to challenge established restrictions.</p>
+                    <p><span id="source-124" class="source-tag"></span> Data confirms the project was not only successful but dominant in its niche.</p>
+                    <p><span id="source-126" class="source-tag"></span> The legacy lies in the established code base, the community built, and the preservation of digital access.</p>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="py-8 mx-auto max-w-4xl px-4 text-center border-t border-gray-900 mt-12">
+            <h4 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Privacy & Data Transparency</h4>
+            <p class="text-xs text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                <strong>4SP does not track your real-time location.</strong> The geographic data mentioned in this history is derived solely from anonymized, aggregate historical data provided by 
+                <a href="https://policies.google.com/technologies/partner-sites" target="_blank" class="text-blue-500 hover:underline">Google Analytics</a>. 
+                We respect your privacy and do not store IP addresses or personal location data on our servers.
+                For more details, please review our <a href="legal.html#privacy-policy" class="text-blue-500 hover:underline">Privacy Policy</a>.
+            </p>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-gray-900 py-6 bg-black">
+        <div class="mx-auto max-w-7xl px-4 text-center text-gray-500 text-sm">
+            &copy; 2026 4SP Organization.
+            <span class="mx-2">|</span>
+            <a href="legal.html" class="hover:underline">Terms</a>
+            <span class="mx-2">|</span>
+            <a href="legal.html" class="hover:underline">Privacy</a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const items = document.querySelectorAll('.accordion-item');
+            const bgLayer = document.getElementById('dynamic-background');
+            const root = document.documentElement;
+
+            function updateBackground(color) {
+                root.style.setProperty('--active-glow', color);
+            }
+
+            items.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                
+                header.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    
+                    // Close all others
+                    items.forEach(i => i.classList.remove('active'));
+
+                    if (!isActive) {
+                        item.classList.add('active');
+                        
+                        // Update background color based on data attribute
+                        const color = item.getAttribute('data-color');
+                        if (color) updateBackground(color);
+
+                        // Smooth scroll to this item
+                        // Waits 600ms (duration of transition) before trying to center the fully opened item
+                        setTimeout(() => {
+                            item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 600);
+                    } else {
+                        // Reset to default purple if closing the active one
+                        updateBackground('#a855f7');
+                    }
+                });
+            });
+
+            // Citation Logic
+            const urlParams = new URLSearchParams(window.location.search);
+            const startParam = parseInt(urlParams.get('start'));
+            const endParam = parseInt(urlParams.get('end'));
+
+            if (!isNaN(startParam)) {
+                // Find which accordion contains the source and open it
+                const startElement = document.getElementById(`source-${startParam}`);
+                if (startElement) {
+                    const parentAccordion = startElement.closest('.accordion-item');
+                    if (parentAccordion) {
+                        // Close others and open this one
+                        items.forEach(i => i.classList.remove('active'));
+                        parentAccordion.classList.add('active');
+                        const color = parentAccordion.getAttribute('data-color');
+                        if (color) updateBackground(color);
+                    }
+
+                    // Highlight range
+                    const end = (!isNaN(endParam) && endParam >= startParam) ? endParam : startParam;
+                    for (let i = startParam; i <= end; i++) {
+                        const el = document.getElementById(`source-${i}`);
+                        if (el) el.classList.add('highlighted');
+                    }
+
+                    // Scroll
+                    setTimeout(() => {
+                        startElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 600);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
