@@ -131,24 +131,17 @@
             transition: all 0.3s ease;
         }
         
-        /* Highlighted State - Colors set dynamically by JS */
+        /* Highlighted State */
         .source-tag.highlighted {
             font-weight: bold;
-            animation: pulse-glow 2s infinite;
+            /* Animation optional, kept subtle */
         }
 
-        /* Highlighted Paragraph Container */
+        /* Highlighted Paragraph Container - TIGHT FIT, NO PADDING */
         p.highlighted-text-block {
-            background-color: rgba(255, 255, 255, 0.03); /* Fallback */
-            border-radius: 8px;
-            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.03); /* Fake padding without layout shift */
+            border-radius: 4px; /* Minimal radius */
             transition: background-color 0.3s ease;
-        }
-
-        @keyframes pulse-glow {
-            0% { opacity: 1; text-shadow: 0 0 5px currentColor; }
-            50% { opacity: 0.7; text-shadow: 0 0 2px currentColor; }
-            100% { opacity: 1; text-shadow: 0 0 5px currentColor; }
+            /* Box shadow removed to prevent overlap */
         }
 
         /* Custom List Styling */
@@ -490,23 +483,20 @@
                     const end = (!isNaN(endParam) && endParam >= startParam) ? endParam : startParam;
                     
                     // Convert Hex to RGBA for background
-                    // Simple helper since we know the colors are hex
                     const parentColor = parentAccordion ? parentAccordion.getAttribute('data-color') : '#a855f7';
                     
                     for (let i = startParam; i <= end; i++) {
                         const el = document.getElementById(`source-${i}`);
                         if (el) {
                             el.classList.add('highlighted');
-                            el.style.color = parentColor; // Apply exact container color to text
+                            el.style.color = parentColor; // Apply exact container color to source tag text
                             
-                            // Highlight the parent paragraph
+                            // Highlight the parent paragraph with a solid translucent color
                             const parentP = el.closest('p');
                             if (parentP) {
                                 parentP.classList.add('highlighted-text-block');
-                                // Use a tiny opacity of the container color for background
-                                // Note: For simplicity in vanilla JS without hex-to-rgba func, we use opacity in CSS or inline style
-                                parentP.style.backgroundColor = parentColor + '10'; // Hex alpha (approx 6%)
-                                parentP.style.boxShadow = `0 0 0 4px ${parentColor}10`;
+                                // Use a low opacity of the container color for background
+                                parentP.style.backgroundColor = parentColor + '20'; // ~12% opacity
                             }
                         }
                     }
