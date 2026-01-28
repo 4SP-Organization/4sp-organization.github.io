@@ -110,7 +110,6 @@
             padding: 0 2rem;
             opacity: 0;
             transform: translateY(10px);
-            /* Matched duration to JS timeout (0.6s) */
             transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease, transform 0.6s ease;
         }
 
@@ -132,17 +131,24 @@
             transition: all 0.3s ease;
         }
         
+        /* Highlighted State - Colors set dynamically by JS */
         .source-tag.highlighted {
-            color: #a855f7; 
             font-weight: bold;
-            text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
-            animation: pulse-purple 2s infinite;
+            animation: pulse-glow 2s infinite;
         }
 
-        @keyframes pulse-purple {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
+        /* Highlighted Paragraph Container */
+        p.highlighted-text-block {
+            background-color: rgba(255, 255, 255, 0.03); /* Fallback */
+            border-radius: 8px;
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.03); /* Fake padding without layout shift */
+            transition: background-color 0.3s ease;
+        }
+
+        @keyframes pulse-glow {
+            0% { opacity: 1; text-shadow: 0 0 5px currentColor; }
+            50% { opacity: 0.7; text-shadow: 0 0 2px currentColor; }
+            100% { opacity: 1; text-shadow: 0 0 5px currentColor; }
         }
 
         /* Custom List Styling */
@@ -425,63 +431,85 @@
                 root.style.setProperty('--active-glow', color);
             }
 
+            // Function to handle accordion clicks
+            function toggleAccordion(item) {
+                const isActive = item.classList.contains('active');
+                
+                // Close all others
+                items.forEach(i => i.classList.remove('active'));
+
+                if (!isActive) {
+                    item.classList.add('active');
+                    
+                    // Update background color based on data attribute
+                    const color = item.getAttribute('data-color');
+                    if (color) updateBackground(color);
+
+                    // Smooth scroll to this item after transition
+                    setTimeout(() => {
+                        item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 600);
+                } else {
+                    // Reset to default purple if closing the active one
+                    updateBackground('#a855f7');
+                }
+            }
+
+            // Attach event listeners
             items.forEach(item => {
                 const header = item.querySelector('.accordion-header');
-                
-                header.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    
-                    // Close all others
-                    items.forEach(i => i.classList.remove('active'));
-
-                    if (!isActive) {
-                        item.classList.add('active');
-                        
-                        // Update background color based on data attribute
-                        const color = item.getAttribute('data-color');
-                        if (color) updateBackground(color);
-
-                        // Smooth scroll to this item
-                        // Waits 600ms (duration of transition) before trying to center the fully opened item
-                        setTimeout(() => {
-                            item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }, 600);
-                    } else {
-                        // Reset to default purple if closing the active one
-                        updateBackground('#a855f7');
-                    }
-                });
+                header.addEventListener('click', () => toggleAccordion(item));
             });
 
-            // Citation Logic
+            // Handle URL Parameters for Deep Linking
             const urlParams = new URLSearchParams(window.location.search);
             const startParam = parseInt(urlParams.get('start'));
             const endParam = parseInt(urlParams.get('end'));
 
             if (!isNaN(startParam)) {
-                // Find which accordion contains the source and open it
+                // Find which accordion contains the source
                 const startElement = document.getElementById(`source-${startParam}`);
                 if (startElement) {
                     const parentAccordion = startElement.closest('.accordion-item');
                     if (parentAccordion) {
-                        // Close others and open this one
+                        // Dynamically open the accordion and apply colors
                         items.forEach(i => i.classList.remove('active'));
                         parentAccordion.classList.add('active');
-                        const color = parentAccordion.getAttribute('data-color');
-                        if (color) updateBackground(color);
+                        
+                        // Apply the container color to CSS variable
+                        const containerColor = parentAccordion.getAttribute('data-color');
+                        if (containerColor) updateBackground(containerColor);
+
+                        // Scroll logic
+                        setTimeout(() => {
+                            parentAccordion.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 600);
                     }
 
-                    // Highlight range
+                    // Highlight the specific range
                     const end = (!isNaN(endParam) && endParam >= startParam) ? endParam : startParam;
+                    
+                    // Convert Hex to RGBA for background
+                    // Simple helper since we know the colors are hex
+                    const parentColor = parentAccordion ? parentAccordion.getAttribute('data-color') : '#a855f7';
+                    
                     for (let i = startParam; i <= end; i++) {
                         const el = document.getElementById(`source-${i}`);
-                        if (el) el.classList.add('highlighted');
+                        if (el) {
+                            el.classList.add('highlighted');
+                            el.style.color = parentColor; // Apply exact container color to text
+                            
+                            // Highlight the parent paragraph
+                            const parentP = el.closest('p');
+                            if (parentP) {
+                                parentP.classList.add('highlighted-text-block');
+                                // Use a tiny opacity of the container color for background
+                                // Note: For simplicity in vanilla JS without hex-to-rgba func, we use opacity in CSS or inline style
+                                parentP.style.backgroundColor = parentColor + '10'; // Hex alpha (approx 6%)
+                                parentP.style.boxShadow = `0 0 0 4px ${parentColor}10`;
+                            }
+                        }
                     }
-
-                    // Scroll
-                    setTimeout(() => {
-                        startElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 600);
                 }
             }
         });
