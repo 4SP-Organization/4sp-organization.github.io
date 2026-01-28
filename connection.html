@@ -514,14 +514,16 @@
                 const redirectTarget = urlParams.get('redirect') || (window.location.hash ? window.location.hash.substring(1) : null);
 
                 if (redirectTarget) {
-                     if (/^[a-zA-Z0-9_\-\.\/]+$/.test(redirectTarget) && !redirectTarget.startsWith('http')) {
-                         window.location.href = redirectTarget;
-                         return;
-                     }
+                      if (/^[a-zA-Z0-9_\-\.\/]+$/.test(redirectTarget) && !redirectTarget.startsWith('http')) {
+                          window.location.href = redirectTarget;
+                          return;
+                      }
                 }
 
+                // Explicitly hide non-auth containers
                 [unauthLoginContainer, resetPasswordContainer, signupContainer, unauthSocialContainer].forEach(el => {
                     el.classList.add('hidden');
+                    el.style.display = 'none'; // Force hide
                 });
                 
                 authCodeContainer.classList.remove('hidden');
@@ -545,9 +547,10 @@
             } else {
                 switchView('login');
                 unauthSocialContainer.classList.remove('hidden'); 
-                unauthSocialContainer.style.display = 'flex'; 
+                unauthSocialContainer.style.display = 'flex'; // Restore flex
                 
                 authCodeContainer.classList.add('hidden');
+                authCodeContainer.style.display = 'none'; 
                 authInfoContainer.classList.add('hidden');
                 authInfoContainer.style.display = 'none';
                 
