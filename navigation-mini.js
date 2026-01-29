@@ -197,6 +197,16 @@ let db;
                 transform: translateY(-2px) scale(1.02);
             }
 
+            .auth-menu-link-admin {
+                background-color: rgba(59, 130, 246, 0.1) !important;
+                border: 1px solid rgba(96, 165, 250, 0.5) !important;
+                color: white !important;
+            }
+            .auth-menu-link-admin:hover {
+                background-color: rgba(96, 165, 250, 0.2) !important;
+                border-color: rgba(96, 165, 250, 1) !important;
+            }
+
             .logged-out-auth-toggle { 
                 background: #010101; border: 1px solid #374151; 
                 border-radius: 14px; 
@@ -311,7 +321,7 @@ let db;
                     }
                 }
                 
-                const adminButton = currentIsPrivileged ? '<a href="https://4sp-max.giize.com/logged-in/analytics.html" class="auth-menu-link" style="background-color: #3b82f6; color: white;"><i class="fa-solid fa-star w-4"></i>4SP MAX</a>' : '';
+                const adminButton = currentIsPrivileged ? '<a href="https://4sp-max.giize.com/logged-in/analytics.html" class="auth-menu-link auth-menu-link-admin"><i class="fa-solid fa-star w-4"></i>4SP MAX</a>' : '';
 
                 return `
                     <div id="auth-button-container" class="relative flex-shrink-0 flex items-center">
@@ -502,3 +512,4 @@ let db;
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
     else run();
 })();
+// Made with ❤️ from 4SP

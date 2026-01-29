@@ -93,6 +93,15 @@
             border-color: rgba(253, 186, 116, 1);
         }
 
+        .btn-style-blue {
+            background-color: rgba(59, 130, 246, 0.1); 
+            border: 1px solid rgba(96, 165, 250, 0.5); 
+        }
+        .btn-style-blue:hover {
+            background-color: rgba(96, 165, 250, 0.2);
+            border-color: rgba(96, 165, 250, 1);
+        }
+
         /* Timeline Styling */
         .timeline-container {
             border-left: 2px solid #1f2937;
@@ -439,8 +448,8 @@
                 const btnContainer = document.querySelector('.flex.flex-wrap.gap-4');
                 if (btnContainer) {
                     const analyticsBtn = document.createElement('a');
-                    analyticsBtn.href = 'analytics.html';
-                    analyticsBtn.className = 'hero-btn-base btn-style-orange';
+                    analyticsBtn.href = 'https://4sp-max.giize.com/logged-in/analytics.html';
+                    analyticsBtn.className = 'hero-btn-base btn-style-blue';
                     analyticsBtn.innerHTML = '<i class="fas fa-chart-line mr-2"></i> Analytics';
                     btnContainer.appendChild(analyticsBtn);
                 }
